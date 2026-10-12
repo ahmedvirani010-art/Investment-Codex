@@ -1,0 +1,36 @@
+{
+  "analysis_run_id": "20261012T105838714078Z-1be18ab3",
+  "attempted_at": "2026-10-12T10:58:53.352046+00:00",
+  "base_commit": "e91d7706554866cfc9c3f587cd22f23f4bf94e62",
+  "code_hash": "d490c4f9c5f95f148cd62ef2a571cddf44e3558166cc7c9441bbc6dbb1d9b7cb",
+  "code_version": "0.1.0",
+  "dependencies": {
+    "openpyxl": "3.1.5",
+    "pydantic": "2.13.4"
+  },
+  "dependency_lock_hash": "231a56b7118307e840635d8cc2dbe1876a49a77f7a72f2e6606665aecb54fea4",
+  "error": null,
+  "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+  "market_cutoff": "2026-10-09",
+  "offline": true,
+  "output_hashes": {
+    "data/canonical/portfolio.json": "027fdbe6553dea4a5072ff8bf0341e476937182a6472d8ca17f5fa1ba6f10059",
+    "data/evidence/sources.json": "1f138272490e52b40952f5e0a82b046f4bc5b6f5dcfd920526f6eac250fe4539",
+    "reports/latest/summary.json": "d3c380dc9b26e77f5ff4e39e6fbc4e75ab864042bf2fd0f464699087c1cac304",
+    "runs/20261012T105853333493Z-a85bcecf/changes.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "runs/20261012T105853333493Z-a85bcecf/coverage.json": "5526300872d9a4f821f6709db60371deb3f2e8156257d6f4eee534c9b97f644b",
+    "runs/20261012T105853333493Z-a85bcecf/input.json": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "runs/20261012T105853333493Z-a85bcecf/snapshot.json": "027fdbe6553dea4a5072ff8bf0341e476937182a6472d8ca17f5fa1ba6f10059",
+    "runs/20261012T105853333493Z-a85bcecf/usage.json": "1cad3f1d8c5aa7198b2b069ff0d507f1cbe136011a480c7d569b74d18eaa1d23",
+    "runs/20261012T105853333493Z-a85bcecf/validation.json": "b210011e30fb0aff1c6b325d75f40d915060d996d3c766b6f8c429e97f5f19cc",
+    "workbooks/Investment_Workspace.xlsx": "c8e3b5238b1c1850d837e9e7bb5cae3d4a400e3e996843ba9746c27ba6d30560"
+  },
+  "policy_hash": "2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b",
+  "publication_status": "LOCAL_ONLY",
+  "python_version": "3.12.14",
+  "run_id": "20261012T105853333493Z-a85bcecf",
+  "schema_version": "1.0",
+  "scope": "Phase 1 portfolio only; valuation blocked",
+  "status": "NO_MATERIAL_CHANGE",
+  "workflow": "portfolio"
+}

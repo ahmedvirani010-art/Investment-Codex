@@ -21,7 +21,7 @@
       }
     }
   ],
-  "attempt_status": "SUCCESS",
+  "attempt_status": "NO_MATERIAL_CHANGE",
   "changes": [
     {
       "field": "quantity",
@@ -542,7 +542,7 @@
     }
   ],
   "notes": [],
-  "published_run_id": "20261012T105838714078Z-1be18ab3",
+  "published_run_id": "20261012T105853333493Z-a85bcecf",
   "reconciliation": [],
   "run_log": [
     {
@@ -555,6 +555,17 @@
       "run_id": "20261012T105838714078Z-1be18ab3",
       "status": "SUCCESS",
       "workflow": "init-demo"
+    },
+    {
+      "analysis_run_id": "20261012T105838714078Z-1be18ab3",
+      "attempted_at": "2026-10-12T10:58:53.352046+00:00",
+      "error": null,
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff": "2026-10-09",
+      "publication_status": "LOCAL_ONLY",
+      "run_id": "20261012T105853333493Z-a85bcecf",
+      "status": "NO_MATERIAL_CHANGE",
+      "workflow": "portfolio"
     }
   ],
   "schema_version": "1.0",
@@ -857,6 +868,17 @@
       "output_tokens": null,
       "reasoning_tokens": null,
       "run_id": "20261012T105838714078Z-1be18ab3",
+      "runtime_seconds": null,
+      "telemetry": "AI telemetry unknown; total wall time recorded externally after commit"
+    },
+    {
+      "cached_input_tokens": null,
+      "calculation_runtime_seconds": 0.018608,
+      "cost": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "reasoning_tokens": null,
+      "run_id": "20261012T105853333493Z-a85bcecf",
       "runtime_seconds": null,
       "telemetry": "AI telemetry unknown; total wall time recorded externally after commit"
     }
