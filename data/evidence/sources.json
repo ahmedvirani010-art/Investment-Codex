@@ -1,0 +1,56 @@
+[
+  {
+    "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+    "effective_date": "2026-10-08",
+    "evidence_label": "ASSUMPTION",
+    "fact_hash": "9f7272a24e85877f29c7222088166a4118c4a3b9df9cabc472924e3fe318ec26",
+    "locator": "fixtures/demo.json#/opening",
+    "publisher": "test fixture",
+    "source_id": "demo.opening.v1",
+    "title": "SYNTHETIC opening balances"
+  },
+  {
+    "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+    "effective_date": "2026-10-09",
+    "evidence_label": "ASSUMPTION",
+    "fact_hash": "dcfc56993c1908cc67699a96615ce1dc790be3687a3fa868a728c43b08fbf898",
+    "locator": "fixtures/demo.json#/transactions",
+    "publisher": "test fixture",
+    "source_id": "demo.ledger.v1",
+    "title": "SYNTHETIC settled ledger"
+  },
+  {
+    "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+    "effective_date": "2026-10-09",
+    "evidence_label": "ASSUMPTION",
+    "fact_hash": "948754cc02565c9a3ae080a86ee67e451aa505f986413084c03ed5f458748550",
+    "locator": "fixtures/demo.json#/closing",
+    "publisher": "test fixture",
+    "source_id": "demo.closing.v1",
+    "title": "SYNTHETIC closing balances"
+  },
+  {
+    "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+    "effective_date": "2026-10-09",
+    "evidence_label": "ASSUMPTION",
+    "fact_hash": "e1fbabeb97d82a9b1d532996813d0c644982dcdf66577074f1c3c77443b988ed",
+    "locator": "fixtures/demo.json#/prices",
+    "publisher": "test fixture",
+    "source_id": "demo.prices.v1",
+    "title": "SYNTHETIC current-share prices"
+  },
+  {
+    "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+    "effective_date": "2026-10-09",
+    "evidence_label": "ASSUMPTION",
+    "locator": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+    "publisher": "offline fixture",
+    "source_id": "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "title": "Immutable imported bundle"
+  }
+]

@@ -1,0 +1,37 @@
+{
+  "analysis_run_id": "20261012T105838714078Z-1be18ab3",
+  "attempted_at": "2026-10-12T10:58:38.726657+00:00",
+  "base_commit": "af4c7605038e94a0dda80189d4c9a4d82c04c590",
+  "code_hash": "d490c4f9c5f95f148cd62ef2a571cddf44e3558166cc7c9441bbc6dbb1d9b7cb",
+  "code_version": "0.1.0",
+  "dependencies": {
+    "openpyxl": "3.1.5",
+    "pydantic": "2.13.4"
+  },
+  "dependency_lock_hash": "231a56b7118307e840635d8cc2dbe1876a49a77f7a72f2e6606665aecb54fea4",
+  "error": null,
+  "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+  "market_cutoff": "2026-10-09",
+  "offline": true,
+  "output_hashes": {
+    "data/canonical/portfolio.json": "59f52f40471b9871a7176f3e68cf790de58c614d06a6e142aa9f8d9a1fbdddd7",
+    "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "data/evidence/sources.json": "1f138272490e52b40952f5e0a82b046f4bc5b6f5dcfd920526f6eac250fe4539",
+    "reports/latest/summary.json": "4e08867832df76ed5b5e70f139b51b80cfed92fd3db30f8c14fa3829214e65fc",
+    "runs/20261012T105838714078Z-1be18ab3/changes.json": "965d91bfc080802c80a8e30952bb4a808e5354e6c1f94e68d4c1af00ba5a55e4",
+    "runs/20261012T105838714078Z-1be18ab3/coverage.json": "5526300872d9a4f821f6709db60371deb3f2e8156257d6f4eee534c9b97f644b",
+    "runs/20261012T105838714078Z-1be18ab3/input.json": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "runs/20261012T105838714078Z-1be18ab3/snapshot.json": "59f52f40471b9871a7176f3e68cf790de58c614d06a6e142aa9f8d9a1fbdddd7",
+    "runs/20261012T105838714078Z-1be18ab3/usage.json": "3329e730dc8e2d7779871da79b80fc3646998bfef30ef503148d41cfbabb3890",
+    "runs/20261012T105838714078Z-1be18ab3/validation.json": "117726c27ba63ace1724ea89bd564465930c8f6ddde4e710e201086f47beeedf",
+    "workbooks/Investment_Workspace.xlsx": "1edf3e431318d3cb2ca1785230ccb1fc6b5a9166e3afa09eb6991f6b00247159"
+  },
+  "policy_hash": "2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b",
+  "publication_status": "LOCAL_ONLY",
+  "python_version": "3.12.14",
+  "run_id": "20261012T105838714078Z-1be18ab3",
+  "schema_version": "1.0",
+  "scope": "Phase 1 portfolio only; valuation blocked",
+  "status": "SUCCESS",
+  "workflow": "init-demo"
+}

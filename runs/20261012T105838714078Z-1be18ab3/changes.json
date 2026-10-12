@@ -1,0 +1,222 @@
+[
+  {
+    "field": "quantity",
+    "new": "80",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-BANK"
+  },
+  {
+    "field": "cost",
+    "new": "8000.00",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-BANK"
+  },
+  {
+    "field": "price",
+    "new": "125",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-BANK"
+  },
+  {
+    "field": "market_value",
+    "new": "10000",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-BANK"
+  },
+  {
+    "field": "quantity",
+    "new": "50",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-ENERGY"
+  },
+  {
+    "field": "cost",
+    "new": "5050.00",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-ENERGY"
+  },
+  {
+    "field": "price",
+    "new": "110",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-ENERGY"
+  },
+  {
+    "field": "market_value",
+    "new": "5500",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-ENERGY"
+  },
+  {
+    "field": "quantity",
+    "new": "40",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-INDUSTRIAL"
+  },
+  {
+    "field": "cost",
+    "new": "4000.00",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-INDUSTRIAL"
+  },
+  {
+    "field": "price",
+    "new": "105",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-INDUSTRIAL"
+  },
+  {
+    "field": "market_value",
+    "new": "4200",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-INDUSTRIAL"
+  },
+  {
+    "field": "quantity",
+    "new": "10",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-LOSS"
+  },
+  {
+    "field": "cost",
+    "new": "1000.00",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-LOSS"
+  },
+  {
+    "field": "price",
+    "new": "75",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-LOSS"
+  },
+  {
+    "field": "market_value",
+    "new": "750",
+    "previous": null,
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-LOSS"
+  }
+]

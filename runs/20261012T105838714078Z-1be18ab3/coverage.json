@@ -1,0 +1,110 @@
+[
+  {
+    "assumption_ids": [
+      "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+    ],
+    "code_version": "0.1.0",
+    "confidence": "SYNTHETIC",
+    "effective_date": "2026-10-09",
+    "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "market_cutoff_metadata": "2026-10-09",
+    "outcome": "BLOCKED_MODEL",
+    "owner": "valuation",
+    "reason": "Phase 2 adapter and verified inputs not supplied",
+    "record_id": "coverage.0",
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "schema_version": "1.0",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-BANK",
+    "units": "PKR / shares / fraction as named",
+    "upstream_run_ids": [],
+    "validation_status": "VALIDATED"
+  },
+  {
+    "assumption_ids": [
+      "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+    ],
+    "code_version": "0.1.0",
+    "confidence": "SYNTHETIC",
+    "effective_date": "2026-10-09",
+    "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "market_cutoff_metadata": "2026-10-09",
+    "outcome": "BLOCKED_MODEL",
+    "owner": "valuation",
+    "reason": "Phase 2 adapter and verified inputs not supplied",
+    "record_id": "coverage.1",
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "schema_version": "1.0",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-ENERGY",
+    "units": "PKR / shares / fraction as named",
+    "upstream_run_ids": [],
+    "validation_status": "VALIDATED"
+  },
+  {
+    "assumption_ids": [
+      "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+    ],
+    "code_version": "0.1.0",
+    "confidence": "SYNTHETIC",
+    "effective_date": "2026-10-09",
+    "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "market_cutoff_metadata": "2026-10-09",
+    "outcome": "BLOCKED_MODEL",
+    "owner": "valuation",
+    "reason": "Phase 2 adapter and verified inputs not supplied",
+    "record_id": "coverage.2",
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "schema_version": "1.0",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-INDUSTRIAL",
+    "units": "PKR / shares / fraction as named",
+    "upstream_run_ids": [],
+    "validation_status": "VALIDATED"
+  },
+  {
+    "assumption_ids": [
+      "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+    ],
+    "code_version": "0.1.0",
+    "confidence": "SYNTHETIC",
+    "effective_date": "2026-10-09",
+    "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "market_cutoff_metadata": "2026-10-09",
+    "outcome": "BLOCKED_MODEL",
+    "owner": "valuation",
+    "reason": "Phase 2 adapter and verified inputs not supplied",
+    "record_id": "coverage.3",
+    "run_id": "20261012T105838714078Z-1be18ab3",
+    "schema_version": "1.0",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "ticker": "DEMO-LOSS",
+    "units": "PKR / shares / fraction as named",
+    "upstream_run_ids": [],
+    "validation_status": "VALIDATED"
+  }
+]
