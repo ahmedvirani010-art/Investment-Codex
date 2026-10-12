@@ -1,0 +1,521 @@
+{
+  "$defs": {
+    "Policy": {
+      "additionalProperties": false,
+      "properties": {
+        "cash_tolerance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0.01",
+          "title": "Cash Tolerance"
+        },
+        "cost_tolerance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0.01",
+          "title": "Cost Tolerance"
+        },
+        "holdings_max_age_days": {
+          "default": 3,
+          "minimum": 0,
+          "title": "Holdings Max Age Days",
+          "type": "integer"
+        },
+        "max_position_weight": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "maximum": 1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Max Position Weight"
+        },
+        "price_max_age_days": {
+          "default": 3,
+          "minimum": 0,
+          "title": "Price Max Age Days",
+          "type": "integer"
+        },
+        "quantity_tolerance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0.000001",
+          "title": "Quantity Tolerance"
+        }
+      },
+      "title": "Policy",
+      "type": "object"
+    },
+    "Position": {
+      "additionalProperties": false,
+      "properties": {
+        "cost": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Cost"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Quantity"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "quantity",
+        "cost"
+      ],
+      "title": "Position",
+      "type": "object"
+    },
+    "Price": {
+      "additionalProperties": false,
+      "properties": {
+        "adjustment_basis": {
+          "const": "CURRENT_SHARES",
+          "default": "CURRENT_SHARES",
+          "title": "Adjustment Basis",
+          "type": "string"
+        },
+        "close": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Close"
+        },
+        "session_date": {
+          "format": "date",
+          "title": "Session Date",
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "session_date",
+        "close",
+        "source_id"
+      ],
+      "title": "Price",
+      "type": "object"
+    },
+    "Security": {
+      "additionalProperties": false,
+      "properties": {
+        "currency": {
+          "const": "PKR",
+          "default": "PKR",
+          "title": "Currency",
+          "type": "string"
+        },
+        "sector": {
+          "title": "Sector",
+          "type": "string"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ticker",
+        "sector"
+      ],
+      "title": "Security",
+      "type": "object"
+    },
+    "Snapshot": {
+      "additionalProperties": false,
+      "properties": {
+        "cash": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Cash"
+        },
+        "positions": {
+          "items": {
+            "$ref": "#/$defs/Position"
+          },
+          "title": "Positions",
+          "type": "array"
+        },
+        "source_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        }
+      },
+      "required": [
+        "timestamp",
+        "source_id",
+        "cash",
+        "positions"
+      ],
+      "title": "Snapshot",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "evidence_label": {
+          "enum": [
+            "CONFIRMED",
+            "ESTIMATE",
+            "ASSUMPTION",
+            "UNVERIFIED"
+          ],
+          "title": "Evidence Label",
+          "type": "string"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "publisher": {
+          "minLength": 1,
+          "title": "Publisher",
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "title",
+        "publisher",
+        "effective_date",
+        "locator",
+        "evidence_label"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Transaction": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Amount"
+        },
+        "fees": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Fees"
+        },
+        "kind": {
+          "enum": [
+            "BUY",
+            "SELL",
+            "DEPOSIT",
+            "WITHDRAWAL",
+            "DIVIDEND",
+            "SPLIT"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "price": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Price"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Quantity"
+        },
+        "ratio": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ratio"
+        },
+        "settlement_date": {
+          "format": "date",
+          "title": "Settlement Date",
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "taxes": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Taxes"
+        },
+        "ticker": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ticker"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "transaction_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Transaction Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "transaction_id",
+        "timestamp",
+        "settlement_date",
+        "kind",
+        "source_id"
+      ],
+      "title": "Transaction",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "closing": {
+      "$ref": "#/$defs/Snapshot"
+    },
+    "market_cutoff": {
+      "format": "date",
+      "title": "Market Cutoff",
+      "type": "string"
+    },
+    "mode": {
+      "enum": [
+        "DEMO",
+        "USER_IMPORT"
+      ],
+      "title": "Mode",
+      "type": "string"
+    },
+    "opening": {
+      "$ref": "#/$defs/Snapshot"
+    },
+    "policy": {
+      "$ref": "#/$defs/Policy"
+    },
+    "prices": {
+      "items": {
+        "$ref": "#/$defs/Price"
+      },
+      "title": "Prices",
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "securities": {
+      "items": {
+        "$ref": "#/$defs/Security"
+      },
+      "title": "Securities",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "transactions": {
+      "items": {
+        "$ref": "#/$defs/Transaction"
+      },
+      "title": "Transactions",
+      "type": "array"
+    }
+  },
+  "required": [
+    "mode",
+    "market_cutoff",
+    "sources",
+    "securities",
+    "opening",
+    "closing",
+    "transactions",
+    "prices"
+  ],
+  "title": "Bundle",
+  "type": "object"
+}

@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "phase": 1,
+  "timezone": "Asia/Karachi",
+  "currency": "PKR",
+  "default_mode": "OFFLINE",
+  "git_auto_push": false,
+  "position_limits": null,
+  "sector_limits": null,
+  "tax_profile": null,
+  "scheduler_enabled": false,
+  "note": "Descriptive setup metadata. Runtime policy comes exclusively from the validated input bundle. No live source adapters or schedules are configured."
+}
