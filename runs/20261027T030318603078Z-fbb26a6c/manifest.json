@@ -1,0 +1,41 @@
+{
+  "analysis_run_id": "20261026T225805178235Z-8f6aa76b",
+  "attempted_at": "2026-10-27T03:03:18.691867+00:00",
+  "base_commit": "a6738d1dbe909867b7d83e4314764422b90d10fc",
+  "code_hash": "df9e7ac6d35cbbcd2d2515ede6c9be915f9b086c2bd0cd0c307a071fe0d6f429",
+  "code_version": "0.5.0",
+  "dataset_id": "legacy.demo",
+  "dependencies": {
+    "openpyxl": "3.1.5",
+    "pydantic": "2.13.4"
+  },
+  "dependency_lock_hash": "f6e3b2a9538f33fdd5a4c64c2fbe546d30a6878ede26baddd669de331eca202a",
+  "error": null,
+  "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+  "market_cutoff": "2026-10-09",
+  "offline": true,
+  "output_hashes": {
+    "data/canonical/portfolio.json": "23a5eef5f09c9ece52404d4717dc7753d5791852e17e035cac52cdc22e227209",
+    "data/evidence/sources.json": "1f138272490e52b40952f5e0a82b046f4bc5b6f5dcfd920526f6eac250fe4539",
+    "reports/latest/changes.md": "f8969cd0b912594e7bac8bcc2ae977753fbc7d6dd431d29825f5ab316248c567",
+    "reports/latest/readiness.json": "93d139b38e5eaf7f105a06fa8de44f6f41d7e723792558da2820f2a94a4c09f5",
+    "reports/latest/summary.json": "00b37fbfb4ef12a4b823423ab2726763fc8bf06e8bd62dbb4738b2b22a69deb2",
+    "runs/20261027T030318603078Z-fbb26a6c/changes.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "runs/20261027T030318603078Z-fbb26a6c/coverage.json": "394051476589c8d001a28b272f0cc417e48057e6f672b4e1b6163693cbd55464",
+    "runs/20261027T030318603078Z-fbb26a6c/deferred.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "runs/20261027T030318603078Z-fbb26a6c/dependencies.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "runs/20261027T030318603078Z-fbb26a6c/input.json": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "runs/20261027T030318603078Z-fbb26a6c/snapshot.json": "23a5eef5f09c9ece52404d4717dc7753d5791852e17e035cac52cdc22e227209",
+    "runs/20261027T030318603078Z-fbb26a6c/usage.json": "f4260f5e0f6988858fdacdac7b4380e389d1a3d319048ce0926fdd7dbdf8e578",
+    "runs/20261027T030318603078Z-fbb26a6c/validation.json": "b210011e30fb0aff1c6b325d75f40d915060d996d3c766b6f8c429e97f5f19cc",
+    "workbooks/Investment_Workspace.xlsx": "957e43821c4116e66e8fe7348ff54b7a8af301562d623aecff8526f69aa09fd5"
+  },
+  "policy_hash": "2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b",
+  "publication_status": "LOCAL_ONLY",
+  "python_version": "3.12.14",
+  "run_id": "20261027T030318603078Z-fbb26a6c",
+  "schema_version": "1.0",
+  "scope": "Phase 1 portfolio; valuation blocked",
+  "status": "NO_MATERIAL_CHANGE",
+  "workflow": "export-excel"
+}

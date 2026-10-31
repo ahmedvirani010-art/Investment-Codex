@@ -1,5 +1,5 @@
 {
-  "calculation_status": "SUCCESS",
+  "calculation_status": "NO_MATERIAL_CHANGE",
   "compatibility": "NOT_MIGRATED",
   "coverage": {
     "cross-asset": "BLOCKED_INPUT",
