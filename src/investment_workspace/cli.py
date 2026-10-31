@@ -1,4 +1,4 @@
-"""Offline portfolio and research CLI. Phase 3 commands fail explicitly."""
+"""Offline portfolio and research CLI. Validated local imports; later phases remain blocked."""
 
 import argparse
 import json
@@ -10,19 +10,33 @@ from .storage import LockBusy, PublicationError
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Evidence-linked investment workspace — Phase 2 offline research")
+    parser = argparse.ArgumentParser(description="Evidence-linked investment workspace — Phase 3 integrated research")
     parser.add_argument("--root", type=Path, default=Path.cwd(), help="Git workspace root")
     sub = parser.add_subparsers(dest="command", required=True)
     init = sub.add_parser("init", help="Publish the clearly labelled synthetic offline demo")
     init.add_argument("--offline", action="store_true", required=True)
+    init.add_argument("--phase3", action="store_true", help="Use the synthetic integrated workflows demo")
     init.add_argument("--phase2", action="store_true", help="Use the synthetic Phase 2 model/entitlement demo")
     imp = sub.add_parser("import-portfolio", help="Import a strict JSON bundle of snapshots, ledger, prices and sources")
     imp.add_argument("--file", type=Path, required=True)
     research = sub.add_parser("import-research", help="Import a sources/research JSON evidence packet")
     research.add_argument("--file", type=Path, required=True)
+    integration = sub.add_parser("import-integration", help="Import strict sources/integration JSON packet")
+    integration.add_argument("--file", type=Path, required=True)
+    history = sub.add_parser("import-history", help="Fill one history in a JSON integration packet from a raw OHLCV CSV")
+    history.add_argument("--file", type=Path, required=True)
+    history.add_argument("--packet", type=Path, required=True)
+    history.add_argument("--history-id", required=True)
+    inspect = sub.add_parser("inspect-datastore", help="Read-only legacy workbook sheet/formula inventory")
+    inspect.add_argument("--workbook", type=Path, required=True)
+    analyze = sub.add_parser("analyze", help="Recalculate and report one security from owned shared state")
+    analyze.add_argument("ticker")
+    analyze.add_argument("--offline", action="store_true")
     sub.add_parser("update-dividends", help="Recompute accepted dividend evidence and entitlement")
     run_parser = sub.add_parser("run", help="Recalculate the last accepted portfolio import")
-    run_parser.add_argument("workflow", choices=["daily", "portfolio", "valuation", "ic", "event"])
+    run_parser.add_argument("workflow", choices=["daily", "portfolio", "valuation", "ic", "event", "timing", "macro", "watchlist"])
+    run_parser.add_argument("--source-file", type=Path, help="Event JSON sources/integration packet; never guesses PDF contents")
+    run_parser.add_argument("--ticker")
     run_parser.add_argument("--offline", action="store_true")
     run_parser.add_argument("--scope", choices=["required"], default="required")
     run_parser.add_argument("--require-full-coverage", action="store_true")
@@ -36,6 +50,7 @@ def main(argv=None):
     replay.add_argument("--offline", action="store_true", required=True)
     notes = sub.add_parser("import-overrides", help="Explicitly import confirmed notes from Manual_Inputs only")
     notes.add_argument("--workbook", type=Path, required=True)
+    sub.add_parser("schedule-status", help="Show disabled schedule plan and activation dependencies")
     sub.add_parser("recover", help="Recover interrupted publication and retry its input")
     push = sub.add_parser("push", help="Explicitly authorize a non-forced push; verify remote SHA")
     push.add_argument("--remote", default="origin")
@@ -47,17 +62,52 @@ def main(argv=None):
             from .storage import read_json
             if read_json(root, pipeline.STATE):
                 raise ValueError("workspace already has accepted data; init will not replace it with a demo")
-            result = pipeline.run(root, pipeline.fixture_bytes(args.phase2), workflow="init-demo")
+            result = pipeline.run(root, pipeline.fixture_bytes(args.phase2, args.phase3), workflow="init-demo")
         elif args.command == "import-portfolio":
             result = pipeline.run(root, args.file.read_bytes(), workflow="import-portfolio")
         elif args.command == "import-research":
             result = pipeline.import_research(root, args.file.read_bytes())
+        elif args.command == "import-integration":
+            result = pipeline.import_integration(root, args.file.read_bytes())
+        elif args.command == "import-history":
+            from .adapters import read_history_csv
+            from .storage import dumps
+            try:
+                packet = json.loads(args.packet.read_bytes())
+                histories = packet["integration"]["histories"]
+                matches = [h for h in histories if h["record_id"] == args.history_id]
+                if len(matches) != 1:
+                    raise ValueError("history ID must resolve to exactly one packet history")
+                matches[0]["bars"] = read_history_csv(args.file)
+            except (ValueError, KeyError, TypeError) as exc:
+                result = pipeline.run(root, args.file.read_bytes(), workflow="import-history", validation_error=str(exc))
+            else:
+                result = pipeline.import_integration(root, dumps(packet), workflow="import-history")
+        elif args.command == "inspect-datastore":
+            from .adapters import inspect_datastore
+            result = inspect_datastore(args.workbook)
+        elif args.command == "analyze":
+            raw = pipeline.current_input(root)
+            if args.ticker not in {s["ticker"] for s in json.loads(raw)["securities"]}:
+                raise ValueError("ticker must be declared in the accepted securities")
+            result = pipeline.run(root, raw, workflow="analyze")
+            state = pipeline.read_json(root, pipeline.STATE)
+            result["security"] = {key: [r for r in state.get("integration", {}).get(key, []) if r.get("ticker") == args.ticker or args.ticker in r.get("affected_tickers", [])]
+                                  for key in ("timing", "events", "watchlist", "ic_actions")}
+            result["security"].update({key: [r for r in state.get("research", {}).get(key, []) if r.get("ticker") == args.ticker]
+                                       for key in ("earnings", "valuations", "entries")})
         elif args.command == "update-dividends":
             result = pipeline.run(root, pipeline.current_input(root), workflow="update-dividends")
         elif args.command == "run":
-            if args.workflow not in {"daily", "portfolio", "valuation"}:
-                raise ValueError("this workflow needs Phase 3 verified models/data")
-            result = pipeline.run(root, pipeline.current_input(root), workflow=args.workflow)
+            if args.source_file:
+                if args.workflow != "event":
+                    raise ValueError("--source-file is only supported for run event")
+                result = pipeline.import_integration(root, args.source_file.read_bytes(), workflow="event")
+            else:
+                result = pipeline.run(root, pipeline.current_input(root), workflow=args.workflow)
+            if args.ticker:
+                result["requested_ticker"] = args.ticker
+                result["scope_note"] = "Shared dependents and full required coverage checked"
         elif args.command == "validate":
             result = pipeline.validate(root, args.run)
         elif args.command == "export-excel":
@@ -66,6 +116,8 @@ def main(argv=None):
             result = pipeline.replay(root, args.run_id, args.output)
         elif args.command == "import-overrides":
             result = pipeline.import_overrides(root, args.workbook)
+        elif args.command == "schedule-status":
+            result = pipeline.read_json(root, "config/schedules.json", {"enabled": False, "status": "UNCONFIGURED", "timezone": "Asia/Karachi"})
         elif args.command == "recover":
             result = pipeline.recover(root)
         else:
@@ -76,7 +128,7 @@ def main(argv=None):
             if result.get("status") == "FAILED" or state.get("research", {}).get("summary", {}).get("valuation_status") != "COMPLETE":
                 return 1
         return 1 if result.get("status") == "FAILED" else 0
-    except (ValueError, OSError, PublicationError, LockBusy) as exc:
+    except (ValueError, OSError, KeyError, TypeError, PublicationError, LockBusy) as exc:
         print(str(exc), file=sys.stderr)
         return 2
 

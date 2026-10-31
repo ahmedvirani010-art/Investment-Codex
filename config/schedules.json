@@ -1,0 +1,26 @@
+{
+  "schema_version": "3.0",
+  "enabled": false,
+  "timezone": "Asia/Karachi",
+  "activation_status": "BLOCKED_PENDING_SOURCE_AND_OPERATIONAL_PARITY",
+  "requirements": [
+    "persistent runner and verified source access",
+    "completed-session calendar and delay handling",
+    "manual-run parity including the real legacy datastore",
+    "confirmed production portfolio, methodology, tax and risk settings",
+    "review existing jobs before disabling duplicate schedules"
+  ],
+  "plans": [
+    {"workflow": "daily", "target": "weekdays after verified completed session", "utc_time": null},
+    {"workflow": "valuation", "target": "Saturday 10:00 Asia/Karachi", "utc_time": "Saturday 05:00"},
+    {"workflow": "ic", "target": "Sunday 19:00 Asia/Karachi", "utc_time": "Sunday 14:00"},
+    {"workflow": "macro", "target": "Monday; time not recovered", "utc_time": null},
+    {"workflow": "event", "target": "verified event or manual request", "utc_time": null}
+  ],
+  "special_monitors": {
+    "ATRL_BFAGRO": "DISABLED_MISSING_VERIFIED_ADAPTER_AND_RECOVERED_SCHEDULE",
+    "western_rate_cut": "DISABLED_MISSING_VERIFIED_ADAPTER_AND_RECOVERED_SCHEDULE",
+    "pakistan_bull_bear": "STRICTLY_ABOVE_8_WITH_VERIFIED_APPROVED_METHODOLOGY_ONLY"
+  },
+  "execution": "No services, jobs or schedules are created by this file"
+}

@@ -80,7 +80,11 @@ def _calculate(bundle, state, previous, run_id, input_hash):
     securities = {s.ticker: s for s in bundle.securities}
     if research.universe_date > cutoff:
         raise ValueError("universe date after cutoff")
-    required = sorted(set(research.required_tickers) | set(securities))
+    extra = {c.ticker for c in bundle.integration.candidates} if bundle.integration else set()
+    if bundle.integration:
+        extra |= {t for e in bundle.integration.events for t in e.affected_tickers}
+        extra |= {t for m in bundle.integration.memberships if m.effective_date <= cutoff <= m.valid_until for t in m.constituents}
+    required = sorted(set(research.required_tickers) | set(securities) | extra)
     if set(research.exclusions) - set(required) or any(not v.strip() for v in research.exclusions.values()):
         raise ValueError("exclusions require a required ticker and reason")
     if any(h["ticker"] in research.exclusions for h in state["holdings"] if Decimal(h["quantity"]) > 0):
@@ -105,6 +109,8 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             raise ValueError("research record effective after cutoff")
         evidence_ok(record.source_ids)
         payload = record.model_dump(mode="json")
+        if not payload.get("covered_event_ids"):
+            payload.pop("covered_event_ids", None)
         if record.record_id in old_records:
             if old_records[record.record_id]["payload"] != payload:
                 raise ValueError("research record ID is immutable; use a new ID and supersedes")
@@ -243,6 +249,8 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             old = next((r for r in old_rows if r.get("record_id") == row.get("record_id")
                         and r.get("scenario") == row.get("scenario")), None)
             ignored = {"run_id", "input_hash", "upstream_run_ids"}
+            if key == "entries" and bundle.integration:
+                ignored |= {"resolved_timing_gate", "resolved_risk_gate", "gate_upstream_ids", "gate_source_ids", "entry_status"}
             if old and {k: v for k, v in row.items() if k not in ignored} == {k: v for k, v in old.items() if k not in ignored}:
                 output[key][i] = old
     output["summary"] = {"valuation_status": "COMPLETE" if universe_ok and eligible and not any(c["outcome"].startswith("BLOCKED") for c in state["coverage"]) else "PARTIAL",

@@ -15,6 +15,7 @@ from .excel import export_workbook, read_notes, validate_workbook
 from .portfolio import calculate
 from .schemas import Bundle, NoteOverride, Transaction
 from .research import COLLECTIONS, calculate_research
+from .workflows import calculate_workflows, records as integration_records, GROUPS as INTEGRATION_GROUPS, SINGLE as INTEGRATION_SINGLE
 from pydantic import ValidationError
 from .storage import (LockBusy, PublicationError, atomic_write, committed, digest, dumps,
                       git, head, prepare_repository, publish, read_json, require_clean,
@@ -37,8 +38,8 @@ def code_hash():
     return digest(b"".join(p.name.encode() + p.read_bytes() for p in sorted(root.glob("*.py"))))
 
 
-def fixture_bytes(phase2=False):
-    name = "phase2-demo.json" if phase2 else "demo.json"
+def fixture_bytes(phase2=False, phase3=False):
+    name = "phase3-demo.json" if phase3 else "phase2-demo.json" if phase2 else "demo.json"
     return files("investment_workspace").joinpath("fixtures/" + name).read_bytes()
 
 
@@ -68,10 +69,10 @@ def recover_abandoned_staging(root):
 
 def same_analytics(left, right):
     # Exclude lineage from change detection; original dates/IDs survive no-change runs.
-    keys = ("holdings", "transactions", "summary", "reconciliation", "data_gaps", "coverage", "notes", "research")
+    keys = ("holdings", "transactions", "summary", "reconciliation", "data_gaps", "coverage", "notes", "research", "integration")
     def clean(value):
         if isinstance(value, dict):
-            return {k: clean(v) for k, v in value.items() if k not in {"run_id", "upstream_run_ids", "code_version", "input_hash", "confidence", "validation_status", "owner", "schema_version", "effective_date", "record_id", "market_cutoff_metadata", "import_source_id", "units", "assumption_ids", "source_ids"}}
+            return {k: clean(v) for k, v in value.items() if not (k == "covered_event_ids" and v == []) and k not in {"run_id", "upstream_run_ids", "code_version", "input_hash", "confidence", "validation_status", "owner", "schema_version", "effective_date", "record_id", "market_cutoff_metadata", "import_source_id", "units", "assumption_ids", "source_ids"}}
         if isinstance(value, list):
             return [clean(v) for v in value]
         return value
@@ -170,6 +171,9 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
             research_facts = [r.model_dump(mode="json") for group in COLLECTIONS
                               for r in getattr(bundle.research, group) if source.source_id in r.source_ids
                               or any(a.source_id == source.source_id for a in getattr(r, "adjustments", []))] if bundle.research else []
+            for record in research_facts:
+                if not record.get("covered_event_ids"):
+                    record.pop("covered_event_ids", None)
             prior_research = [r["payload"] for r in previous.get("research", {}).get("history", [])
                               if source.source_id in r["payload"]["source_ids"] or
                               any(a["source_id"] == source.source_id for a in r["payload"].get("adjustments", []))]
@@ -184,10 +188,20 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
                 facts["universe"] = {k: v for k, v in bundle.research.model_dump(mode="json").items() if k not in COLLECTIONS}
             elif source.source_id in all_sources and all_sources[source.source_id].get("bound_universe"):
                 facts["universe"] = all_sources[source.source_id]["bound_universe"]
+            integrated = {r["record_id"]: r["payload"] for r in previous.get("integration", {}).get("history", [])
+                          if source.source_id in r["payload"]["source_ids"] or any(a["source_id"] == source.source_id for a in r["payload"].get("actions", []))}
+            for group, record in integration_records(bundle.integration):
+                if source.source_id in record.source_ids or any(a.source_id == source.source_id for a in getattr(record, "actions", [])):
+                    payload_record = record.model_dump(mode="json")
+                    if record.record_id in integrated and integrated[record.record_id] != payload_record:
+                        raise ValueError("integration record ID is immutable")
+                    integrated[record.record_id] = payload_record
+            if integrated:
+                facts["integration"] = sorted(integrated.values(), key=lambda r: r["record_id"])
             fact_hash = digest(dumps(facts))
             if source.source_id in all_sources:
                 old = {k: all_sources[source.source_id].get(k) for k in payload}
-                has_facts = any(facts.get(k) for k in ("snapshots", "prices", "transactions", "research", "universe"))
+                has_facts = any(facts.get(k) for k in ("snapshots", "prices", "transactions", "research", "universe", "integration"))
                 if old != payload or (has_facts and all_sources[source.source_id].get("fact_hash") != fact_hash):
                     raise ValueError("source ID is immutable; revised evidence needs a new ID")
             if source.source_id not in all_sources:
@@ -210,6 +224,18 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
                         "scope": model.ticker + " explicit scenario/model assumptions", "effective_date": model.effective_date.isoformat(),
                         "value": model.model_dump(mode="json"), "source_ids": model.source_ids,
                         "run_id": run_id, "evidence_label": "ASSUMPTION"})
+        calculate_workflows(bundle, state, previous, run_id, input_hash)
+        if not bundle.integration and workflow in {"ic", "event", "timing", "macro", "watchlist", "analyze"}:
+            state["data_gaps"].append({"ticker": None, "field": "integration", "reason": "MISSING_INTEGRATION_INPUT",
+                "owner": "integration", "next_action": "Import the dated Phase 3 sources/integration evidence packet"})
+        if bundle.integration:
+            for field in ("timing_policy", "risk_limits", "alert_methodology"):
+                assumption = getattr(bundle.integration, field)
+                if assumption and not any(a["assumption_id"] == assumption.record_id for a in state["assumptions"]):
+                    state["assumptions"].append({"assumption_id": assumption.record_id, "owner": field,
+                        "scope": "Explicit Phase 3 methodology/limits; not inherited defaults",
+                        "effective_date": assumption.effective_date.isoformat(), "value": assumption.model_dump(mode="json"),
+                        "source_ids": assumption.source_ids, "run_id": run_id, "evidence_label": "ASSUMPTION"})
         unchanged = same_analytics(previous, state)
         if unchanged:
             registry = state["sources"]
@@ -248,6 +274,10 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
         status = "COMPLETE" if state["research"]["summary"]["valuation_status"] == "COMPLETE" and status != "PARTIAL" else "PARTIAL"
     if not error and not state.get("research") and workflow in {"valuation", "update-dividends"}:
         status = "PARTIAL"
+    if not error and state.get("integration") and status != "NO_MATERIAL_CHANGE":
+        status = "PARTIAL" if state["integration"]["summary"]["integration_status"] == "PARTIAL" or status == "PARTIAL" else "COMPLETE"
+    if not error and not state.get("integration") and workflow in {"ic", "event", "timing", "macro", "watchlist", "analyze"}:
+        status = "PARTIAL"
     status = "FAILED" if error else status
     pending = queued_failures(root)
     logs = deepcopy(previous["run_log"])
@@ -275,6 +305,12 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
             if old_rows != new_rows:
                 state["changes"].append({"run_id": run_id, "ticker": None, "field": collection,
                                           "previous": old_rows, "new": new_rows})
+        for collection in ("timing", "events", "risk", "watchlist", "ic_actions"):
+            old_rows = previous.get("integration", {}).get(collection, [])
+            new_rows = state.get("integration", {}).get(collection, [])
+            if old_rows != new_rows:
+                state["changes"].append({"run_id": run_id, "ticker": None, "field": collection,
+                                          "previous": old_rows, "new": new_rows})
         old_notes = {n["override_id"] for n in previous["notes"]}
         for note in state["notes"]:
             if note["override_id"] not in old_notes:
@@ -285,6 +321,11 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
     if state.get("research"):
         payloads["data/canonical/research.json"] = dumps(state["research"])
         payloads["reports/latest/valuation.json"] = dumps(state["research"]["summary"])
+    if state.get("integration"):
+        payloads["data/canonical/integration.json"] = dumps(state["integration"])
+        payloads["reports/latest/integration.json"] = dumps(state["integration"]["summary"])
+        payloads["feeds/latest/timing.json"] = dumps(state["integration"]["timing"])
+        payloads["feeds/latest/ic.json"] = dumps(state["integration"]["ic_actions"])
     # Once content-addressed evidence exists, never rewrite it.
     if committed(root, source_path) is None:
         payloads[source_path] = input_bytes
@@ -305,7 +346,7 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
     paths = sorted([*payloads, WORKBOOK])
     hashes = {path: digest((stage / path).read_bytes()) for path in paths}
     lockfile = committed(root, "uv.lock")
-    manifest = {**entry, "schema_version": "1.0", "base_commit": head(root), "code_version": __version__, "code_hash": code_hash(), "dependency_lock_hash": digest(lockfile) if lockfile else None, "python_version": sys.version.split()[0], "dependencies": {name: version(name) for name in ("pydantic", "openpyxl")}, "policy_hash": digest(dumps(bundle.policy.model_dump(mode="json"))) if bundle else None, "offline": True, "scope": "Phase 2 research and portfolio" if state.get("research") else "Phase 1 portfolio; valuation blocked", "output_hashes": hashes}
+    manifest = {**entry, "schema_version": "1.0", "base_commit": head(root), "code_version": __version__, "code_hash": code_hash(), "dependency_lock_hash": digest(lockfile) if lockfile else None, "python_version": sys.version.split()[0], "dependencies": {name: version(name) for name in ("pydantic", "openpyxl")}, "policy_hash": digest(dumps(bundle.policy.model_dump(mode="json"))) if bundle else None, "offline": True, "scope": "Phase 3 integrated investment workflows" if state.get("integration") else "Phase 2 research and portfolio" if state.get("research") else "Phase 1 portfolio; valuation blocked", "output_hashes": hashes}
     manifest_path = f"{prefix}/manifest.json"
     atomic_write(stage / manifest_path, dumps(manifest))
     paths.append(manifest_path)
@@ -435,3 +476,22 @@ def import_research(root: Path, raw: bytes):
         return run(root, dumps(bundle), workflow="import-research")
     except (ValueError, KeyError, TypeError) as exc:
         return run(root, raw, workflow="import-research", validation_error=str(exc))
+
+
+def import_integration(root: Path, raw: bytes, *, workflow="import-integration"):
+    """Merge a complete active integration packet into the committed portfolio."""
+    try:
+        packet = json.loads(raw)
+        if set(packet) != {"sources", "integration"}:
+            raise ValueError("integration packet requires exactly sources and integration")
+        bundle = json.loads(current_input(root))
+        sources = {s["source_id"]: s for s in bundle["sources"]}
+        for source in packet["sources"]:
+            if source["source_id"] in sources and sources[source["source_id"]] != source:
+                raise ValueError("source ID is immutable")
+            sources[source["source_id"]] = source
+        bundle["sources"] = list(sources.values())
+        bundle["integration"] = packet["integration"]
+        return run(root, dumps(bundle), workflow=workflow)
+    except (ValueError, KeyError, TypeError) as exc:
+        return run(root, raw, workflow=workflow, validation_error=str(exc))

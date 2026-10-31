@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "phase": 1,
+  "phase": 3,
   "timezone": "Asia/Karachi",
   "currency": "PKR",
   "default_mode": "OFFLINE",
@@ -9,5 +9,5 @@
   "sector_limits": null,
   "tax_profile": null,
   "scheduler_enabled": false,
-  "note": "Descriptive setup metadata. Runtime policy comes exclusively from the validated input bundle. No live source adapters or schedules are configured."
+  "note": "Descriptive setup metadata. Runtime policies are imported explicit dated evidence. Local JSON and CSV adapters are available; live feeds, legacy datastore compatibility and schedules remain unconfigured."
 }

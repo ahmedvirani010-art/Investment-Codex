@@ -129,6 +129,7 @@ class Bundle(StrictModel):
     prices: list[Price]
     policy: Policy = Field(default_factory=Policy)
     research: "Research | None" = None
+    integration: "Integration | None" = None
 
     @model_validator(mode="after")
     def links_and_dates(self):
@@ -158,6 +159,12 @@ class Bundle(StrictModel):
             raise ValueError("future price relative to cutoff")
         if len({p.ticker for p in self.prices}) != len(self.prices):
             raise ValueError("one current price per security required")
+        if self.research and self.integration:
+            research_ids = {r.record_id for group in (self.research.earnings, self.research.models, self.research.dividends, self.research.resolutions) for r in group}
+            integrated_ids = {r.record_id for name in type(self.integration).model_fields if name != "schema_version"
+                              for r in (getattr(self.integration, name) if isinstance(getattr(self.integration, name), list) else [getattr(self.integration, name)]) if r}
+            if research_ids & integrated_ids:
+                raise ValueError("record IDs cannot be reused across research and integration owners")
         if any(s.effective_date > self.market_cutoff for s in self.sources):
             raise ValueError("source effective date after cutoff")
         return self
@@ -288,6 +295,7 @@ class ValuationModel(ResearchRecord):
     timing_gate: Literal["PASSED", "BLOCKED", "UNKNOWN"] = "UNKNOWN"
     risk_gate: Literal["PASSED", "BLOCKED", "UNKNOWN"] = "UNKNOWN"
     event_checked_through: date | None = None
+    covered_event_ids: list[Identifier] = Field(default_factory=list)
     scenarios: list[Scenario]
     dividend_tax_rate: Fraction | None = None
     capital_gains_tax_rate: Fraction | None = None
@@ -370,5 +378,251 @@ class Research(StrictModel):
         return self
 
 
-# Resolve the optional forward annotation after all Phase 2 contracts exist.
+
+
+
+# Phase 3 records share the append-only identity and evidence contract.
+class MarketBar(StrictModel):
+    session_date: date
+    open: Positive
+    high: Positive
+    low: Positive
+    close: Positive
+    volume: NonNegative
+    traded_value: NonNegative | None = None
+
+    @model_validator(mode="after")
+    def prices(self):
+        if not self.low <= min(self.open, self.close) <= max(self.open, self.close) <= self.high:
+            raise ValueError("inconsistent OHLC range")
+        return self
+
+
+class CorporateAction(StrictModel):
+    action_id: Identifier
+    session_date: date
+    kind: Literal["SPLIT", "BONUS"]
+    ratio: Positive
+    source_id: Identifier
+
+
+class MarketHistory(ResearchRecord):
+    role: Literal["SECURITY", "BENCHMARK"] = "SECURITY"
+    price_basis: Literal["RAW"] = "RAW"
+    action_coverage_through: date
+    actions: list[CorporateAction] = Field(default_factory=list)
+    bars: list[MarketBar] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def ordered(self):
+        dates = [b.session_date for b in self.bars]
+        if dates[-1] > self.effective_date:
+            raise ValueError("history extends beyond its effective date")
+        if dates != sorted(set(dates)):
+            raise ValueError("history sessions must be sorted and unique")
+        if len({a.action_id for a in self.actions}) != len(self.actions):
+            raise ValueError("duplicate corporate action ID")
+        return self
+
+
+class SessionCalendar(ResearchRecord):
+    sessions: list[date] = Field(min_length=1)
+    exchange: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def ordered(self):
+        if self.sessions[-1] > self.effective_date:
+            raise ValueError("calendar contains sessions after its effective date")
+        if self.sessions != sorted(set(self.sessions)):
+            raise ValueError("calendar must contain sorted unique completed sessions")
+        return self
+
+
+class Membership(ResearchRecord):
+    constituents: list[Identifier] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def unique(self):
+        if len(set(self.constituents)) != len(self.constituents):
+            raise ValueError("duplicate universe constituent")
+        return self
+
+
+class TimingPolicy(ResearchRecord):
+    benchmark: Identifier
+    relative_lookback: int = Field(ge=2)
+    momentum_lag: int = Field(ge=1)
+    short_window: int = Field(ge=2)
+    long_window: int = Field(ge=3)
+    slope_sessions: int = Field(ge=1)
+    flat_slope: Fraction
+    liquidity_window: int = Field(ge=2)
+    min_average_traded_value: NonNegative
+    min_rank_universe: int = Field(ge=2)
+    max_extension: Fraction
+    breakout_window: int = Field(ge=2)
+    reversion_window: int = Field(ge=2)
+    oversold_z: Signed
+    overbought_z: Signed
+    calibration_status: Literal["PROVISIONAL", "VALIDATED"] = "PROVISIONAL"
+    calibration_rationale: str = Field(min_length=1)
+    backtest_start: date | None = None
+    backtest_cost_rate: Fraction | None = None
+
+    @model_validator(mode="after")
+    def parameters(self):
+        if self.short_window >= self.long_window or self.oversold_z >= 0 or self.overbought_z <= 0:
+            raise ValueError("invalid trend/reversion parameters")
+        return self
+
+
+class MacroObservation(ResearchRecord):
+    domain: Literal["PAKISTAN", "GLOBAL"]
+    indicator: str = Field(min_length=1)
+    evidence_kind: Literal["FACT", "INTERPRETATION", "SCENARIO"]
+    value: Signed | None = None
+    unit: str = Field(min_length=1)
+    narrative: str = Field(min_length=1)
+    regime: str | None = None
+
+
+class MacroScenario(ResearchRecord):
+    name: Literal["bear", "base", "bull"]
+    probability: Fraction | None = None
+    paths: dict[str, str] = Field(min_length=1)
+    rationale: str = Field(min_length=1)
+
+
+class NewsEvent(ResearchRecord):
+    headline: str = Field(min_length=1)
+    affected_tickers: list[Identifier] = Field(min_length=1)
+    transmission: str = Field(min_length=1)
+    urgency: Literal["IMMEDIATE", "WATCH", "NOISE"]
+    requires_model_revision: bool = False
+    eps_delta: Signed | None = None
+    eps_period: str | None = None
+    eps_calculation: str | None = None
+
+    @model_validator(mode="after")
+    def eps_basis(self):
+        if self.eps_delta is not None and (not self.eps_period or not self.eps_calculation):
+            raise ValueError("numerical EPS impact requires period and calculation evidence")
+        if len(set(self.affected_tickers)) != len(self.affected_tickers):
+            raise ValueError("duplicate event ticker")
+        return self
+
+
+class RiskLimits(ResearchRecord):
+    user_confirmed: bool = False
+    max_position_weight: Fraction
+    max_sector_weight: Fraction
+    max_factor_weight: Fraction
+    minimum_cash_weight: Fraction
+    per_trade_risk_budget: Fraction
+    max_daily_participation: Fraction
+    correlation_lookback: int = Field(ge=3)
+    min_correlation_observations: int = Field(ge=3)
+
+    @model_validator(mode="after")
+    def positive_limits(self):
+        if min(self.max_position_weight, self.max_sector_weight, self.max_factor_weight,
+               self.per_trade_risk_budget, self.max_daily_participation) <= 0:
+            raise ValueError("risk limits must be explicitly positive")
+        return self
+
+
+class FactorExposure(ResearchRecord):
+    factors: list[Identifier] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def unique(self):
+        if len(set(self.factors)) != len(self.factors):
+            raise ValueError("duplicate economic factor")
+        return self
+
+
+class Catalyst(ResearchRecord):
+    window_start: date
+    window_end: date
+    description: str = Field(min_length=1)
+    probability_basis: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def window(self):
+        if self.window_end < self.window_start:
+            raise ValueError("invalid catalyst window")
+        return self
+
+
+class WatchCandidate(ResearchRecord):
+    author: str = Field(min_length=1)
+    requested_stage: Literal["RESEARCH", "ON_HOLD", "PRICE_WATCH", "READY", "REJECTED", "ARCHIVED"] = "RESEARCH"
+    thesis: str = Field(min_length=1)
+    invalidation: str = Field(min_length=1)
+    portfolio_fit: str = Field(min_length=1)
+    desired_entry: Positive
+    stop_price: Positive
+    approach_fraction: Fraction
+    catalyst_ids: list[Identifier] = Field(default_factory=list)
+    requested_target_weight: Fraction | None = None
+    next_review: date
+
+    @model_validator(mode="after")
+    def stop(self):
+        if self.stop_price >= self.desired_entry:
+            raise ValueError("stop must be below intended entry")
+        return self
+
+
+class ICProposal(ResearchRecord):
+    action: Literal["ADD", "ACCUMULATE", "HOLD", "TRIM", "EXIT", "REVIEW"]
+    reason: str = Field(min_length=1)
+    confidence: Literal["HIGH", "MEDIUM", "LOW"]
+    invalidation: str = Field(min_length=1)
+    opportunity_cost: str = Field(min_length=1)
+    candidate_id: Identifier | None = None
+
+
+class AlertMethodology(ResearchRecord):
+    methodology_id: str | None = None
+    approved_replacement: bool = False
+    bull_score: Annotated[Decimal, Field(ge=0, le=10, allow_inf_nan=False)] | None = None
+    bear_score: Annotated[Decimal, Field(ge=0, le=10, allow_inf_nan=False)] | None = None
+    rationale: str = Field(min_length=1)
+
+
+class Integration(StrictModel):
+    schema_version: Literal["3.0"] = "3.0"
+    calendar: SessionCalendar | None = None
+    memberships: list[Membership] = Field(default_factory=list)
+    histories: list[MarketHistory] = Field(default_factory=list)
+    timing_policy: TimingPolicy | None = None
+    macro: list[MacroObservation] = Field(default_factory=list)
+    macro_scenarios: list[MacroScenario] = Field(default_factory=list)
+    events: list[NewsEvent] = Field(default_factory=list)
+    risk_limits: RiskLimits | None = None
+    factors: list[FactorExposure] = Field(default_factory=list)
+    catalysts: list[Catalyst] = Field(default_factory=list)
+    candidates: list[WatchCandidate] = Field(default_factory=list)
+    proposals: list[ICProposal] = Field(default_factory=list)
+    alert_methodology: AlertMethodology | None = None
+
+    @model_validator(mode="after")
+    def unique(self):
+        records = [v for name in type(self).model_fields if name != "schema_version"
+                   for v in (getattr(self, name) if isinstance(getattr(self, name), list) else [getattr(self, name)]) if v]
+        if len({r.record_id for r in records}) != len(records):
+            raise ValueError("duplicate integration record ID")
+        for name in ("histories", "factors", "candidates", "proposals"):
+            group = getattr(self, name)
+            if len({r.ticker for r in group}) != len(group):
+                raise ValueError("one active integration record per ticker/owner required")
+        if len({m.name for m in self.macro_scenarios}) != len(self.macro_scenarios):
+            raise ValueError("duplicate macro scenario")
+        probabilities = [m.probability for m in self.macro_scenarios]
+        if probabilities and all(p is not None for p in probabilities) and sum(probabilities) != 1:
+            raise ValueError("scenario probabilities must sum to one")
+        return self
+
+
 Bundle.model_rebuild()

@@ -1,7 +1,7 @@
 # Investment Workspace
 
-A private, Git-backed investment research workspace. **Version 0.2 implements
-Phases 1–2 offline**, with synthetic fixtures and evidence-gated research imports. It does not contain Ahmed's
+A private, Git-backed investment research workspace. **Version 0.3 implements
+Phases 1–3 offline**, with synthetic fixtures and evidence-gated research imports. It does not contain Ahmed's
 holdings, live PSX prices, validated valuations, or trading instructions.
 
 ## Quick start
@@ -27,8 +27,8 @@ The main review artifact is
 Dashboard cells are computed in Python and readable without Excel recalculation.
 Unknown values display as `UNKNOWN`, never zero. The workbook contains holdings,
 transactions, cash, reconciliation, sources, assumptions, coverage, gaps, notes,
-run/change logs, and unknown usage telemetry. Phase 3–4 tabs explicitly say
-`NOT_IMPLEMENTED`; Phase 2 tabs populate from accepted research. `SUCCESS` means the **Phase 1 portfolio calculation** ran, not
+run/change logs, and unknown usage telemetry. Phase 4 tabs explicitly say
+`NOT_IMPLEMENTED`; Phase 2–3 tabs populate from accepted evidence. `SUCCESS` means the **Phase 1 portfolio calculation** ran, not
 that a valuation screen is complete or live investment decisions are ready.
 
 ## Import your own data
@@ -73,7 +73,7 @@ this baseline intentionally refuses silent rewrites.
 
 An unreconciled quantity/cost/cash, stale input, missing price, or unverified
 source appears as a gap. Missing aggregate market values remain unknown.
-Sizing remains blocked through Phase 2; risk limits are never invented.
+Phase 3 sizing remains a research cap under explicit confirmed limits; risk limits are never invented.
 Calendar-day freshness limits are operational input policy, not a verified PSX
 session calendar. No market session is inferred from today's weekday.
 
@@ -181,13 +181,34 @@ A complete coverage ledger with blocked names is never a COMPLETE screen.
 A strict valuation command exits 1 while coverage is incomplete, after publishing
 the coverage and gaps. Screening does not enable sizing or watchlist readiness.
 
+## Phase 3 integrated workflows
+
+[Phase 3 guide](docs/phase3.md) documents raw OHLCV/JSON imports, verified session
+and corporate-action gates, relative performance/rank/momentum, trend and mean
+reversion, point-in-time backtests, macro/news propagation, risk caps, watchlist
+readiness, and proposed IC decisions.
+
+```bash
+uv run --locked python -m investment_workspace import-integration --file inputs/private/integration.json
+uv run --locked python -m investment_workspace run daily --offline
+uv run --locked python -m investment_workspace run ic --offline
+uv run --locked python -m investment_workspace analyze APL --offline
+```
+
+For an isolated synthetic demo, use `init --offline --phase3` with a new `--root`.
+Its source data and limits are illustrative. Events cannot silently rewrite EPS;
+screening cannot create READY; a proposed action cannot create a transaction.
+The real legacy datastore and production source/runner setup remain missing,
+so integrated deployment parity is PARTIAL and schedules stay disabled.
+
 ## Remaining implementation
 
 [Migration inventory and blockers](docs/migration.md) lists the missing source
 workbooks, original evidence contract, model feeds, holdings, prices, tax/risk
 settings and scheduler details. Remaining sectors need validated adapters;
 legacy models need exact column maps and reproducible historical outputs.
-Phase 3 integrated workflows and Phase 4 wealth planning remain unimplemented.
+Phase 3 live-source access, real legacy-datastore migration/parity and production
+scheduling remain blocked. Phase 4 wealth planning remains unimplemented.
 
 Tests cover hand-calculated cash/cost/returns, signed earnings bridges, bank/DCF
 values, coverage gates, revision history, dividend ex-date/split boundaries,

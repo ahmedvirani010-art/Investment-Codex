@@ -67,3 +67,13 @@ verified dividend entitlement. Unknown tax, entitlement and net-return fields
 remain null. Sources, record IDs and history are published with the portfolio
 and workbook as one revision. See the synthetic `phase2-demo.json` fixture for
 an end-to-end example; it is never a source of real holdings or PSX valuations.
+
+## Phase 3 integration contract
+
+The optional `integration` object follows [integration-schema.json](integration-schema.json).
+It contains sourced, dated, immutable session/membership/history records; explicit
+indicator/calibration/risk policies; macro facts/scenarios/events; economic factors;
+catalysts; user-authored candidates; and proposed IC actions. See the exact
+[Phase 3 equations, gates and limitations](phase3.md). Decimal values serialize
+as strings, unknowns stay null, histories retain superseded payloads and provenance,
+and all canonical outputs/workbook tables publish together.

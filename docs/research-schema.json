@@ -977,6 +977,15 @@
           "default": null,
           "title": "Event Checked Through"
         },
+        "covered_event_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Covered Event Ids",
+          "type": "array"
+        },
         "scenarios": {
           "items": {
             "$ref": "#/$defs/Scenario"

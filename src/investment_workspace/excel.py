@@ -10,11 +10,12 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 
 from .schemas import NoteOverride
 from .research import SHEETS
+from .workflows import SHEETS as INTEGRATION_SHEETS
 
 NOTE_COLUMNS = ["override_id", "ticker", "field", "value", "author", "reason", "effective_date", "expires_at", "confirmed", "supersedes"]
 HOLDING_COLUMNS = ["record_id", "ticker", "sector", "quantity", "cost", "price", "price_date", "market_value", "unrealized_gain", "unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "freshness", "reconciliation_state", "run_id", "effective_date", "source_ids"]
-FUTURE_SHEETS = ["Watchlist", "Catalysts", "RS_Trend", "Sector_Rotation", "Mean_Reversion", "Macro", "Scenarios", "Portfolio_Risk", "IC_Actions", "Retirement", "Cross_Asset"]
-NUMERIC_COLUMNS = {"quantity", "cost", "price", "market_value", "unrealized_gain", "unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "cash_after", "realized_gain", "amount", "fees", "taxes", "ratio", "present_fair_value", "horizon_exit_price", "horizon_dividends", "forward_eps", "normalized_eps", "reported_eps", "normalized_pat", "sustainable_dps", "entry_ceiling", "mos_entry_ceiling", "hurdle_entry_ceiling", "hurdle", "gross_return", "net_return", "annualized_return", "margin_of_safety", "dps", "eligible_quantity", "gross_entitlement", "net_entitlement", "gross_received", "net_received", "gross_pending", "payout_crosscheck", "horizon_years", "ledger_quantity", "ledger_cost", "quantity_difference", "cost_difference", "cash_difference"}
+FUTURE_SHEETS = ["Retirement", "Cross_Asset"]
+NUMERIC_COLUMNS = {"quantity", "cost", "price", "market_value", "unrealized_gain", "unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "cash_after", "realized_gain", "amount", "fees", "taxes", "ratio", "present_fair_value", "horizon_exit_price", "horizon_dividends", "forward_eps", "normalized_eps", "reported_eps", "normalized_pat", "sustainable_dps", "entry_ceiling", "mos_entry_ceiling", "hurdle_entry_ceiling", "hurdle", "gross_return", "net_return", "annualized_return", "margin_of_safety", "dps", "eligible_quantity", "gross_entitlement", "net_entitlement", "gross_received", "net_received", "gross_pending", "payout_crosscheck", "horizon_years", "price_return", "benchmark_return", "relative_performance", "rs_momentum", "short_sma", "long_sma", "sma_slope", "extension", "z_score", "average_traded_value", "rs_percentile", "price_breadth", "rs_breadth", "average_relative_performance", "weight_total_sleeve", "max_weight", "scenario_assets", "income_return", "total_return", "correlation", "desired_entry", "stop_price", "approach_fraction", "ledger_quantity", "ledger_cost", "quantity_difference", "cost_difference", "cash_difference"}
 
 
 def cell_value(value, column=""):
@@ -45,7 +46,7 @@ def add_sheet(wb, name, rows, columns=None):
         ws.column_dimensions[ws.cell(1, index).column_letter].width = min(48, max(16, len(col) + 3))
         for row in ws.iter_rows(min_row=2, min_col=index, max_col=index):
             cell = row[0]
-            if col in {"unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "gross_return", "net_return", "annualized_return", "margin_of_safety", "hurdle"} and isinstance(cell.value, (int, float)):
+            if col in {"unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "gross_return", "net_return", "annualized_return", "margin_of_safety", "hurdle", "price_return", "benchmark_return", "relative_performance", "rs_momentum", "sma_slope", "extension", "weight_total_sleeve", "max_weight", "price_breadth", "rs_breadth", "income_return", "total_return"} and isinstance(cell.value, (int, float)):
                 cell.number_format = "0.00%"
             elif col in NUMERIC_COLUMNS and isinstance(cell.value, (int, float)):
                 cell.number_format = '#,##0.00;[Red](#,##0.00)'
@@ -66,6 +67,9 @@ def export_workbook(path: Path, snapshot: dict):
     dashboard = [{"metric": "workspace", "value": "SYNTHETIC DEMO — NOT AHMED'S HOLDINGS" if snapshot["summary"].get("mode") == "DEMO" else "USER IMPORT — CHECK GATES"}]
     dashboard += [{"metric": "attempt_status", "value": snapshot["attempt_status"]}, {"metric": "publication_status", "value": "LOCAL_ONLY"}, {"metric": "published_run_id", "value": snapshot["published_run_id"]}, {"metric": "analysis_run_id", "value": snapshot.get("analysis_run_id")}, {"metric": "valuation_status", "value": snapshot.get("research", {}).get("summary", {}).get("valuation_status", "BLOCKED_MODEL — no research imported")}]
     dashboard += [{"metric": key, "value": value} for key, value in snapshot["summary"].items()]
+    dashboard += [{"metric": key if key.startswith("integration_") else "integration_" + key, "value": value} for key, value in snapshot.get("integration", {}).get("summary", {}).items()]
+    if not snapshot.get("integration"):
+        dashboard.append({"metric": "integration_status", "value": "BLOCKED_INPUT — no integration imported"})
     add_sheet(wb, "Dashboard", dashboard, ["metric", "value"])
     add_sheet(wb, "Holdings", snapshot["holdings"], HOLDING_COLUMNS)
     add_sheet(wb, "Transactions", snapshot["transactions"])
@@ -82,6 +86,8 @@ def export_workbook(path: Path, snapshot: dict):
     add_sheet(wb, "Manual_Inputs", [], NOTE_COLUMNS)
     for name, key in SHEETS.items():
         add_sheet(wb, name, snapshot.get("research", {}).get(key, []))
+    for name, key in INTEGRATION_SHEETS.items():
+        add_sheet(wb, name, snapshot.get("integration", {}).get(key, []))
     for name in FUTURE_SHEETS:
         add_sheet(wb, name, [{"status": "NOT_IMPLEMENTED", "reason": "No accepted model or live data migrated; see docs/migration.md"}])
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -114,7 +120,17 @@ def validate_workbook(path: Path, snapshot: dict):
         if dashboard["published_run_id"] != snapshot["published_run_id"]:
             raise ValueError("workbook revision differs from dataset")
         tables = {"Transactions": snapshot["transactions"], "Cash": [{k: snapshot["summary"].get(k) for k in ("cash", "ledger_cash", "cash_difference", "income_received", "realized_gain")}], "Sources": snapshot["sources"], "Coverage": snapshot["coverage"], "Data_Gaps": snapshot["data_gaps"], "Reconciliation": snapshot["reconciliation"], "Run_Log": snapshot["run_log"], "Change_Log": snapshot["changes"], "Usage": snapshot["usage"], "Notes": snapshot["notes"], "Assumptions": snapshot.get("assumptions", [])}
-        tables.update({name: snapshot.get("research", {}).get(key, []) for name, key in SHEETS.items() if name in wb})
+        for module, sheets in (("research", SHEETS), ("integration", INTEGRATION_SHEETS)):
+            for name, key in sheets.items():
+                if name not in wb:
+                    if snapshot.get(module):
+                        raise ValueError("workbook missing analytical sheet: " + name)
+                    continue
+                legacy = list(wb[name].values)
+                placeholder = (not snapshot.get(module) and len(legacy) == 2 and legacy[0] == ("status", "reason")
+                               and legacy[1][0] == "NOT_IMPLEMENTED")
+                if not placeholder:
+                    tables[name] = snapshot.get(module, {}).get(key, [])
         for name, records in tables.items():
             values = list(wb[name].values)
             headers = values[0]
