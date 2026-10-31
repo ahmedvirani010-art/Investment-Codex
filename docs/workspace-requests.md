@@ -142,3 +142,13 @@ uses a normal push, and retains a recovery bundle on failure. Publication is jou
 across canonical records, workbook and receipts. `recover` rolls back an interrupted
 request publication; rerun `request --pending` after recovery. No force-push, automatic
 conflict merge, schedule activation or trade execution is provided.
+
+## Synthetic GitHub verification
+
+A separate CI-only smoke path on `codex/prd-completion-v06` accepts exactly a request
+ID, the committed synthetic fixture SHA-256 and selected workflows. It seeds a new
+isolated DEMO, resolves that seed's run ID, executes a simulation, and commits proof
+under `reports/smoke/`. It cannot accept arbitrary packages, import financial data,
+change canonical inputs or use R2 credentials. The private production guards remain
+in force. This verifies plugin → Actions → receipt routing; private activation and
+real R2 connectivity still require their own checks.

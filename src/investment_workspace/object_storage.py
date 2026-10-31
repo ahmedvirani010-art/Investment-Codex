@@ -145,7 +145,14 @@ def transfer(root,request,*,dry_run=False,s3=None):
     if request.operation=='push':
         content=dumps({'status':'ARTIFACTS_VERIFIED','run_id':request.run_id,'objects':outputs})
         key=p['archive_prefix']+request.run_id+'/'+digest(content)+'/manifest.json'
-        call(lambda:s3.put_object(Bucket=bucket,Key=key,Body=content))
+        try:
+            s3.head_object(Bucket=bucket,Key=key)
+            exists=True
+        except Exception as exc:
+            if getattr(exc,'response',{}).get('Error',{}).get('Code') not in {'404','NoSuchKey','NotFound'}:
+                raise ValueError('cannot establish archive manifest existence') from None
+            exists=False
+        if not exists: call(lambda:s3.put_object(Bucket=bucket,Key=key,Body=content))
         if digest(call(lambda:_read(s3,bucket,key,p['max_object_bytes'],deadline)))!=digest(content): raise ValueError('archive manifest verification failed')
         result['archive_manifest']={'key':key,'sha256':digest(content)}
     return result

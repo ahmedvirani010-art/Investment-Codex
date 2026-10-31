@@ -19,3 +19,32 @@ jobs:
       - name: Verify installed version
         run: uv run --locked python -c "from importlib.metadata import version; from investment_workspace import __version__; assert version('investment-workspace') == __version__"
       - run: uv run --locked pytest
+  synthetic-request:
+    needs: test
+    if: github.event_name == 'push' && github.ref_name == 'codex/prd-completion-v06' && contains(github.event.head_commit.message, '[workspace-smoke]')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    concurrency:
+      group: investment-workspace-publication
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.23'
+      - run: uv sync --locked
+      - name: Fixed synthetic request only; no R2 or financial secrets
+        run: uv run --locked python scripts/synthetic_request_smoke.py
+      - name: Publish synthetic proof on the development branch
+        run: |
+          git config user.name "Investment Workspace CI"
+          git config user.email "workspace-ci@localhost"
+          git add reports/smoke/
+          git diff --cached --quiet || git commit -m "Record synthetic workspace request verification"
+          git push origin HEAD:codex/prd-completion-v06

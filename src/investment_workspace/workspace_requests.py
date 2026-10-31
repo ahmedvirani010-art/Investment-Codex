@@ -160,6 +160,10 @@ def execute(root,path,*,local_demo=False,s3=None):
                 if result['status']=='FAILED': raise ValueError(result.get('error') or 'calculation failed')
                 calculated=read_json(work,pipeline.STATE);pipeline.validate(work)
                 statuses={m:workflow_status(calculated,m) for m in request.workflows}
+                decision_rows=calculated.get('decisions',{}).get('rows',[])
+                if request.operation=='decision':
+                    statuses['ic_decisions']='PARTIAL' if any(d['decision']=='APPROVE' and d['review_status']=='NEEDS_REVIEW' for d in decision_rows) else 'COMPLETE'
+                if decision_rows: receipt['decisions']=decision_rows
                 receipt.update(status='COMPLETE' if all(s=='COMPLETE' for s in statuses.values()) else 'PARTIAL',modules=statuses,
                                result_run_id=result['run_id'],source_code_hash=result['code_hash'],
                                missing_inputs=calculated.get('data_gaps',[]),deferred_work=calculated.get('deferred_work',[]))

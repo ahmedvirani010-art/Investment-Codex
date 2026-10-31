@@ -393,3 +393,31 @@ def test_bank_mixed_cashflow_and_missing_share_inputs_fail_closed(full):
     with pytest.raises(ValueError,match='FCFE'): reference_value(m,s,'Bank',b)
     s.fcfe=[];s.shares=None
     with pytest.raises(ValueError,match='share count'): reference_value(m,s,'Bank',b)
+
+
+def test_workspace_decision_import_exposes_review_status(repo,full):
+    state=publish(repo,full);p=state['integration']['input']['proposals'][0]
+    source=deepcopy(full['sources'][-1]);source['source_id']='synthetic.decision-source'
+    d={'record_id':'decision.import','ticker':p['ticker'],'effective_date':'2026-10-09','valid_until':'2026-10-12','source_ids':[source['source_id']],
+       'proposal_id':p['record_id'],'decision':'APPROVE','decided_by':'synthetic owner','decided_at':'2026-10-09T00:00:00+05:00',
+       'reason':'explicit historical approval','reviewed_basis_hash':'0'*64}
+    r=execute(repo,request(repo,'decision',package={'sources':[source],'decisions':[d]},workflows=['ic']),local_demo=True)
+    assert r['status']=='PARTIAL',r['errors']
+    assert r['modules']['ic_decisions']=='PARTIAL'
+    assert r['decisions'][0]['review_status']=='NEEDS_REVIEW'
+    assert r['accepted_inputs_changed']
+    assert read_json(repo,pipeline.STATE)['decisions']['rows'][0]['decision']=='APPROVE'
+    assert pipeline.validate(repo)['workbook_parity']=='PASS'
+
+
+def test_pinned_artifact_rehydrates_without_reaccepting_financial_data(storage_ready,monkeypatch):
+    root,s3=storage_ready;data=b'{"sources":[],"decisions":[]}'
+    s3.data['approved/rehydrate.json']=data
+    r=transfer_execute(root,StorageRequest(request_id='rehydrate.source',operation='pull',objects=[PullObject(key='approved/rehydrate.json',sha256=digest(data))]),s3=s3)
+    path=root/'.runtime/r2/artifacts'/digest(data);path.unlink()
+    monkeypatch.setattr('investment_workspace.object_storage.client',lambda:s3)
+    before=storage.committed(root,pipeline.STATE)
+    assert artifact(root,'rehydrate.source',digest(data))==data
+    assert storage.committed(root,pipeline.STATE)==before
+    path.unlink();s3.data['approved/rehydrate.json']=b'tampered'
+    with pytest.raises(ValueError,match='SHA-256'): artifact(root,'rehydrate.source',digest(data))

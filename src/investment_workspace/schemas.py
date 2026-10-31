@@ -188,6 +188,8 @@ class Bundle(StrictModel):
                 raise ValueError("record IDs cannot be reused across research and integration owners")
         if len({p.name for p in self.scenario_profiles})!=len(self.scenario_profiles):
             raise ValueError('one active shared profile per scenario name; use supersession for revisions')
+        if len({d.proposal_id for d in self.decisions})!=len(self.decisions):
+            raise ValueError('one active user decision per proposal; use explicit supersession')
         fact_groups={}
         for fact in self.financials:
             key=(fact.ticker,fact.period_start,fact.period_end,fact.accounting_basis,fact.line_item,fact.units)
