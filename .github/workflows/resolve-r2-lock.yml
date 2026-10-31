@@ -2,8 +2,9 @@ name: Resolve R2 dependency lock
 on:
   push:
     branches: [codex/resolve-r2-lock]
+    paths: ['pyproject.toml', '.github/workflows/resolve-r2-lock.yml']
 permissions:
-  contents: read
+  contents: write
 jobs:
   lock:
     runs-on: ubuntu-latest
@@ -16,6 +17,13 @@ jobs:
         with:
           version: '0.12.23'
       - run: uv lock
+      - name: Commit resolved dependency metadata
+        run: |
+          git config user.name "Investment Workspace CI"
+          git config user.email "workspace-ci@localhost"
+          git add uv.lock
+          git diff --cached --quiet || git commit -m "Lock pinned R2 SDK dependencies"
+          git push origin HEAD:codex/resolve-r2-lock
       - uses: actions/upload-artifact@v4
         with:
           name: resolved-r2-lock
