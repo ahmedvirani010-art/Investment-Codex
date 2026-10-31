@@ -1,0 +1,59 @@
+{
+  "calculation_status": "SUCCESS",
+  "compatibility": "NOT_MIGRATED",
+  "coverage": {
+    "cross-asset": "BLOCKED_INPUT",
+    "ic": "BLOCKED_INPUT",
+    "macro": "BLOCKED_INPUT",
+    "portfolio": "PARTIAL",
+    "retirement": "BLOCKED_INPUT",
+    "timing": "BLOCKED_INPUT",
+    "valuation": "BLOCKED_INPUT",
+    "watchlist": "BLOCKED_INPUT"
+  },
+  "dataset": {
+    "dataset_id": "legacy.demo",
+    "mode": "DEMO"
+  },
+  "dependencies": [
+    {
+      "next_action": "Confirm portfolio limits before sizing",
+      "owner": "validation",
+      "reason": "UNCONFIGURED_RISK_LIMITS",
+      "ticker": null
+    },
+    {
+      "next_action": "Supply and reconcile the real legacy datastore",
+      "owner": "migration",
+      "reason": "LEGACY_PARITY_REQUIRED"
+    },
+    {
+      "next_action": "Import the original PRD source document with hash and locator",
+      "owner": "evidence",
+      "reason": "MISSING_EVIDENCE_CONTRACT"
+    },
+    {
+      "next_action": "Import the original PRD source document with hash and locator",
+      "owner": "evidence",
+      "reason": "MISSING_REPLACEMENT_PROMPTS"
+    },
+    {
+      "next_action": "Import the original PRD source document with hash and locator",
+      "owner": "evidence",
+      "reason": "MISSING_VALUATION_RERUN"
+    },
+    {
+      "next_action": "Import publication/access metadata, ownership, coverage dates and source URL or original hash",
+      "owner": "evidence",
+      "reason": "INCOMPLETE_PROVENANCE"
+    },
+    {
+      "next_action": "Confirm production dataset, manual parity, source coverage and publication policy",
+      "owner": "deployment",
+      "reason": "NOT_ACTIVATED"
+    }
+  ],
+  "deployment": "BLOCKED",
+  "evaluation_as_of": "2026-10-09",
+  "schedules_enabled": false
+}
