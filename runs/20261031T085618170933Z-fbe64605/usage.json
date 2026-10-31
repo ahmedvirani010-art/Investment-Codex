@@ -1,0 +1,21 @@
+{
+  "cache_arithmetic_verified": 0,
+  "cache_hits": 0,
+  "cached_input_tokens": null,
+  "calculation_runtime_seconds": 0.055081,
+  "calculation_units": 0,
+  "cost": null,
+  "deferred_units": 0,
+  "input_tokens": null,
+  "output_tokens": null,
+  "phase_runtime_seconds": {
+    "integration": 4e-06,
+    "portfolio": 0.000417,
+    "valuation": 9e-06,
+    "wealth": 2e-06
+  },
+  "reasoning_tokens": null,
+  "run_id": "20261031T085618170933Z-fbe64605",
+  "runtime_seconds": null,
+  "telemetry": "AI telemetry unknown; total wall time recorded externally after commit"
+}
