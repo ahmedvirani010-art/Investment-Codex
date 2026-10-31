@@ -1,0 +1,22 @@
+name: Resolve R2 dependency lock
+on:
+  push:
+    branches: [codex/resolve-r2-lock]
+permissions:
+  contents: read
+jobs:
+  lock:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.23'
+      - run: uv lock
+      - uses: actions/upload-artifact@v4
+        with:
+          name: resolved-r2-lock
+          path: uv.lock

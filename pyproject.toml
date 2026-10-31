@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "investment-workspace"
-version = "0.5.0"
+version = "0.6.0"
 description = "Offline, evidence-linked investment workspace (Phases 1–4)"
 requires-python = ">=3.12"
-dependencies = ["openpyxl==3.1.5", "pydantic==2.13.4"]
+dependencies = ["openpyxl==3.1.5", "pydantic==2.13.4", "boto3==1.35.99"]
 
 [project.scripts]
 investment-workspace = "investment_workspace.cli:main"
