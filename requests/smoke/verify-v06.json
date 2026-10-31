@@ -1,0 +1,9 @@
+{
+  "request_id": "verify-v06",
+  "fixture_sha256": "88f46f79d617920492b808b368cf9bf01ab3c398cc6c227e9852bbf9d2cb9831",
+  "workflows": [
+    "valuation",
+    "retirement",
+    "cross-asset"
+  ]
+}
