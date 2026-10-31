@@ -203,6 +203,13 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
         if not any(a["assumption_id"] == policy_id for a in state["assumptions"]):
             state["assumptions"].append({"assumption_id": policy_id, "owner": "validation", "scope": "input freshness and reconciliation tolerances; no investment recommendation", "effective_date": bundle.market_cutoff.isoformat(), "value": bundle.policy.model_dump(mode="json"), "source_ids": [source_id], "run_id": run_id, "evidence_label": "ASSUMPTION"})
         calculate_research(bundle, state, previous, run_id, input_hash)
+        if bundle.research:
+            for model in bundle.research.models:
+                if not any(a["assumption_id"] == model.record_id for a in state["assumptions"]):
+                    state["assumptions"].append({"assumption_id": model.record_id, "owner": "valuation",
+                        "scope": model.ticker + " explicit scenario/model assumptions", "effective_date": model.effective_date.isoformat(),
+                        "value": model.model_dump(mode="json"), "source_ids": model.source_ids,
+                        "run_id": run_id, "evidence_label": "ASSUMPTION"})
         unchanged = same_analytics(previous, state)
         if unchanged:
             registry = state["sources"]

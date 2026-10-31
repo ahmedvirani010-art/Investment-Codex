@@ -135,7 +135,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
                 "effective_date": record.effective_date.isoformat(), "market_cutoff": cutoff.isoformat(),
                 "source_ids": sorted(ids), "assumption_ids": [record.record_id] if owner == "valuation" else [],
                 "input_hash": input_hash, "units": "PKR / shares / fraction as named",
-                "model_version": "reference-adapters-v1", "confidence": "SYNTHETIC" if bundle.mode == "DEMO" else "SOURCE_DECLARED",
+                "model_version": getattr(record, "model_version", "reference-adapters-v1"), "confidence": "SYNTHETIC" if bundle.mode == "DEMO" else "SOURCE_DECLARED",
                 "freshness": "CURRENT" if record.valid_until >= cutoff else "STALE", "validation_status": "VALIDATED"}
 
     earnings = {e.ticker: e for e in research.earnings}
@@ -185,7 +185,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
                             "scenario_id": s.scenario_id, "earnings_id": e.record_id,
                             "upstream_run_ids": sorted({provenance[e.record_id]["run_id"], provenance[m.record_id]["run_id"]}),
                             "source_ids": sorted(set(m.source_ids + e.source_ids + [a.source_id for a in e.adjustments] + [p.source_id]) | set(research.universe_source_ids)),
-                            "method": m.method, "model_version": m.model_version, "forward_period": m.forward_period,
+                            "method": m.method, "model_version": m.model_version, "origin": m.origin, "certification": m.certification, "forward_period": m.forward_period,
                             "forward_basis": m.forward_basis, "reported_eps": e.reported_eps,
                             "normalized_eps": next(r["normalized_eps"] for r in output["earnings"] if r["ticker"] == ticker),
                             "forward_eps": s.forward_eps, "sustainable_dps": s.sustainable_dps,

@@ -88,12 +88,18 @@ def require_clean(root: Path):
 
 def prepare_repository(root: Path):
     root.mkdir(parents=True, exist_ok=True)
+    created_ignore = False
     if not (root / ".git").exists():
         git(root, "init", "-q")
+        if not (root / ".gitignore").exists():
+            atomic_write(root / ".gitignore", b".runtime/\ninputs/private/\n.env\n")
+            created_ignore = True
     if head(root) is None:
         # Do not include pre-existing files or user changes in an initial commit.
         if git(root, "diff", "--cached", "--name-only").stdout:
             raise PublicationError("pre-existing staged changes must be preserved before init")
+        if created_ignore:
+            git(root, "add", "--", ".gitignore")
         git(root, "-c", "user.name=Investment Workspace", "-c", "user.email=workspace@localhost", "commit", "--allow-empty", "-m", "workspace: initialize local publication history")
 
 

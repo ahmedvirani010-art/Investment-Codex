@@ -35,6 +35,7 @@ def test_reference_models_bridge_returns_and_coverage(repo, research_bundle):
     assert Decimal(bank["present_fair_value"]) == 225  # 100*(.20-.02)/(.10-.02)
     assert Decimal(bank["gross_return"]) == Decimal("0.04")  # (125 + 5 - 125)/125, not (FV-price)/price
     assert bank["net_return"] is None
+    assert bank["assumption_ids"][0] in {a["assumption_id"] for a in state["assumptions"]}
     industrial = next(r for r in research["valuations"] if r["ticker"] == "DEMO-INDUSTRIAL")
     assert abs(Decimal(industrial["present_fair_value"]) - Decimal("118.1818181818181818")) < Decimal("1e-14")
     assert research["summary"]["eligible_count"] == 3
@@ -291,3 +292,10 @@ def test_valuation_without_research_is_partial(repo, bundle):
     result = pipeline.run(repo, pipeline.current_input(repo), workflow="valuation")
     assert result["status"] == "PARTIAL"
     assert main(["--root", str(repo), "run", "valuation", "--require-full-coverage"]) == 1
+
+
+def test_phase2_init_in_empty_directory(tmp_path):
+    root = tmp_path / "new-demo"
+    assert main(["--root", str(root), "init", "--offline", "--phase2"]) == 0
+    assert read_json(root, pipeline.STATE)["research"]["summary"]["eligible_count"] == 3
+    assert not storage.git(root, "status", "--porcelain").stdout
