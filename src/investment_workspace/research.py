@@ -2,6 +2,9 @@
 
 from decimal import Decimal, localcontext
 
+from .contracts import payload as record_payload, normalize
+from .runtime import assessment_date, cached, BudgetExceeded
+
 
 ZERO = Decimal(0)
 ISSUES = {"POL": "POL_DPS", "BAHL": "BAHL_EPS", "OGDC": "OGDC_ENTITLEMENT",
@@ -13,32 +16,12 @@ DRIVERS = {
 }
 COLLECTIONS = ("earnings", "models", "dividends", "resolutions")
 SHEETS = {"Earnings_Bridge": "earnings", "Valuation": "valuations",
-          "Entry_Levels": "entries", "Dividend_Calendar": "dividends", "Top_10": "ranking"}
+          "Entry_Levels": "entries", "Dividend_Calendar": "dividends", "Top_10": "ranking", "Forward_Bridge": "forecasts"}
 
 
-def fair_value(model, scenario, sector):
-    """Explicit reference adapters v1, not recovered proprietary equations."""
-    s = scenario
-    missing = DRIVERS.get(sector, set()) - s.drivers.keys()
-    if missing or any(not v.strip() for v in s.drivers.values()):
-        raise ValueError("missing sector driver evidence: " + ", ".join(sorted(missing)))
-    if model.method == "BANK_JUSTIFIED_PB" and sector == "Bank":
-        if s.book_value_per_share is None or s.sustainable_roe is None:
-            raise ValueError("bank model needs book value and sustainable ROE")
-        value = s.book_value_per_share * (s.sustainable_roe - s.terminal_growth) / (s.discount_rate - s.terminal_growth)
-    elif model.method == "FCFE_DCF" and sector in {"E&P", "Industrial"}:
-        if not s.fcfe or s.shares is None or s.terminal_value is None:
-            raise ValueError("FCFE model needs annual equity cash flows, shares and explicit terminal equity value")
-        if sector == "E&P" and s.payout_crosscheck is None:
-            raise ValueError("E&P requires a payout cross-check")
-        # Terminal equity value is explicitly supplied; finite reserve/contract life is not inferred.
-        value = (sum((cf / (1 + s.discount_rate) ** year for year, cf in enumerate(s.fcfe, 1)), ZERO)
-                 + s.terminal_value / (1 + s.discount_rate) ** len(s.fcfe)) / s.shares
-    else:
-        raise ValueError(f"unsupported sector/method: {sector}/{model.method}")
-    if value <= 0:
-        raise ValueError("non-positive equity value; no entry level or ranking")
-    return value
+def fair_value(model, scenario, sector, bundle=None):
+    from .models import reference_value
+    return reference_value(model, scenario, sector, bundle)
 
 
 def return_bridge(model, s, value, price):
@@ -76,6 +59,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             raise ValueError("accepted research cannot be omitted; use import-research to revise it")
         return
     cutoff = bundle.market_cutoff
+    assessment = assessment_date(bundle)
     sources = {s.source_id: s for s in bundle.sources}
     securities = {s.ticker: s for s in bundle.securities}
     if research.universe_date > cutoff:
@@ -95,7 +79,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             raise ValueError("research references an unregistered source")
         return all(sources[i].evidence_label == "CONFIRMED" for i in ids)
 
-    universe_ok = evidence_ok(research.universe_source_ids) and research.full_universe_verified and research.universe_valid_until >= cutoff
+    universe_ok = evidence_ok(research.universe_source_ids) and research.full_universe_verified and research.universe_valid_until >= assessment
     history = list(previous.get("research", {}).get("history", []))
     old_records = {r["record_id"]: r for r in history}
     active_old = {r["record_id"]: r for group in COLLECTIONS
@@ -108,11 +92,11 @@ def _calculate(bundle, state, previous, run_id, input_hash):
         if record.effective_date > cutoff:
             raise ValueError("research record effective after cutoff")
         evidence_ok(record.source_ids)
-        payload = record.model_dump(mode="json")
+        payload = record_payload(record)
         if not payload.get("covered_event_ids"):
             payload.pop("covered_event_ids", None)
         if record.record_id in old_records:
-            if old_records[record.record_id]["payload"] != payload:
+            if normalize(old_records[record.record_id]["payload"]) != payload:
                 raise ValueError("research record ID is immutable; use a new ID and supersedes")
             if record.record_id not in active_old:
                 raise ValueError("superseded research record cannot be reactivated")
@@ -131,7 +115,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             raise ValueError("accepted research record omitted without explicit supersession")
 
     output = {"input": research.model_dump(mode="json"), "history": history,
-              "earnings": [], "valuations": [], "entries": [], "dividends": [], "ranking": []}
+              "earnings": [], "valuations": [], "entries": [], "dividends": [], "ranking": [], "forecasts": []}
     provenance = {r["record_id"]: r for r in history}
 
     def meta(record, owner):
@@ -142,7 +126,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
                 "source_ids": sorted(ids), "assumption_ids": [record.record_id] if owner == "valuation" else [],
                 "input_hash": input_hash, "units": "PKR / shares / fraction as named",
                 "model_version": getattr(record, "model_version", "reference-adapters-v1"), "confidence": "SYNTHETIC" if bundle.mode == "DEMO" else "SOURCE_DECLARED",
-                "freshness": "CURRENT" if record.valid_until >= cutoff else "STALE", "validation_status": "VALIDATED"}
+                "freshness": "CURRENT" if record.valid_until >= assessment else "STALE", "validation_status": "VALIDATED"}
 
     earnings = {e.ticker: e for e in research.earnings}
     for e in research.earnings:
@@ -168,21 +152,29 @@ def _calculate(bundle, state, previous, run_id, input_hash):
                 if e is None or m.earnings_id != e.record_id:
                     outcome, reason = "BLOCKED_EVIDENCE", "Missing owned earnings bridge"
                 elif not (evidence_ok(m.source_ids + e.source_ids + [a.source_id for a in e.adjustments])
-                          and m.valid_until >= cutoff and e.valid_until >= cutoff
-                          and m.event_checked_through == cutoff and p and p.close is not None
+                          and m.valid_until >= assessment and e.valid_until >= assessment
+                          and m.event_checked_through == assessment and p and p.close is not None
                           and evidence_ok([p.source_id])
-                          and (cutoff - p.session_date).days <= bundle.policy.price_max_age_days):
+                          and (assessment - p.session_date).days <= bundle.policy.price_max_age_days):
                     outcome, reason = "BLOCKED_EVIDENCE", "Unverified/stale evidence, price or event coverage"
                 elif m.accounting_basis != e.basis or m.share_basis_date != e.share_basis_date:
                     outcome, reason = "BLOCKED_EVIDENCE", "Earnings/forecast accounting or share basis mismatch"
                 elif ticker in ISSUES and not any(r.ticker == ticker and r.issue == ISSUES[ticker]
-                          and r.valid_until >= cutoff and evidence_ok(r.source_ids) for r in research.resolutions):
+                          and r.valid_until >= assessment and evidence_ok(r.source_ids) for r in research.resolutions):
                     outcome, reason = "BLOCKED_EVIDENCE", "Unresolved legacy conflict: " + ISSUES[ticker]
                 elif m.certification != "VALIDATED":
                     outcome, reason = "BLOCKED_MODEL", "Provisional model; excluded from ranking"
                 else:
                     for s in m.scenarios:
-                        value = fair_value(m, s, securities[ticker].sector)
+                        from .models import bridge
+                        forecast_rows = [bridge(f,m,bundle) for f in s.operating_forecasts]
+                        for index, forecast in enumerate(forecast_rows):
+                            output['forecasts'].append(_json_numbers({**meta(m,'valuation'), **forecast,
+                                'scenario':s.name,'year':index+1,'forecast_basis':m.forward_basis,'model_version':m.model_version}))
+                        value = Decimal(cached('valuation', ticker + '.' + s.name,
+                            {'model': record_payload(m), 'scenario': record_payload(s), 'sector': securities[ticker].sector,
+                             'financials': [record_payload(f) for f in bundle.financials if f.record_id in {of.revenue_fact_id for of in s.operating_forecasts}]},
+                            lambda: fair_value(m, s, securities[ticker].sector, bundle)))
                         if m.origin == "LEGACY_RECOVERED" and (not m.legacy_column_map
                                 or s.name not in m.historical_outputs
                                 or abs(value - m.historical_outputs[s.name]) > m.reproduction_tolerance):
@@ -190,7 +182,9 @@ def _calculate(bundle, state, previous, run_id, input_hash):
                         rows.append(_json_numbers({**meta(m, "valuation"), "scenario": s.name,
                             "scenario_id": s.scenario_id, "earnings_id": e.record_id,
                             "upstream_run_ids": sorted({provenance[e.record_id]["run_id"], provenance[m.record_id]["run_id"]}),
-                            "source_ids": sorted(set(m.source_ids + e.source_ids + [a.source_id for a in e.adjustments] + [p.source_id]) | set(research.universe_source_ids)),
+                            "source_ids": sorted(set(m.source_ids + e.source_ids + [a.source_id for a in e.adjustments] + [p.source_id]
+                                + (m.approval.source_ids if m.approval else []) + [src for component in s.components for src in component.source_ids]
+                                + [src for f in bundle.financials if f.record_id in {of.revenue_fact_id for of in s.operating_forecasts} for src in f.source_ids]) | set(research.universe_source_ids)),
                             "method": m.method, "model_version": m.model_version, "origin": m.origin, "certification": m.certification, "forward_period": m.forward_period,
                             "forward_basis": m.forward_basis, "reported_eps": e.reported_eps,
                             "normalized_eps": next(r["normalized_eps"] for r in output["earnings"] if r["ticker"] == ticker),
@@ -217,8 +211,12 @@ def _calculate(bundle, state, previous, run_id, input_hash):
                         "sizing_status": "BLOCKED", "basis": "GROSS; net planning requires tax/cost settings"}))
                     # New inputs are revalued; unchanged records preserve original lineage below.
                     outcome, reason = "REVALUED", "Validated explicit model; arithmetic and evidence gates passed"
+        except BudgetExceeded as exc:
+            outcome, reason = "BLOCKED_EVIDENCE", str(exc)
         except ValueError as exc:
             outcome, reason = "BLOCKED_MODEL", str(exc)
+        if outcome.startswith('BLOCKED'):
+            output['forecasts'] = [r for r in output['forecasts'] if r['ticker'] != ticker]
         state["coverage"].append({"ticker": ticker, "outcome": outcome, "reason": reason, "owner": "valuation",
                                   "run_id": run_id, "market_cutoff": cutoff.isoformat(),
                                   "source_ids": m.source_ids if m else research.universe_source_ids})
@@ -266,7 +264,7 @@ def dividend_result(d, bundle, state, metadata, evidence_ok):
     receipts = [t for t in state["transactions"] if t["transaction_id"] in d.receipt_transaction_ids]
     if len(receipts) != len(d.receipt_transaction_ids) or any(t["kind"] != "DIVIDEND" or t["ticker"] != d.ticker for t in receipts):
         raise ValueError("receipt must reference an accepted DIVIDEND transaction for the same ticker")
-    verified = (evidence_ok(d.source_ids) and d.valid_until >= bundle.market_cutoff and d.dates_verified
+    verified = (evidence_ok(d.source_ids) and d.valid_until >= assessment_date(bundle) and d.dates_verified
                 and d.ex_date is not None and d.record_date is not None and d.settlement_rule == "SETTLED_BEFORE_EX")
     # Only compute entitlement inside the reconciled ledger window. Current holdings prove nothing before opening.
     if verified and bundle.opening.timestamp.date() < d.ex_date <= bundle.closing.timestamp.date() and not state["reconciliation"] and evidence_ok([bundle.opening.source_id, bundle.closing.source_id] + [t.source_id for t in bundle.transactions]):
@@ -284,7 +282,7 @@ def dividend_result(d, bundle, state, metadata, evidence_ok):
         net = gross * (1 - d.tax_rate) if d.tax_rate is not None else None
         status = "NOT_ENTITLED" if quantity == 0 else "ENTITLED"
         if quantity and d.payment_date:
-            status = "OVERDUE" if d.payment_date < bundle.market_cutoff else "RECEIVABLE"
+            status = "OVERDUE" if d.payment_date < assessment_date(bundle) else "RECEIVABLE"
         if receipts:
             total = sum((Decimal(t["amount"]) for t in receipts), ZERO)
             withheld = sum((Decimal(t["taxes"]) for t in receipts), ZERO)

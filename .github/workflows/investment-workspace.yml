@@ -1,0 +1,76 @@
+name: Controlled investment workspace
+on:
+  workflow_dispatch:
+    inputs:
+      workflow:
+        type: choice
+        options: [daily, valuation, ic, macro]
+        default: daily
+        required: true
+      dry_run:
+        type: boolean
+        default: true
+  schedule:
+    - cron: '0 * * * 1-5'
+    - cron: '0 5 * * 6'
+    - cron: '0 14 * * 0'
+permissions:
+  contents: write
+concurrency:
+  group: investment-workspace-publication
+  cancel-in-progress: false
+jobs:
+  research:
+    if: github.event.repository.private == true
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - name: Gate production policy
+        id: policy
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          config=json.loads(Path('config/production.json').read_text())
+          enabled=config.get('enabled') is True
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('enabled='+str(enabled).lower()+'\n')
+          if not enabled:
+              print('Production policy is disabled. No data mutation or publication attempted.')
+          PY
+      - if: steps.policy.outputs.enabled == 'true'
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - if: steps.policy.outputs.enabled == 'true'
+        uses: astral-sh/setup-uv@v6
+        with:
+          version: '0.12.23'
+      - if: steps.policy.outputs.enabled == 'true'
+        run: uv sync --locked
+      - name: Evaluate controlled imports and publish authorized diagnostics
+        if: steps.policy.outputs.enabled == 'true'
+        env:
+          REQUESTED_WORKFLOW: ${{ inputs.workflow }}
+          REQUESTED_DRY_RUN: ${{ inputs.dry_run }}
+          TRIGGER_SCHEDULE: ${{ github.event.schedule }}
+          TRIGGER_NAME: ${{ github.event_name }}
+        run: |
+          uv run --locked python - <<'PY'
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+          import os
+          from investment_workspace.cli import main
+          trigger=os.environ['TRIGGER_SCHEDULE']
+          workflow='valuation' if trigger=='0 5 * * 6' else 'ic' if trigger=='0 14 * * 0' else os.environ.get('REQUESTED_WORKFLOW') or 'daily'
+          args=['automation','--workflow',workflow,'--as-of',datetime.now(ZoneInfo('Asia/Karachi')).date().isoformat()]
+          if os.environ.get('TRIGGER_NAME')=='schedule':
+              args.append('--scheduled')
+          elif os.environ.get('REQUESTED_DRY_RUN','true')=='true':
+              args.append('--dry-run')
+          raise SystemExit(main(args))
+          PY

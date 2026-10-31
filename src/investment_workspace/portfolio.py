@@ -3,6 +3,7 @@
 from decimal import Decimal, localcontext
 
 from .schemas import Bundle
+from .runtime import assessment_date
 
 ZERO = Decimal(0)
 
@@ -70,7 +71,7 @@ def _calculate(bundle: Bundle) -> dict:
     exceptions = []
     holdings = []
     all_tickers = sorted(set(positions) | set(closing))
-    holdings_age = (bundle.market_cutoff - bundle.closing.timestamp.date()).days
+    holdings_age = (assessment_date(bundle) - bundle.closing.timestamp.date()).days
     if holdings_age > bundle.policy.holdings_max_age_days:
         gaps.append({"ticker": None, "field": "holdings", "reason": "STALE_HOLDINGS", "owner": "portfolio", "next_action": "Import a dated settled snapshot"})
     if bundle.policy.max_position_weight is None:
@@ -89,7 +90,7 @@ def _calculate(bundle: Bundle) -> dict:
         if not qty and not observed_qty:
             continue
         price = prices.get(ticker)
-        age = (bundle.market_cutoff - price.session_date).days if price else None
+        age = (assessment_date(bundle) - price.session_date).days if price else None
         freshness = "MISSING" if not price or price.close is None else "STALE" if age > bundle.policy.price_max_age_days else "CURRENT"
         if freshness != "CURRENT":
             gaps.append({"ticker": ticker, "field": "price", "reason": f"{freshness}_PRICE", "owner": "prices", "next_action": "Import a verified completed-session price"})

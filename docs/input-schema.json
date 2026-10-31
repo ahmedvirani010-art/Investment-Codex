@@ -8,6 +8,11 @@
           "title": "Description",
           "type": "string"
         },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
         "pretax_amount": {
           "anyOf": [
             {
@@ -19,18 +24,6 @@
             }
           ],
           "title": "Pretax Amount"
-        },
-        "tax_effect": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Tax Effect"
         },
         "rationale": {
           "minLength": 1,
@@ -48,10 +41,17 @@
           "title": "Source Id",
           "type": "string"
         },
-        "locator": {
-          "minLength": 1,
-          "title": "Locator",
-          "type": "string"
+        "tax_effect": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Tax Effect"
         }
       },
       "required": [
@@ -69,86 +69,10 @@
     "AlertMethodology": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
-        "effective_date": {
-          "format": "date",
-          "title": "Effective Date",
-          "type": "string"
-        },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
-          "type": "string"
-        },
-        "source_ids": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Source Ids",
-          "type": "array"
-        },
-        "supersedes": {
-          "anyOf": [
-            {
-              "maxLength": 100,
-              "pattern": "^[A-Za-z0-9_.-]+$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Supersedes"
-        },
-        "methodology_id": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Methodology Id"
-        },
         "approved_replacement": {
           "default": false,
           "title": "Approved Replacement",
           "type": "boolean"
-        },
-        "bull_score": {
-          "anyOf": [
-            {
-              "maximum": 10.0,
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Bull Score"
         },
         "bear_score": {
           "anyOf": [
@@ -168,46 +92,50 @@
           "default": null,
           "title": "Bear Score"
         },
-        "rationale": {
-          "minLength": 1,
-          "title": "Rationale",
-          "type": "string"
-        }
-      },
-      "required": [
-        "record_id",
-        "ticker",
-        "effective_date",
-        "valid_until",
-        "source_ids",
-        "rationale"
-      ],
-      "title": "AlertMethodology",
-      "type": "object"
-    },
-    "Catalyst": {
-      "additionalProperties": false,
-      "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
+        "bull_score": {
+          "anyOf": [
+            {
+              "maximum": 10.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Bull Score"
         },
         "effective_date": {
           "format": "date",
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+        "methodology_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Methodology Id"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
           "type": "string"
         },
         "source_ids": {
@@ -234,9 +162,222 @@
           "default": null,
           "title": "Supersedes"
         },
-        "window_start": {
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
           "format": "date",
-          "title": "Window Start",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "rationale"
+      ],
+      "title": "AlertMethodology",
+      "type": "object"
+    },
+    "AssetQuote": {
+      "additionalProperties": false,
+      "properties": {
+        "close": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Close"
+        },
+        "fx_to_pkr": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx To Pkr"
+        },
+        "session_date": {
+          "format": "date",
+          "title": "Session Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_date",
+        "close"
+      ],
+      "title": "AssetQuote",
+      "type": "object"
+    },
+    "AssetReturn": {
+      "additionalProperties": false,
+      "properties": {
+        "annual_fee_rate": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Annual Fee Rate"
+        },
+        "annual_nominal_return": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": -1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Annual Nominal Return"
+        },
+        "asset_key": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Asset Key",
+          "type": "string"
+        },
+        "return_tax_rate": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Return Tax Rate"
+        },
+        "withdrawal_tax_rate": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Withdrawal Tax Rate"
+        }
+      },
+      "required": [
+        "asset_key",
+        "annual_nominal_return",
+        "annual_fee_rate",
+        "return_tax_rate",
+        "withdrawal_tax_rate"
+      ],
+      "title": "AssetReturn",
+      "type": "object"
+    },
+    "Catalyst": {
+      "additionalProperties": false,
+      "properties": {
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "probability_basis": {
+          "minLength": 1,
+          "title": "Probability Basis",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
           "type": "string"
         },
         "window_end": {
@@ -244,14 +385,9 @@
           "title": "Window End",
           "type": "string"
         },
-        "description": {
-          "minLength": 1,
-          "title": "Description",
-          "type": "string"
-        },
-        "probability_basis": {
-          "minLength": 1,
-          "title": "Probability Basis",
+        "window_start": {
+          "format": "date",
+          "title": "Window Start",
           "type": "string"
         }
       },
@@ -278,11 +414,6 @@
           "title": "Action Id",
           "type": "string"
         },
-        "session_date": {
-          "format": "date",
-          "title": "Session Date",
-          "type": "string"
-        },
         "kind": {
           "enum": [
             "SPLIT",
@@ -304,6 +435,11 @@
           ],
           "title": "Ratio"
         },
+        "session_date": {
+          "format": "date",
+          "title": "Session Date",
+          "type": "string"
+        },
         "source_id": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
@@ -321,19 +457,21 @@
       "title": "CorporateAction",
       "type": "object"
     },
-    "Dividend": {
+    "CrossAssetHistory": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
+        "asset_key": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
+          "title": "Asset Key",
           "type": "string"
         },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
+        "currency": {
+          "enum": [
+            "PKR",
+            "USD"
+          ],
+          "title": "Currency",
           "type": "string"
         },
         "effective_date": {
@@ -341,9 +479,40 @@
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+        "fx_source_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx Source Id"
+        },
+        "quotes": {
+          "items": {
+            "$ref": "#/$defs/AssetQuote"
+          },
+          "minItems": 2,
+          "title": "Quotes",
+          "type": "array"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "return_basis": {
+          "enum": [
+            "PRICE",
+            "TOTAL_RETURN"
+          ],
+          "title": "Return Basis",
           "type": "string"
         },
         "source_ids": {
@@ -370,10 +539,70 @@
           "default": null,
           "title": "Supersedes"
         },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "asset_key",
+        "currency",
+        "return_basis",
+        "quotes"
+      ],
+      "title": "CrossAssetHistory",
+      "type": "object"
+    },
+    "Dividend": {
+      "additionalProperties": false,
+      "properties": {
         "announcement_date": {
           "format": "date",
           "title": "Announcement Date",
           "type": "string"
+        },
+        "book_closure_end": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Book Closure End"
+        },
+        "book_closure_start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Book Closure Start"
+        },
+        "dates_verified": {
+          "default": false,
+          "title": "Dates Verified",
+          "type": "boolean"
         },
         "dividend_type": {
           "const": "CASH",
@@ -394,6 +623,11 @@
           ],
           "title": "Dps"
         },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
         "ex_date": {
           "anyOf": [
             {
@@ -406,45 +640,6 @@
           ],
           "default": null,
           "title": "Ex Date"
-        },
-        "record_date": {
-          "anyOf": [
-            {
-              "format": "date",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Record Date"
-        },
-        "book_closure_start": {
-          "anyOf": [
-            {
-              "format": "date",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Book Closure Start"
-        },
-        "book_closure_end": {
-          "anyOf": [
-            {
-              "format": "date",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Book Closure End"
         },
         "payment_date": {
           "anyOf": [
@@ -459,10 +654,33 @@
           "default": null,
           "title": "Payment Date"
         },
-        "dates_verified": {
-          "default": false,
-          "title": "Dates Verified",
-          "type": "boolean"
+        "receipt_transaction_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Receipt Transaction Ids",
+          "type": "array"
+        },
+        "record_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Record Date"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
         },
         "settlement_rule": {
           "anyOf": [
@@ -476,6 +694,30 @@
           ],
           "default": null,
           "title": "Settlement Rule"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
         },
         "tax_rate": {
           "anyOf": [
@@ -495,14 +737,16 @@
           "default": null,
           "title": "Tax Rate"
         },
-        "receipt_transaction_ids": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "title": "Receipt Transaction Ids",
-          "type": "array"
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -520,16 +764,19 @@
     "Earnings": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
+        "adjustments": {
+          "items": {
+            "$ref": "#/$defs/Adjustment"
+          },
+          "title": "Adjustments",
+          "type": "array"
         },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
+        "basis": {
+          "enum": [
+            "STANDALONE",
+            "CONSOLIDATED"
+          ],
+          "title": "Basis",
           "type": "string"
         },
         "effective_date": {
@@ -537,9 +784,71 @@
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
+        "period_end": {
           "format": "date",
-          "title": "Valid Until",
+          "title": "Period End",
+          "type": "string"
+        },
+        "period_label": {
+          "minLength": 1,
+          "title": "Period Label",
+          "type": "string"
+        },
+        "period_start": {
+          "format": "date",
+          "title": "Period Start",
+          "type": "string"
+        },
+        "quality": {
+          "default": "UNASSESSED",
+          "enum": [
+            "A",
+            "B",
+            "C",
+            "D",
+            "UNASSESSED"
+          ],
+          "title": "Quality",
+          "type": "string"
+        },
+        "quality_rationale": {
+          "minLength": 1,
+          "title": "Quality Rationale",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "reported_eps": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Reported Eps"
+        },
+        "reported_pat": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Reported Pat"
+        },
+        "share_basis_date": {
+          "format": "date",
+          "title": "Share Basis Date",
           "type": "string"
         },
         "source_ids": {
@@ -566,40 +875,16 @@
           "default": null,
           "title": "Supersedes"
         },
-        "period_start": {
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
           "format": "date",
-          "title": "Period Start",
+          "title": "Valid Until",
           "type": "string"
-        },
-        "period_end": {
-          "format": "date",
-          "title": "Period End",
-          "type": "string"
-        },
-        "period_label": {
-          "minLength": 1,
-          "title": "Period Label",
-          "type": "string"
-        },
-        "basis": {
-          "enum": [
-            "STANDALONE",
-            "CONSOLIDATED"
-          ],
-          "title": "Basis",
-          "type": "string"
-        },
-        "reported_pat": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Reported Pat"
         },
         "weighted_average_shares": {
           "anyOf": [
@@ -613,47 +898,6 @@
             }
           ],
           "title": "Weighted Average Shares"
-        },
-        "reported_eps": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Reported Eps"
-        },
-        "share_basis_date": {
-          "format": "date",
-          "title": "Share Basis Date",
-          "type": "string"
-        },
-        "adjustments": {
-          "items": {
-            "$ref": "#/$defs/Adjustment"
-          },
-          "title": "Adjustments",
-          "type": "array"
-        },
-        "quality": {
-          "default": "UNASSESSED",
-          "enum": [
-            "A",
-            "B",
-            "C",
-            "D",
-            "UNASSESSED"
-          ],
-          "title": "Quality",
-          "type": "string"
-        },
-        "quality_rationale": {
-          "minLength": 1,
-          "title": "Quality Rationale",
-          "type": "string"
         }
       },
       "required": [
@@ -675,29 +919,80 @@
       "title": "Earnings",
       "type": "object"
     },
+    "EvidenceDocument": {
+      "additionalProperties": false,
+      "properties": {
+        "role": {
+          "default": "SOURCE_DOCUMENT",
+          "enum": [
+            "SOURCE_DOCUMENT",
+            "EVIDENCE_CONTRACT",
+            "REPLACEMENT_PROMPTS",
+            "VALUATION_RERUN"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Sha256",
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "store_permitted": {
+          "const": true,
+          "title": "Store Permitted",
+          "type": "boolean"
+        },
+        "suffix": {
+          "enum": [
+            ".pdf",
+            ".xlsx",
+            ".json",
+            ".csv",
+            ".md",
+            ".txt"
+          ],
+          "title": "Suffix",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_id",
+        "sha256",
+        "suffix",
+        "store_permitted"
+      ],
+      "title": "EvidenceDocument",
+      "type": "object"
+    },
     "FactorExposure": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
         "effective_date": {
           "format": "date",
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+        "factors": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Factors",
+          "type": "array"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
           "type": "string"
         },
         "source_ids": {
@@ -724,15 +1019,16 @@
           "default": null,
           "title": "Supersedes"
         },
-        "factors": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Factors",
-          "type": "array"
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -746,29 +1042,58 @@
       "title": "FactorExposure",
       "type": "object"
     },
-    "ICProposal": {
+    "FinancialFact": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
+        "accounting_basis": {
+          "enum": [
+            "STANDALONE",
+            "CONSOLIDATED"
+          ],
+          "title": "Accounting Basis",
           "type": "string"
         },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
+        "amount": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Amount"
         },
         "effective_date": {
           "format": "date",
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
+        "line_item": {
+          "minLength": 1,
+          "title": "Line Item",
+          "type": "string"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "period_end": {
           "format": "date",
-          "title": "Valid Until",
+          "title": "Period End",
+          "type": "string"
+        },
+        "period_start": {
+          "format": "date",
+          "title": "Period Start",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
           "type": "string"
         },
         "source_ids": {
@@ -795,6 +1120,47 @@
           "default": null,
           "title": "Supersedes"
         },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "units": {
+          "enum": [
+            "PKR",
+            "PKR_PER_SHARE",
+            "SHARES"
+          ],
+          "title": "Units",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "period_start",
+        "period_end",
+        "accounting_basis",
+        "line_item",
+        "amount",
+        "units",
+        "locator"
+      ],
+      "title": "FinancialFact",
+      "type": "object"
+    },
+    "ICProposal": {
+      "additionalProperties": false,
+      "properties": {
         "action": {
           "enum": [
             "ADD",
@@ -805,30 +1171,6 @@
             "REVIEW"
           ],
           "title": "Action",
-          "type": "string"
-        },
-        "reason": {
-          "minLength": 1,
-          "title": "Reason",
-          "type": "string"
-        },
-        "confidence": {
-          "enum": [
-            "HIGH",
-            "MEDIUM",
-            "LOW"
-          ],
-          "title": "Confidence",
-          "type": "string"
-        },
-        "invalidation": {
-          "minLength": 1,
-          "title": "Invalidation",
-          "type": "string"
-        },
-        "opportunity_cost": {
-          "minLength": 1,
-          "title": "Opportunity Cost",
           "type": "string"
         },
         "candidate_id": {
@@ -844,6 +1186,76 @@
           ],
           "default": null,
           "title": "Candidate Id"
+        },
+        "confidence": {
+          "enum": [
+            "HIGH",
+            "MEDIUM",
+            "LOW"
+          ],
+          "title": "Confidence",
+          "type": "string"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "invalidation": {
+          "minLength": 1,
+          "title": "Invalidation",
+          "type": "string"
+        },
+        "opportunity_cost": {
+          "minLength": 1,
+          "title": "Opportunity Cost",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -864,11 +1276,16 @@
     "Integration": {
       "additionalProperties": false,
       "properties": {
-        "schema_version": {
-          "const": "3.0",
-          "default": "3.0",
-          "title": "Schema Version",
-          "type": "string"
+        "alert_methodology": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/AlertMethodology"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "calendar": {
           "anyOf": [
@@ -881,11 +1298,32 @@
           ],
           "default": null
         },
-        "memberships": {
+        "candidates": {
           "items": {
-            "$ref": "#/$defs/Membership"
+            "$ref": "#/$defs/WatchCandidate"
           },
-          "title": "Memberships",
+          "title": "Candidates",
+          "type": "array"
+        },
+        "catalysts": {
+          "items": {
+            "$ref": "#/$defs/Catalyst"
+          },
+          "title": "Catalysts",
+          "type": "array"
+        },
+        "events": {
+          "items": {
+            "$ref": "#/$defs/NewsEvent"
+          },
+          "title": "Events",
+          "type": "array"
+        },
+        "factors": {
+          "items": {
+            "$ref": "#/$defs/FactorExposure"
+          },
+          "title": "Factors",
           "type": "array"
         },
         "histories": {
@@ -894,17 +1332,6 @@
           },
           "title": "Histories",
           "type": "array"
-        },
-        "timing_policy": {
-          "anyOf": [
-            {
-              "$ref": "#/$defs/TimingPolicy"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null
         },
         "macro": {
           "items": {
@@ -920,11 +1347,18 @@
           "title": "Macro Scenarios",
           "type": "array"
         },
-        "events": {
+        "memberships": {
           "items": {
-            "$ref": "#/$defs/NewsEvent"
+            "$ref": "#/$defs/Membership"
           },
-          "title": "Events",
+          "title": "Memberships",
+          "type": "array"
+        },
+        "proposals": {
+          "items": {
+            "$ref": "#/$defs/ICProposal"
+          },
+          "title": "Proposals",
           "type": "array"
         },
         "risk_limits": {
@@ -938,38 +1372,16 @@
           ],
           "default": null
         },
-        "factors": {
-          "items": {
-            "$ref": "#/$defs/FactorExposure"
-          },
-          "title": "Factors",
-          "type": "array"
+        "schema_version": {
+          "const": "3.0",
+          "default": "3.0",
+          "title": "Schema Version",
+          "type": "string"
         },
-        "catalysts": {
-          "items": {
-            "$ref": "#/$defs/Catalyst"
-          },
-          "title": "Catalysts",
-          "type": "array"
-        },
-        "candidates": {
-          "items": {
-            "$ref": "#/$defs/WatchCandidate"
-          },
-          "title": "Candidates",
-          "type": "array"
-        },
-        "proposals": {
-          "items": {
-            "$ref": "#/$defs/ICProposal"
-          },
-          "title": "Proposals",
-          "type": "array"
-        },
-        "alert_methodology": {
+        "timing_policy": {
           "anyOf": [
             {
-              "$ref": "#/$defs/AlertMethodology"
+              "$ref": "#/$defs/TimingPolicy"
             },
             {
               "type": "null"
@@ -984,26 +1396,31 @@
     "LegacyResolution": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
         "effective_date": {
           "format": "date",
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+        "issue": {
+          "enum": [
+            "POL_DPS",
+            "BAHL_EPS",
+            "OGDC_ENTITLEMENT",
+            "INDU_CASH_INCOME",
+            "AKBL_TREASURY_OCI"
+          ],
+          "title": "Issue",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
           "type": "string"
         },
         "source_ids": {
@@ -1030,20 +1447,15 @@
           "default": null,
           "title": "Supersedes"
         },
-        "issue": {
-          "enum": [
-            "POL_DPS",
-            "BAHL_EPS",
-            "OGDC_ENTITLEMENT",
-            "INDU_CASH_INCOME",
-            "AKBL_TREASURY_OCI"
-          ],
-          "title": "Issue",
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
           "type": "string"
         },
-        "rationale": {
-          "minLength": 1,
-          "title": "Rationale",
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
           "type": "string"
         }
       },
@@ -1062,16 +1474,12 @@
     "MacroObservation": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
+        "domain": {
+          "enum": [
+            "PAKISTAN",
+            "GLOBAL"
+          ],
+          "title": "Domain",
           "type": "string"
         },
         "effective_date": {
@@ -1079,10 +1487,42 @@
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+        "evidence_kind": {
+          "enum": [
+            "FACT",
+            "INTERPRETATION",
+            "SCENARIO"
+          ],
+          "title": "Evidence Kind",
           "type": "string"
+        },
+        "indicator": {
+          "minLength": 1,
+          "title": "Indicator",
+          "type": "string"
+        },
+        "narrative": {
+          "minLength": 1,
+          "title": "Narrative",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "regime": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Regime"
         },
         "source_ids": {
           "items": {
@@ -1108,26 +1548,20 @@
           "default": null,
           "title": "Supersedes"
         },
-        "domain": {
-          "enum": [
-            "PAKISTAN",
-            "GLOBAL"
-          ],
-          "title": "Domain",
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
           "type": "string"
         },
-        "indicator": {
+        "unit": {
           "minLength": 1,
-          "title": "Indicator",
+          "title": "Unit",
           "type": "string"
         },
-        "evidence_kind": {
-          "enum": [
-            "FACT",
-            "INTERPRETATION",
-            "SCENARIO"
-          ],
-          "title": "Evidence Kind",
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
           "type": "string"
         },
         "value": {
@@ -1145,28 +1579,6 @@
           ],
           "default": null,
           "title": "Value"
-        },
-        "unit": {
-          "minLength": 1,
-          "title": "Unit",
-          "type": "string"
-        },
-        "narrative": {
-          "minLength": 1,
-          "title": "Narrative",
-          "type": "string"
-        },
-        "regime": {
-          "anyOf": [
-            {
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Regime"
         }
       },
       "required": [
@@ -1187,26 +1599,55 @@
     "MacroScenario": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
         "effective_date": {
           "format": "date",
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+        "name": {
+          "enum": [
+            "bear",
+            "base",
+            "bull"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "paths": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "minProperties": 1,
+          "title": "Paths",
+          "type": "object"
+        },
+        "probability": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Probability"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
           "type": "string"
         },
         "source_ids": {
@@ -1233,44 +1674,15 @@
           "default": null,
           "title": "Supersedes"
         },
-        "name": {
-          "enum": [
-            "bear",
-            "base",
-            "bull"
-          ],
-          "title": "Name",
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
           "type": "string"
         },
-        "probability": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Probability"
-        },
-        "paths": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "minProperties": 1,
-          "title": "Paths",
-          "type": "object"
-        },
-        "rationale": {
-          "minLength": 1,
-          "title": "Rationale",
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
           "type": "string"
         }
       },
@@ -1290,12 +1702,7 @@
     "MarketBar": {
       "additionalProperties": false,
       "properties": {
-        "session_date": {
-          "format": "date",
-          "title": "Session Date",
-          "type": "string"
-        },
-        "open": {
+        "close": {
           "anyOf": [
             {
               "exclusiveMinimum": 0.0,
@@ -1306,7 +1713,7 @@
               "type": "string"
             }
           ],
-          "title": "Open"
+          "title": "Close"
         },
         "high": {
           "anyOf": [
@@ -1334,7 +1741,7 @@
           ],
           "title": "Low"
         },
-        "close": {
+        "open": {
           "anyOf": [
             {
               "exclusiveMinimum": 0.0,
@@ -1345,20 +1752,12 @@
               "type": "string"
             }
           ],
-          "title": "Close"
+          "title": "Open"
         },
-        "volume": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Volume"
+        "session_date": {
+          "format": "date",
+          "title": "Session Date",
+          "type": "string"
         },
         "traded_value": {
           "anyOf": [
@@ -1376,6 +1775,19 @@
           ],
           "default": null,
           "title": "Traded Value"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Volume"
         }
       },
       "required": [
@@ -1392,67 +1804,6 @@
     "MarketHistory": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
-        "effective_date": {
-          "format": "date",
-          "title": "Effective Date",
-          "type": "string"
-        },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
-          "type": "string"
-        },
-        "source_ids": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Source Ids",
-          "type": "array"
-        },
-        "supersedes": {
-          "anyOf": [
-            {
-              "maxLength": 100,
-              "pattern": "^[A-Za-z0-9_.-]+$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Supersedes"
-        },
-        "role": {
-          "default": "SECURITY",
-          "enum": [
-            "SECURITY",
-            "BENCHMARK"
-          ],
-          "title": "Role",
-          "type": "string"
-        },
-        "price_basis": {
-          "const": "RAW",
-          "default": "RAW",
-          "title": "Price Basis",
-          "type": "string"
-        },
         "action_coverage_through": {
           "format": "date",
           "title": "Action Coverage Through",
@@ -1472,6 +1823,67 @@
           "minItems": 1,
           "title": "Bars",
           "type": "array"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "price_basis": {
+          "const": "RAW",
+          "default": "RAW",
+          "title": "Price Basis",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "role": {
+          "default": "SECURITY",
+          "enum": [
+            "SECURITY",
+            "BENCHMARK"
+          ],
+          "title": "Role",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -1489,26 +1901,25 @@
     "Membership": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
+        "constituents": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Constituents",
+          "type": "array"
         },
         "effective_date": {
           "format": "date",
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
           "type": "string"
         },
         "source_ids": {
@@ -1535,15 +1946,16 @@
           "default": null,
           "title": "Supersedes"
         },
-        "constituents": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Constituents",
-          "type": "array"
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -1557,29 +1969,32 @@
       "title": "Membership",
       "type": "object"
     },
-    "NewsEvent": {
+    "ModelApproval": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
+        "approved_by": {
+          "minLength": 1,
+          "title": "Approved By",
           "type": "string"
         },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
-        "effective_date": {
+        "approved_date": {
           "format": "date",
-          "title": "Effective Date",
+          "title": "Approved Date",
           "type": "string"
         },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+        "methodology_validated": {
+          "const": true,
+          "title": "Methodology Validated",
+          "type": "boolean"
+        },
+        "model_version": {
+          "minLength": 1,
+          "title": "Model Version",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
           "type": "string"
         },
         "source_ids": {
@@ -1591,26 +2006,22 @@
           "minItems": 1,
           "title": "Source Ids",
           "type": "array"
-        },
-        "supersedes": {
-          "anyOf": [
-            {
-              "maxLength": 100,
-              "pattern": "^[A-Za-z0-9_.-]+$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Supersedes"
-        },
-        "headline": {
-          "minLength": 1,
-          "title": "Headline",
-          "type": "string"
-        },
+        }
+      },
+      "required": [
+        "approved_by",
+        "approved_date",
+        "model_version",
+        "methodology_validated",
+        "source_ids",
+        "rationale"
+      ],
+      "title": "ModelApproval",
+      "type": "object"
+    },
+    "NewsEvent": {
+      "additionalProperties": false,
+      "properties": {
         "affected_tickers": {
           "items": {
             "maxLength": 100,
@@ -1621,24 +2032,22 @@
           "title": "Affected Tickers",
           "type": "array"
         },
-        "transmission": {
-          "minLength": 1,
-          "title": "Transmission",
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
           "type": "string"
         },
-        "urgency": {
-          "enum": [
-            "IMMEDIATE",
-            "WATCH",
-            "NOISE"
+        "eps_calculation": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
           ],
-          "title": "Urgency",
-          "type": "string"
-        },
-        "requires_model_revision": {
-          "default": false,
-          "title": "Requires Model Revision",
-          "type": "boolean"
+          "default": null,
+          "title": "Eps Calculation"
         },
         "eps_delta": {
           "anyOf": [
@@ -1668,9 +2077,37 @@
           "default": null,
           "title": "Eps Period"
         },
-        "eps_calculation": {
+        "headline": {
+          "minLength": 1,
+          "title": "Headline",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "requires_model_revision": {
+          "default": false,
+          "title": "Requires Model Revision",
+          "type": "boolean"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
           "anyOf": [
             {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
               "type": "string"
             },
             {
@@ -1678,7 +2115,32 @@
             }
           ],
           "default": null,
-          "title": "Eps Calculation"
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "transmission": {
+          "minLength": 1,
+          "title": "Transmission",
+          "type": "string"
+        },
+        "urgency": {
+          "enum": [
+            "IMMEDIATE",
+            "WATCH",
+            "NOISE"
+          ],
+          "title": "Urgency",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -1695,21 +2157,170 @@
       "title": "NewsEvent",
       "type": "object"
     },
+    "OperatingForecast": {
+      "additionalProperties": false,
+      "properties": {
+        "capex": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Capex"
+        },
+        "cash_income_included": {
+          "title": "Cash Income Included",
+          "type": "boolean"
+        },
+        "depreciation": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Depreciation"
+        },
+        "ebitda_margin": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Ebitda Margin"
+        },
+        "net_borrowing": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Net Borrowing"
+        },
+        "net_interest_expense": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Net Interest Expense"
+        },
+        "other_income": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Other Income"
+        },
+        "period": {
+          "minLength": 1,
+          "title": "Period",
+          "type": "string"
+        },
+        "revenue_fact_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Revenue Fact Id",
+          "type": "string"
+        },
+        "revenue_growth": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": -1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Revenue Growth"
+        },
+        "shares": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Shares"
+        },
+        "tax_charge": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Tax Charge"
+        },
+        "working_capital_increase": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Working Capital Increase"
+        }
+      },
+      "required": [
+        "period",
+        "revenue_fact_id",
+        "revenue_growth",
+        "ebitda_margin",
+        "depreciation",
+        "net_interest_expense",
+        "other_income",
+        "tax_charge",
+        "capex",
+        "working_capital_increase",
+        "net_borrowing",
+        "shares",
+        "cash_income_included"
+      ],
+      "title": "OperatingForecast",
+      "type": "object"
+    },
     "Policy": {
       "additionalProperties": false,
       "properties": {
-        "price_max_age_days": {
-          "default": 3,
-          "minimum": 0,
-          "title": "Price Max Age Days",
-          "type": "integer"
-        },
-        "holdings_max_age_days": {
-          "default": 3,
-          "minimum": 0,
-          "title": "Holdings Max Age Days",
-          "type": "integer"
-        },
         "cash_tolerance": {
           "anyOf": [
             {
@@ -1738,19 +2349,11 @@
           "default": "0.01",
           "title": "Cost Tolerance"
         },
-        "quantity_tolerance": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "default": "0.000001",
-          "title": "Quantity Tolerance"
+        "holdings_max_age_days": {
+          "default": 3,
+          "minimum": 0,
+          "title": "Holdings Max Age Days",
+          "type": "integer"
         },
         "max_position_weight": {
           "anyOf": [
@@ -1769,6 +2372,26 @@
           ],
           "default": null,
           "title": "Max Position Weight"
+        },
+        "price_max_age_days": {
+          "default": 3,
+          "minimum": 0,
+          "title": "Price Max Age Days",
+          "type": "integer"
+        },
+        "quantity_tolerance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0.000001",
+          "title": "Quantity Tolerance"
         }
       },
       "title": "Policy",
@@ -1777,11 +2400,18 @@
     "Position": {
       "additionalProperties": false,
       "properties": {
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
+        "cost": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Cost"
         },
         "quantity": {
           "anyOf": [
@@ -1796,18 +2426,11 @@
           ],
           "title": "Quantity"
         },
-        "cost": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Cost"
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
         }
       },
       "required": [
@@ -1821,15 +2444,10 @@
     "Price": {
       "additionalProperties": false,
       "properties": {
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
-        "session_date": {
-          "format": "date",
-          "title": "Session Date",
+        "adjustment_basis": {
+          "const": "CURRENT_SHARES",
+          "default": "CURRENT_SHARES",
+          "title": "Adjustment Basis",
           "type": "string"
         },
         "close": {
@@ -1848,16 +2466,21 @@
           ],
           "title": "Close"
         },
+        "session_date": {
+          "format": "date",
+          "title": "Session Date",
+          "type": "string"
+        },
         "source_id": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
           "title": "Source Id",
           "type": "string"
         },
-        "adjustment_basis": {
-          "const": "CURRENT_SHARES",
-          "default": "CURRENT_SHARES",
-          "title": "Adjustment Basis",
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
           "type": "string"
         }
       },
@@ -1873,65 +2496,6 @@
     "Research": {
       "additionalProperties": false,
       "properties": {
-        "schema_version": {
-          "const": "2.0",
-          "default": "2.0",
-          "title": "Schema Version",
-          "type": "string"
-        },
-        "universe_date": {
-          "format": "date",
-          "title": "Universe Date",
-          "type": "string"
-        },
-        "universe_valid_until": {
-          "format": "date",
-          "title": "Universe Valid Until",
-          "type": "string"
-        },
-        "universe_source_ids": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Universe Source Ids",
-          "type": "array"
-        },
-        "required_tickers": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "title": "Required Tickers",
-          "type": "array"
-        },
-        "universe_basis": {
-          "minLength": 1,
-          "title": "Universe Basis",
-          "type": "string"
-        },
-        "full_universe_verified": {
-          "default": false,
-          "title": "Full Universe Verified",
-          "type": "boolean"
-        },
-        "earnings": {
-          "items": {
-            "$ref": "#/$defs/Earnings"
-          },
-          "title": "Earnings",
-          "type": "array"
-        },
-        "models": {
-          "items": {
-            "$ref": "#/$defs/ValuationModel"
-          },
-          "title": "Models",
-          "type": "array"
-        },
         "dividends": {
           "items": {
             "$ref": "#/$defs/Dividend"
@@ -1939,11 +2503,11 @@
           "title": "Dividends",
           "type": "array"
         },
-        "resolutions": {
+        "earnings": {
           "items": {
-            "$ref": "#/$defs/LegacyResolution"
+            "$ref": "#/$defs/Earnings"
           },
-          "title": "Resolutions",
+          "title": "Earnings",
           "type": "array"
         },
         "exclusions": {
@@ -1957,6 +2521,65 @@
           },
           "title": "Exclusions",
           "type": "object"
+        },
+        "full_universe_verified": {
+          "default": false,
+          "title": "Full Universe Verified",
+          "type": "boolean"
+        },
+        "models": {
+          "items": {
+            "$ref": "#/$defs/ValuationModel"
+          },
+          "title": "Models",
+          "type": "array"
+        },
+        "required_tickers": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Required Tickers",
+          "type": "array"
+        },
+        "resolutions": {
+          "items": {
+            "$ref": "#/$defs/LegacyResolution"
+          },
+          "title": "Resolutions",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "2.0",
+          "default": "2.0",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "universe_basis": {
+          "minLength": 1,
+          "title": "Universe Basis",
+          "type": "string"
+        },
+        "universe_date": {
+          "format": "date",
+          "title": "Universe Date",
+          "type": "string"
+        },
+        "universe_source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Universe Source Ids",
+          "type": "array"
+        },
+        "universe_valid_until": {
+          "format": "date",
+          "title": "Universe Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -1969,29 +2592,45 @@
       "title": "Research",
       "type": "object"
     },
-    "RiskLimits": {
+    "RetirementPlan": {
       "additionalProperties": false,
       "properties": {
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "monthly_spending_real": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Monthly Spending Real"
+        },
+        "months": {
+          "maximum": 1200,
+          "minimum": 1,
+          "title": "Months",
+          "type": "integer"
+        },
         "record_id": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
           "title": "Record Id",
           "type": "string"
         },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
-        "effective_date": {
+        "retirement_date": {
           "format": "date",
-          "title": "Effective Date",
-          "type": "string"
-        },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+          "title": "Retirement Date",
           "type": "string"
         },
         "source_ids": {
@@ -2003,6 +2642,11 @@
           "minItems": 1,
           "title": "Source Ids",
           "type": "array"
+        },
+        "start_date": {
+          "format": "date",
+          "title": "Start Date",
+          "type": "string"
         },
         "supersedes": {
           "anyOf": [
@@ -2018,10 +2662,82 @@
           "default": null,
           "title": "Supersedes"
         },
-        "user_confirmed": {
-          "default": false,
-          "title": "User Confirmed",
-          "type": "boolean"
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        },
+        "withdrawal_order": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Withdrawal Order",
+          "type": "array"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "start_date",
+        "retirement_date",
+        "months",
+        "monthly_spending_real",
+        "withdrawal_order"
+      ],
+      "title": "RetirementPlan",
+      "type": "object"
+    },
+    "RiskLimits": {
+      "additionalProperties": false,
+      "properties": {
+        "correlation_lookback": {
+          "minimum": 3,
+          "title": "Correlation Lookback",
+          "type": "integer"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "max_daily_participation": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Max Daily Participation"
+        },
+        "max_factor_weight": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Max Factor Weight"
         },
         "max_position_weight": {
           "anyOf": [
@@ -2051,19 +2767,10 @@
           ],
           "title": "Max Sector Weight"
         },
-        "max_factor_weight": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
-          "title": "Max Factor Weight"
+        "min_correlation_observations": {
+          "minimum": 3,
+          "title": "Min Correlation Observations",
+          "type": "integer"
         },
         "minimum_cash_weight": {
           "anyOf": [
@@ -2093,29 +2800,51 @@
           ],
           "title": "Per Trade Risk Budget"
         },
-        "max_daily_participation": {
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
           "anyOf": [
             {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
-              "type": "number"
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
             },
             {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
+              "type": "null"
             }
           ],
-          "title": "Max Daily Participation"
+          "default": null,
+          "title": "Supersedes"
         },
-        "correlation_lookback": {
-          "minimum": 3,
-          "title": "Correlation Lookback",
-          "type": "integer"
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
         },
-        "min_correlation_observations": {
-          "minimum": 3,
-          "title": "Min Correlation Observations",
-          "type": "integer"
+        "user_confirmed": {
+          "default": false,
+          "title": "User Confirmed",
+          "type": "boolean"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -2136,110 +2865,65 @@
       "title": "RiskLimits",
       "type": "object"
     },
+    "SOTPComponent": {
+      "additionalProperties": false,
+      "properties": {
+        "component_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Component Id",
+          "type": "string"
+        },
+        "equity_value": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Equity Value"
+        },
+        "ownership": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Ownership"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "component_id",
+        "equity_value",
+        "ownership",
+        "source_ids"
+      ],
+      "title": "SOTPComponent",
+      "type": "object"
+    },
     "Scenario": {
       "additionalProperties": false,
       "properties": {
-        "scenario_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Scenario Id",
-          "type": "string"
-        },
-        "name": {
-          "enum": [
-            "bear",
-            "base",
-            "bull"
-          ],
-          "title": "Name",
-          "type": "string"
-        },
-        "forward_eps": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Forward Eps"
-        },
-        "sustainable_dps": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Sustainable Dps"
-        },
-        "exit_price": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Exit Price"
-        },
-        "horizon_dividends": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Horizon Dividends"
-        },
-        "exit_basis": {
-          "const": "EX_DISTRIBUTION",
-          "title": "Exit Basis",
-          "type": "string"
-        },
-        "dividends_rationale": {
-          "minLength": 1,
-          "title": "Dividends Rationale",
-          "type": "string"
-        },
-        "discount_rate": {
-          "anyOf": [
-            {
-              "exclusiveMinimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Discount Rate"
-        },
-        "terminal_growth": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Terminal Growth"
-        },
         "book_value_per_share": {
           "anyOf": [
             {
@@ -2257,9 +2941,86 @@
           "default": null,
           "title": "Book Value Per Share"
         },
-        "sustainable_roe": {
+        "cash_income_excluded": {
           "anyOf": [
             {
+              "type": "boolean"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Cash Income Excluded"
+        },
+        "components": {
+          "items": {
+            "$ref": "#/$defs/SOTPComponent"
+          },
+          "title": "Components",
+          "type": "array"
+        },
+        "contract_years": {
+          "anyOf": [
+            {
+              "minimum": 1,
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Contract Years"
+        },
+        "crosscheck_tolerance": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Crosscheck Tolerance"
+        },
+        "discount_rate": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Discount Rate"
+        },
+        "dividends_rationale": {
+          "minLength": 1,
+          "title": "Dividends Rationale",
+          "type": "string"
+        },
+        "drivers": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "minProperties": 1,
+          "title": "Drivers",
+          "type": "object"
+        },
+        "earnings_multiple": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
               "type": "number"
             },
             {
@@ -2271,7 +3032,25 @@
             }
           ],
           "default": null,
-          "title": "Sustainable Roe"
+          "title": "Earnings Multiple"
+        },
+        "exit_basis": {
+          "const": "EX_DISTRIBUTION",
+          "title": "Exit Basis",
+          "type": "string"
+        },
+        "exit_price": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Exit Price"
         },
         "fcfe": {
           "items": {
@@ -2288,24 +3067,32 @@
           "title": "Fcfe",
           "type": "array"
         },
-        "shares": {
+        "forward_eps": {
           "anyOf": [
             {
-              "exclusiveMinimum": 0.0,
               "type": "number"
             },
             {
               "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
               "type": "string"
-            },
-            {
-              "type": "null"
             }
           ],
-          "default": null,
-          "title": "Shares"
+          "title": "Forward Eps"
         },
-        "terminal_value": {
+        "horizon_dividends": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Horizon Dividends"
+        },
+        "minority_interests": {
           "anyOf": [
             {
               "minimum": 0.0,
@@ -2320,7 +3107,72 @@
             }
           ],
           "default": null,
-          "title": "Terminal Value"
+          "title": "Minority Interests"
+        },
+        "name": {
+          "enum": [
+            "bear",
+            "base",
+            "bull"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "normalized_operating_eps": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Normalized Operating Eps"
+        },
+        "operating_forecasts": {
+          "items": {
+            "$ref": "#/$defs/OperatingForecast"
+          },
+          "title": "Operating Forecasts",
+          "type": "array"
+        },
+        "parent_liabilities": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Liabilities"
+        },
+        "parent_net_debt": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Parent Net Debt"
         },
         "payout_crosscheck": {
           "anyOf": [
@@ -2339,13 +3191,103 @@
           "default": null,
           "title": "Payout Crosscheck"
         },
-        "drivers": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "minProperties": 1,
-          "title": "Drivers",
-          "type": "object"
+        "scenario_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Scenario Id",
+          "type": "string"
+        },
+        "shares": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Shares"
+        },
+        "surplus_cash_per_share": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Surplus Cash Per Share"
+        },
+        "sustainable_dps": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Sustainable Dps"
+        },
+        "sustainable_roe": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sustainable Roe"
+        },
+        "terminal_growth": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Terminal Growth"
+        },
+        "terminal_value": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Terminal Value"
         }
       },
       "required": [
@@ -2367,20 +3309,20 @@
     "Security": {
       "additionalProperties": false,
       "properties": {
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
+        "currency": {
+          "const": "PKR",
+          "default": "PKR",
+          "title": "Currency",
           "type": "string"
         },
         "sector": {
           "title": "Sector",
           "type": "string"
         },
-        "currency": {
-          "const": "PKR",
-          "default": "PKR",
-          "title": "Currency",
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
           "type": "string"
         }
       },
@@ -2394,27 +3336,30 @@
     "SessionCalendar": {
       "additionalProperties": false,
       "properties": {
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "exchange": {
+          "minLength": 1,
+          "title": "Exchange",
+          "type": "string"
+        },
         "record_id": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
           "title": "Record Id",
           "type": "string"
         },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
-        "effective_date": {
-          "format": "date",
-          "title": "Effective Date",
-          "type": "string"
-        },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
-          "type": "string"
+        "sessions": {
+          "items": {
+            "format": "date",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Sessions",
+          "type": "array"
         },
         "source_ids": {
           "items": {
@@ -2440,18 +3385,15 @@
           "default": null,
           "title": "Supersedes"
         },
-        "sessions": {
-          "items": {
-            "format": "date",
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Sessions",
-          "type": "array"
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
         },
-        "exchange": {
-          "minLength": 1,
-          "title": "Exchange",
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
           "type": "string"
         }
       },
@@ -2467,20 +3409,75 @@
       "title": "SessionCalendar",
       "type": "object"
     },
+    "SheetMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "collection": {
+          "enum": [
+            "timing",
+            "mean_reversion",
+            "valuations",
+            "earnings",
+            "history"
+          ],
+          "title": "Collection",
+          "type": "string"
+        },
+        "columns": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "minProperties": 2,
+          "title": "Columns",
+          "type": "object"
+        },
+        "header_row": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Header Row",
+          "type": "integer"
+        },
+        "ignored_columns": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Ignored Columns",
+          "type": "object"
+        },
+        "key_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Fields",
+          "type": "array"
+        },
+        "price_basis": {
+          "default": "RAW",
+          "enum": [
+            "RAW",
+            "SPLIT_ADJUSTED"
+          ],
+          "title": "Price Basis",
+          "type": "string"
+        },
+        "sheet": {
+          "maxLength": 31,
+          "minLength": 1,
+          "title": "Sheet",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sheet",
+        "collection",
+        "columns"
+      ],
+      "title": "SheetMapping",
+      "type": "object"
+    },
     "Snapshot": {
       "additionalProperties": false,
       "properties": {
-        "timestamp": {
-          "format": "date-time",
-          "title": "Timestamp",
-          "type": "string"
-        },
-        "source_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Source Id",
-          "type": "string"
-        },
         "cash": {
           "anyOf": [
             {
@@ -2500,6 +3497,17 @@
           },
           "title": "Positions",
           "type": "array"
+        },
+        "source_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
         }
       },
       "required": [
@@ -2514,30 +3522,48 @@
     "Source": {
       "additionalProperties": false,
       "properties": {
-        "source_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Source Id",
-          "type": "string"
+        "accessed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Accessed At"
         },
-        "title": {
-          "minLength": 1,
-          "title": "Title",
-          "type": "string"
+        "coverage_through": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Coverage Through"
         },
-        "publisher": {
-          "minLength": 1,
-          "title": "Publisher",
-          "type": "string"
+        "document_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Document Sha256"
         },
         "effective_date": {
           "format": "date",
           "title": "Effective Date",
-          "type": "string"
-        },
-        "locator": {
-          "minLength": 1,
-          "title": "Locator",
           "type": "string"
         },
         "evidence_label": {
@@ -2549,6 +3575,65 @@
           ],
           "title": "Evidence Label",
           "type": "string"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        },
+        "publisher": {
+          "minLength": 1,
+          "title": "Publisher",
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "pattern": "^https?://",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
         }
       },
       "required": [
@@ -2565,43 +3650,15 @@
     "TimingPolicy": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
-        "effective_date": {
-          "format": "date",
-          "title": "Effective Date",
-          "type": "string"
-        },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
-          "type": "string"
-        },
-        "source_ids": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Source Ids",
-          "type": "array"
-        },
-        "supersedes": {
+        "backtest_cost_rate": {
           "anyOf": [
             {
-              "maxLength": 100,
-              "pattern": "^[A-Za-z0-9_.-]+$",
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
               "type": "string"
             },
             {
@@ -2609,7 +3666,20 @@
             }
           ],
           "default": null,
-          "title": "Supersedes"
+          "title": "Backtest Cost Rate"
+        },
+        "backtest_start": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Backtest Start"
         },
         "benchmark": {
           "maxLength": 100,
@@ -2617,30 +3687,29 @@
           "title": "Benchmark",
           "type": "string"
         },
-        "relative_lookback": {
+        "breakout_window": {
           "minimum": 2,
-          "title": "Relative Lookback",
+          "title": "Breakout Window",
           "type": "integer"
         },
-        "momentum_lag": {
-          "minimum": 1,
-          "title": "Momentum Lag",
-          "type": "integer"
+        "calibration_rationale": {
+          "minLength": 1,
+          "title": "Calibration Rationale",
+          "type": "string"
         },
-        "short_window": {
-          "minimum": 2,
-          "title": "Short Window",
-          "type": "integer"
+        "calibration_status": {
+          "default": "PROVISIONAL",
+          "enum": [
+            "PROVISIONAL",
+            "VALIDATED"
+          ],
+          "title": "Calibration Status",
+          "type": "string"
         },
-        "long_window": {
-          "minimum": 3,
-          "title": "Long Window",
-          "type": "integer"
-        },
-        "slope_sessions": {
-          "minimum": 1,
-          "title": "Slope Sessions",
-          "type": "integer"
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
         },
         "flat_slope": {
           "anyOf": [
@@ -2661,6 +3730,25 @@
           "title": "Liquidity Window",
           "type": "integer"
         },
+        "long_window": {
+          "minimum": 3,
+          "title": "Long Window",
+          "type": "integer"
+        },
+        "max_extension": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Max Extension"
+        },
         "min_average_traded_value": {
           "anyOf": [
             {
@@ -2679,41 +3767,10 @@
           "title": "Min Rank Universe",
           "type": "integer"
         },
-        "max_extension": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
-          "title": "Max Extension"
-        },
-        "breakout_window": {
-          "minimum": 2,
-          "title": "Breakout Window",
+        "momentum_lag": {
+          "minimum": 1,
+          "title": "Momentum Lag",
           "type": "integer"
-        },
-        "reversion_window": {
-          "minimum": 2,
-          "title": "Reversion Window",
-          "type": "integer"
-        },
-        "oversold_z": {
-          "anyOf": [
-            {
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Oversold Z"
         },
         "overbought_z": {
           "anyOf": [
@@ -2727,42 +3784,59 @@
           ],
           "title": "Overbought Z"
         },
-        "calibration_status": {
-          "default": "PROVISIONAL",
-          "enum": [
-            "PROVISIONAL",
-            "VALIDATED"
-          ],
-          "title": "Calibration Status",
-          "type": "string"
-        },
-        "calibration_rationale": {
-          "minLength": 1,
-          "title": "Calibration Rationale",
-          "type": "string"
-        },
-        "backtest_start": {
+        "oversold_z": {
           "anyOf": [
             {
-              "format": "date",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Backtest Start"
-        },
-        "backtest_cost_rate": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
               "type": "number"
             },
             {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Oversold Z"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "relative_lookback": {
+          "minimum": 2,
+          "title": "Relative Lookback",
+          "type": "integer"
+        },
+        "reversion_window": {
+          "minimum": 2,
+          "title": "Reversion Window",
+          "type": "integer"
+        },
+        "short_window": {
+          "minimum": 2,
+          "title": "Short Window",
+          "type": "integer"
+        },
+        "slope_sessions": {
+          "minimum": 1,
+          "title": "Slope Sessions",
+          "type": "integer"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
               "type": "string"
             },
             {
@@ -2770,7 +3844,18 @@
             }
           ],
           "default": null,
-          "title": "Backtest Cost Rate"
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -2802,76 +3887,6 @@
     "Transaction": {
       "additionalProperties": false,
       "properties": {
-        "transaction_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Transaction Id",
-          "type": "string"
-        },
-        "timestamp": {
-          "format": "date-time",
-          "title": "Timestamp",
-          "type": "string"
-        },
-        "settlement_date": {
-          "format": "date",
-          "title": "Settlement Date",
-          "type": "string"
-        },
-        "kind": {
-          "enum": [
-            "BUY",
-            "SELL",
-            "DEPOSIT",
-            "WITHDRAWAL",
-            "DIVIDEND",
-            "SPLIT"
-          ],
-          "title": "Kind",
-          "type": "string"
-        },
-        "ticker": {
-          "anyOf": [
-            {
-              "maxLength": 100,
-              "pattern": "^[A-Za-z0-9_.-]+$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Ticker"
-        },
-        "quantity": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "default": "0",
-          "title": "Quantity"
-        },
-        "price": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "default": "0",
-          "title": "Price"
-        },
         "amount": {
           "anyOf": [
             {
@@ -2900,7 +3915,19 @@
           "default": "0",
           "title": "Fees"
         },
-        "taxes": {
+        "kind": {
+          "enum": [
+            "BUY",
+            "SELL",
+            "DEPOSIT",
+            "WITHDRAWAL",
+            "DIVIDEND",
+            "SPLIT"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "price": {
           "anyOf": [
             {
               "minimum": 0.0,
@@ -2912,7 +3939,21 @@
             }
           ],
           "default": "0",
-          "title": "Taxes"
+          "title": "Price"
+        },
+        "quantity": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Quantity"
         },
         "ratio": {
           "anyOf": [
@@ -2931,10 +3972,54 @@
           "default": null,
           "title": "Ratio"
         },
+        "settlement_date": {
+          "format": "date",
+          "title": "Settlement Date",
+          "type": "string"
+        },
         "source_id": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
           "title": "Source Id",
+          "type": "string"
+        },
+        "taxes": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0",
+          "title": "Taxes"
+        },
+        "ticker": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Ticker"
+        },
+        "timestamp": {
+          "format": "date-time",
+          "title": "Timestamp",
+          "type": "string"
+        },
+        "transaction_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Transaction Id",
           "type": "string"
         }
       },
@@ -2951,145 +4036,6 @@
     "ValuationModel": {
       "additionalProperties": false,
       "properties": {
-        "record_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Record Id",
-          "type": "string"
-        },
-        "ticker": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Ticker",
-          "type": "string"
-        },
-        "effective_date": {
-          "format": "date",
-          "title": "Effective Date",
-          "type": "string"
-        },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
-          "type": "string"
-        },
-        "source_ids": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "minItems": 1,
-          "title": "Source Ids",
-          "type": "array"
-        },
-        "supersedes": {
-          "anyOf": [
-            {
-              "maxLength": 100,
-              "pattern": "^[A-Za-z0-9_.-]+$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Supersedes"
-        },
-        "earnings_id": {
-          "maxLength": 100,
-          "pattern": "^[A-Za-z0-9_.-]+$",
-          "title": "Earnings Id",
-          "type": "string"
-        },
-        "method": {
-          "enum": [
-            "BANK_JUSTIFIED_PB",
-            "FCFE_DCF",
-            "UNSUPPORTED"
-          ],
-          "title": "Method",
-          "type": "string"
-        },
-        "model_version": {
-          "minLength": 1,
-          "title": "Model Version",
-          "type": "string"
-        },
-        "certification": {
-          "default": "PROVISIONAL",
-          "enum": [
-            "PROVISIONAL",
-            "VALIDATED"
-          ],
-          "title": "Certification",
-          "type": "string"
-        },
-        "origin": {
-          "enum": [
-            "NEW_EXPLICIT_MODEL",
-            "LEGACY_RECOVERED"
-          ],
-          "title": "Origin",
-          "type": "string"
-        },
-        "methodology_rationale": {
-          "minLength": 1,
-          "title": "Methodology Rationale",
-          "type": "string"
-        },
-        "legacy_column_map": {
-          "additionalProperties": {
-            "type": "string"
-          },
-          "title": "Legacy Column Map",
-          "type": "object"
-        },
-        "historical_outputs": {
-          "additionalProperties": {
-            "anyOf": [
-              {
-                "minimum": 0.0,
-                "type": "number"
-              },
-              {
-                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-                "type": "string"
-              }
-            ]
-          },
-          "title": "Historical Outputs",
-          "type": "object"
-        },
-        "reproduction_tolerance": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "default": "0.000001",
-          "title": "Reproduction Tolerance"
-        },
-        "forward_period": {
-          "minLength": 1,
-          "title": "Forward Period",
-          "type": "string"
-        },
-        "forward_basis": {
-          "enum": [
-            "FY",
-            "CY",
-            "NTM"
-          ],
-          "title": "Forward Basis",
-          "type": "string"
-        },
         "accounting_basis": {
           "enum": [
             "STANDALONE",
@@ -3098,140 +4044,21 @@
           "title": "Accounting Basis",
           "type": "string"
         },
-        "share_basis_date": {
-          "format": "date",
-          "title": "Share Basis Date",
-          "type": "string"
-        },
-        "horizon_years": {
+        "approval": {
           "anyOf": [
             {
-              "exclusiveMinimum": 0.0,
-              "type": "number"
+              "$ref": "#/$defs/ModelApproval"
             },
             {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
+              "type": "null"
             }
           ],
-          "title": "Horizon Years"
-        },
-        "sovereign_benchmark": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Sovereign Benchmark"
+          "default": null
         },
         "benchmark_date": {
           "format": "date",
           "title": "Benchmark Date",
           "type": "string"
-        },
-        "equity_risk_premium": {
-          "anyOf": [
-            {
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Equity Risk Premium"
-        },
-        "discount_rate_rationale": {
-          "minLength": 1,
-          "title": "Discount Rate Rationale",
-          "type": "string"
-        },
-        "margin_of_safety": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
-          "title": "Margin Of Safety"
-        },
-        "timing_gate": {
-          "default": "UNKNOWN",
-          "enum": [
-            "PASSED",
-            "BLOCKED",
-            "UNKNOWN"
-          ],
-          "title": "Timing Gate",
-          "type": "string"
-        },
-        "risk_gate": {
-          "default": "UNKNOWN",
-          "enum": [
-            "PASSED",
-            "BLOCKED",
-            "UNKNOWN"
-          ],
-          "title": "Risk Gate",
-          "type": "string"
-        },
-        "event_checked_through": {
-          "anyOf": [
-            {
-              "format": "date",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Event Checked Through"
-        },
-        "covered_event_ids": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "title": "Covered Event Ids",
-          "type": "array"
-        },
-        "scenarios": {
-          "items": {
-            "$ref": "#/$defs/Scenario"
-          },
-          "title": "Scenarios",
-          "type": "array"
-        },
-        "dividend_tax_rate": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Dividend Tax Rate"
         },
         "capital_gains_tax_rate": {
           "anyOf": [
@@ -3251,6 +4078,58 @@
           "default": null,
           "title": "Capital Gains Tax Rate"
         },
+        "certification": {
+          "default": "PROVISIONAL",
+          "enum": [
+            "PROVISIONAL",
+            "VALIDATED"
+          ],
+          "title": "Certification",
+          "type": "string"
+        },
+        "covered_event_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Covered Event Ids",
+          "type": "array"
+        },
+        "discount_rate_rationale": {
+          "minLength": 1,
+          "title": "Discount Rate Rationale",
+          "type": "string"
+        },
+        "dividend_tax_rate": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dividend Tax Rate"
+        },
+        "earnings_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Earnings Id",
+          "type": "string"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
         "entry_cost_rate": {
           "anyOf": [
             {
@@ -3268,6 +4147,32 @@
           ],
           "default": null,
           "title": "Entry Cost Rate"
+        },
+        "equity_risk_premium": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Equity Risk Premium"
+        },
+        "event_checked_through": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Event Checked Through"
         },
         "exit_cost_rate": {
           "anyOf": [
@@ -3287,6 +4192,56 @@
           "default": null,
           "title": "Exit Cost Rate"
         },
+        "forward_basis": {
+          "enum": [
+            "FY",
+            "CY",
+            "NTM"
+          ],
+          "title": "Forward Basis",
+          "type": "string"
+        },
+        "forward_period": {
+          "minLength": 1,
+          "title": "Forward Period",
+          "type": "string"
+        },
+        "historical_outputs": {
+          "additionalProperties": {
+            "anyOf": [
+              {
+                "minimum": 0.0,
+                "type": "number"
+              },
+              {
+                "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+                "type": "string"
+              }
+            ]
+          },
+          "title": "Historical Outputs",
+          "type": "object"
+        },
+        "horizon_years": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Horizon Years"
+        },
+        "legacy_column_map": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Legacy Column Map",
+          "type": "object"
+        },
         "liabilities_per_share": {
           "anyOf": [
             {
@@ -3303,6 +4258,151 @@
           ],
           "default": null,
           "title": "Liabilities Per Share"
+        },
+        "margin_of_safety": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Margin Of Safety"
+        },
+        "method": {
+          "enum": [
+            "BANK_JUSTIFIED_PB",
+            "FCFE_DCF",
+            "FINITE_LIFE_FCFE",
+            "SOTP",
+            "ROE_BOOK",
+            "NORMALIZED_MULTIPLE",
+            "UNSUPPORTED"
+          ],
+          "title": "Method",
+          "type": "string"
+        },
+        "methodology_rationale": {
+          "minLength": 1,
+          "title": "Methodology Rationale",
+          "type": "string"
+        },
+        "model_version": {
+          "minLength": 1,
+          "title": "Model Version",
+          "type": "string"
+        },
+        "origin": {
+          "enum": [
+            "NEW_EXPLICIT_MODEL",
+            "LEGACY_RECOVERED"
+          ],
+          "title": "Origin",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "reproduction_tolerance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "0.000001",
+          "title": "Reproduction Tolerance"
+        },
+        "risk_gate": {
+          "default": "UNKNOWN",
+          "enum": [
+            "PASSED",
+            "BLOCKED",
+            "UNKNOWN"
+          ],
+          "title": "Risk Gate",
+          "type": "string"
+        },
+        "scenarios": {
+          "items": {
+            "$ref": "#/$defs/Scenario"
+          },
+          "title": "Scenarios",
+          "type": "array"
+        },
+        "share_basis_date": {
+          "format": "date",
+          "title": "Share Basis Date",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "sovereign_benchmark": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Sovereign Benchmark"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "timing_gate": {
+          "default": "UNKNOWN",
+          "enum": [
+            "PASSED",
+            "BLOCKED",
+            "UNKNOWN"
+          ],
+          "title": "Timing Gate",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
         }
       },
       "required": [
@@ -3334,10 +4434,144 @@
     "WatchCandidate": {
       "additionalProperties": false,
       "properties": {
+        "approach_fraction": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            }
+          ],
+          "title": "Approach Fraction"
+        },
+        "author": {
+          "minLength": 1,
+          "title": "Author",
+          "type": "string"
+        },
+        "catalyst_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Catalyst Ids",
+          "type": "array"
+        },
+        "desired_entry": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Desired Entry"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "invalidation": {
+          "minLength": 1,
+          "title": "Invalidation",
+          "type": "string"
+        },
+        "next_review": {
+          "format": "date",
+          "title": "Next Review",
+          "type": "string"
+        },
+        "portfolio_fit": {
+          "minLength": 1,
+          "title": "Portfolio Fit",
+          "type": "string"
+        },
         "record_id": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
           "title": "Record Id",
+          "type": "string"
+        },
+        "requested_stage": {
+          "default": "RESEARCH",
+          "enum": [
+            "RESEARCH",
+            "ON_HOLD",
+            "PRICE_WATCH",
+            "READY",
+            "REJECTED",
+            "ARCHIVED"
+          ],
+          "title": "Requested Stage",
+          "type": "string"
+        },
+        "requested_target_weight": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Requested Target Weight"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "stop_price": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Stop Price"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "thesis": {
+          "minLength": 1,
+          "title": "Thesis",
           "type": "string"
         },
         "ticker": {
@@ -3346,14 +4580,217 @@
           "title": "Ticker",
           "type": "string"
         },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "author",
+        "thesis",
+        "invalidation",
+        "portfolio_fit",
+        "desired_entry",
+        "stop_price",
+        "approach_fraction",
+        "next_review"
+      ],
+      "title": "WatchCandidate",
+      "type": "object"
+    },
+    "Wealth": {
+      "additionalProperties": false,
+      "properties": {
+        "assets": {
+          "items": {
+            "$ref": "#/$defs/WealthAsset"
+          },
+          "minItems": 1,
+          "title": "Assets",
+          "type": "array"
+        },
+        "flows": {
+          "items": {
+            "$ref": "#/$defs/WealthFlow"
+          },
+          "title": "Flows",
+          "type": "array"
+        },
+        "histories": {
+          "items": {
+            "$ref": "#/$defs/CrossAssetHistory"
+          },
+          "title": "Histories",
+          "type": "array"
+        },
+        "include_crypto": {
+          "default": false,
+          "title": "Include Crypto",
+          "type": "boolean"
+        },
+        "min_correlation_observations": {
+          "default": 12,
+          "minimum": 3,
+          "title": "Min Correlation Observations",
+          "type": "integer"
+        },
+        "plans": {
+          "items": {
+            "$ref": "#/$defs/RetirementPlan"
+          },
+          "title": "Plans",
+          "type": "array"
+        },
+        "scenarios": {
+          "items": {
+            "$ref": "#/$defs/WealthScenario"
+          },
+          "title": "Scenarios",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "4.0",
+          "default": "4.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "assets"
+      ],
+      "title": "Wealth",
+      "type": "object"
+    },
+    "WealthAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "available_from": {
+          "format": "date",
+          "title": "Available From",
+          "type": "string"
+        },
+        "balance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Balance"
+        },
+        "currency": {
+          "default": "PKR",
+          "enum": [
+            "PKR",
+            "USD"
+          ],
+          "title": "Currency",
+          "type": "string"
+        },
+        "economic_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Economic Id",
+          "type": "string"
+        },
         "effective_date": {
           "format": "date",
           "title": "Effective Date",
           "type": "string"
         },
-        "valid_until": {
-          "format": "date",
-          "title": "Valid Until",
+        "fx_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx Date"
+        },
+        "fx_source_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx Source Id"
+        },
+        "fx_to_pkr": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx To Pkr"
+        },
+        "kind": {
+          "enum": [
+            "CASH",
+            "GOLD",
+            "VPS",
+            "PF",
+            "GRATUITY",
+            "CRYPTO",
+            "OTHER",
+            "PSX_SLEEVE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "portfolio_link": {
+          "anyOf": [
+            {
+              "enum": [
+                "TOTAL",
+                "EQUITY",
+                "CASH"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Portfolio Link"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
           "type": "string"
         },
         "source_ids": {
@@ -3380,109 +4817,15 @@
           "default": null,
           "title": "Supersedes"
         },
-        "author": {
-          "minLength": 1,
-          "title": "Author",
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
           "type": "string"
         },
-        "requested_stage": {
-          "default": "RESEARCH",
-          "enum": [
-            "RESEARCH",
-            "ON_HOLD",
-            "PRICE_WATCH",
-            "READY",
-            "REJECTED",
-            "ARCHIVED"
-          ],
-          "title": "Requested Stage",
-          "type": "string"
-        },
-        "thesis": {
-          "minLength": 1,
-          "title": "Thesis",
-          "type": "string"
-        },
-        "invalidation": {
-          "minLength": 1,
-          "title": "Invalidation",
-          "type": "string"
-        },
-        "portfolio_fit": {
-          "minLength": 1,
-          "title": "Portfolio Fit",
-          "type": "string"
-        },
-        "desired_entry": {
-          "anyOf": [
-            {
-              "exclusiveMinimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Desired Entry"
-        },
-        "stop_price": {
-          "anyOf": [
-            {
-              "exclusiveMinimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
-              "type": "string"
-            }
-          ],
-          "title": "Stop Price"
-        },
-        "approach_fraction": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            }
-          ],
-          "title": "Approach Fraction"
-        },
-        "catalyst_ids": {
-          "items": {
-            "maxLength": 100,
-            "pattern": "^[A-Za-z0-9_.-]+$",
-            "type": "string"
-          },
-          "title": "Catalyst Ids",
-          "type": "array"
-        },
-        "requested_target_weight": {
-          "anyOf": [
-            {
-              "exclusiveMaximum": 1.0,
-              "minimum": 0.0,
-              "type": "number"
-            },
-            {
-              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
-              "type": "string"
-            },
-            {
-              "type": "null"
-            }
-          ],
-          "default": null,
-          "title": "Requested Target Weight"
-        },
-        "next_review": {
+        "valid_until": {
           "format": "date",
-          "title": "Next Review",
+          "title": "Valid Until",
           "type": "string"
         }
       },
@@ -3492,26 +4835,457 @@
         "effective_date",
         "valid_until",
         "source_ids",
-        "author",
-        "thesis",
-        "invalidation",
-        "portfolio_fit",
-        "desired_entry",
-        "stop_price",
-        "approach_fraction",
-        "next_review"
+        "economic_id",
+        "kind",
+        "available_from"
       ],
-      "title": "WatchCandidate",
+      "title": "WealthAsset",
+      "type": "object"
+    },
+    "WealthFlow": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Amount"
+        },
+        "amount_basis": {
+          "const": "NET",
+          "default": "NET",
+          "title": "Amount Basis",
+          "type": "string"
+        },
+        "asset_key": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Asset Key"
+        },
+        "economic_claim_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Economic Claim Id"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "ends": {
+          "format": "date",
+          "title": "Ends",
+          "type": "string"
+        },
+        "frequency": {
+          "enum": [
+            "MONTHLY",
+            "ONCE"
+          ],
+          "title": "Frequency",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "CONTRIBUTION",
+            "BENEFIT",
+            "EXPENSE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "price_basis": {
+          "enum": [
+            "NOMINAL",
+            "REAL_AT_START"
+          ],
+          "title": "Price Basis",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "starts": {
+          "format": "date",
+          "title": "Starts",
+          "type": "string"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "kind",
+        "amount",
+        "price_basis",
+        "frequency",
+        "starts",
+        "ends"
+      ],
+      "title": "WealthFlow",
+      "type": "object"
+    },
+    "WealthScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "annual_inflation": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": -1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Annual Inflation"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "name": {
+          "enum": [
+            "bear",
+            "base",
+            "bull"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "returns": {
+          "items": {
+            "$ref": "#/$defs/AssetReturn"
+          },
+          "title": "Returns",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "name",
+        "annual_inflation",
+        "returns"
+      ],
+      "title": "WealthScenario",
+      "type": "object"
+    },
+    "WorkbookMigration": {
+      "additionalProperties": false,
+      "properties": {
+        "absolute_tolerance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "default": "1E-8",
+          "title": "Absolute Tolerance"
+        },
+        "approved_by": {
+          "minLength": 1,
+          "title": "Approved By",
+          "type": "string"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "ignored_sheets": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Ignored Sheets",
+          "type": "object"
+        },
+        "kind": {
+          "enum": [
+            "LEGACY_DATASTORE",
+            "MODEL_WORKBOOK"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "mappings": {
+          "items": {
+            "$ref": "#/$defs/SheetMapping"
+          },
+          "minItems": 1,
+          "title": "Mappings",
+          "type": "array"
+        },
+        "methodology_reviewed": {
+          "default": false,
+          "title": "Methodology Reviewed",
+          "type": "boolean"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "relative_tolerance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d{0,16}0*$",
+              "type": "string"
+            }
+          ],
+          "default": "1E-12",
+          "title": "Relative Tolerance"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "store_permitted": {
+          "const": true,
+          "title": "Store Permitted",
+          "type": "boolean"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        },
+        "workbook_sha256": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Workbook Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "kind",
+        "workbook_sha256",
+        "mappings",
+        "approved_by",
+        "reason",
+        "store_permitted"
+      ],
+      "title": "WorkbookMigration",
       "type": "object"
     }
   },
   "additionalProperties": false,
   "properties": {
-    "schema_version": {
-      "const": "1.0",
-      "default": "1.0",
-      "title": "Schema Version",
+    "closing": {
+      "$ref": "#/$defs/Snapshot"
+    },
+    "dataset_id": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Dataset Id"
+    },
+    "documents": {
+      "items": {
+        "$ref": "#/$defs/EvidenceDocument"
+      },
+      "title": "Documents",
+      "type": "array"
+    },
+    "financials": {
+      "items": {
+        "$ref": "#/$defs/FinancialFact"
+      },
+      "title": "Financials",
+      "type": "array"
+    },
+    "integration": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/Integration"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "market_cutoff": {
+      "format": "date",
+      "title": "Market Cutoff",
       "type": "string"
+    },
+    "migrations": {
+      "items": {
+        "$ref": "#/$defs/WorkbookMigration"
+      },
+      "title": "Migrations",
+      "type": "array"
     },
     "mode": {
       "enum": [
@@ -3521,37 +5295,11 @@
       "title": "Mode",
       "type": "string"
     },
-    "market_cutoff": {
-      "format": "date",
-      "title": "Market Cutoff",
-      "type": "string"
-    },
-    "sources": {
-      "items": {
-        "$ref": "#/$defs/Source"
-      },
-      "title": "Sources",
-      "type": "array"
-    },
-    "securities": {
-      "items": {
-        "$ref": "#/$defs/Security"
-      },
-      "title": "Securities",
-      "type": "array"
-    },
     "opening": {
       "$ref": "#/$defs/Snapshot"
     },
-    "closing": {
-      "$ref": "#/$defs/Snapshot"
-    },
-    "transactions": {
-      "items": {
-        "$ref": "#/$defs/Transaction"
-      },
-      "title": "Transactions",
-      "type": "array"
+    "policy": {
+      "$ref": "#/$defs/Policy"
     },
     "prices": {
       "items": {
@@ -3559,9 +5307,6 @@
       },
       "title": "Prices",
       "type": "array"
-    },
-    "policy": {
-      "$ref": "#/$defs/Policy"
     },
     "research": {
       "anyOf": [
@@ -3574,10 +5319,37 @@
       ],
       "default": null
     },
-    "integration": {
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "securities": {
+      "items": {
+        "$ref": "#/$defs/Security"
+      },
+      "title": "Securities",
+      "type": "array"
+    },
+    "sources": {
+      "items": {
+        "$ref": "#/$defs/Source"
+      },
+      "title": "Sources",
+      "type": "array"
+    },
+    "transactions": {
+      "items": {
+        "$ref": "#/$defs/Transaction"
+      },
+      "title": "Transactions",
+      "type": "array"
+    },
+    "wealth": {
       "anyOf": [
         {
-          "$ref": "#/$defs/Integration"
+          "$ref": "#/$defs/Wealth"
         },
         {
           "type": "null"

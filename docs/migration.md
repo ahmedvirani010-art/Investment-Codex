@@ -1,4 +1,4 @@
-# Migration inventory — Phases 1–3
+# Migration inventory — Phases 1–4
 
 Inspected the selected checkout and accessible workspace input/shared folders.
 The repository was unborn/empty. Only `Investment_Workspace_PRD.md` was supplied;
@@ -47,4 +47,4 @@ point-in-time membership and explicit fees. This does not establish real legacy
 row/formula/history parity or authorize deployment. Source endpoints, the real
 compatibility workbook, approved production calibration and a persistent runner
 remain unavailable. See [Phase 3 details](phase3.md). No duplicate legacy jobs
-have been disabled. Phase 4 acceptance remains unrun.
+have been disabled. Phase 4 now has hand-calculated synthetic acceptance tests; this is not a real retirement plan. See [completion status](implementation-status.md) and [source recovery](recovery_inventory.md).

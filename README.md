@@ -1,7 +1,7 @@
 # Investment Workspace
 
-A private, Git-backed investment research workspace. **Version 0.3 implements
-Phases 1–3 offline**, with synthetic fixtures and evidence-gated research imports. It does not contain Ahmed's
+A private, Git-backed investment research workspace. **Version 0.4 implements
+Phases 1–4 with controlled offline imports**, with synthetic fixtures and evidence-gated research imports. It does not contain Ahmed's
 holdings, live PSX prices, validated valuations, or trading instructions.
 
 ## Quick start
@@ -27,8 +27,7 @@ The main review artifact is
 Dashboard cells are computed in Python and readable without Excel recalculation.
 Unknown values display as `UNKNOWN`, never zero. The workbook contains holdings,
 transactions, cash, reconciliation, sources, assumptions, coverage, gaps, notes,
-run/change logs, and unknown usage telemetry. Phase 4 tabs explicitly say
-`NOT_IMPLEMENTED`; Phase 2–3 tabs populate from accepted evidence. `SUCCESS` means the **Phase 1 portfolio calculation** ran, not
+run/change logs, and unknown usage telemetry. Phase 2–4 tabs populate from accepted evidence; missing inputs remain blocked. `SUCCESS` means the **Phase 1 portfolio calculation** ran, not
 that a valuation screen is complete or live investment decisions are ready.
 
 ## Import your own data
@@ -201,14 +200,37 @@ screening cannot create READY; a proposed action cannot create a transaction.
 The real legacy datastore and production source/runner setup remain missing,
 so integrated deployment parity is PARTIAL and schedules stay disabled.
 
-## Remaining implementation
+## Completion release and wealth planning
+
+[Completion guide](docs/completion.md) covers separate evaluation dates, dataset
+isolation, evidence packages, legacy mappings, sector replacements, numerical
+forecast bridges, calculation caches/budgets and disabled Actions operation.
+[Phase 4 guide](docs/phase4.md) documents retirement and cross-asset assumptions.
+
+```bash
+uv run --locked python -m investment_workspace readiness
+uv run --locked python -m investment_workspace run daily --as-of 2026-10-26 --offline
+uv run --locked python -m investment_workspace import-evidence --file inputs/private/package.json
+uv run --locked python -m investment_workspace import-wealth --file inputs/private/wealth.json
+uv run --locked python -m investment_workspace run retirement --offline --require-full-coverage
+uv run --locked python -m investment_workspace changes --since-run RUN_ID
+```
+
+`init --offline --phase4` in a fresh `--root` creates the complete synthetic demo.
+It does not replace accepted data. A separate, explicitly confirmed dataset
+activation archives demo history before accepting real holdings. Mode flips alone
+cannot promote fixtures. Existing commands and committed snapshots remain supported.
+
+## Remaining evidence and deployment dependencies
 
 [Migration inventory and blockers](docs/migration.md) lists the missing source
 workbooks, original evidence contract, model feeds, holdings, prices, tax/risk
 settings and scheduler details. Remaining sectors need validated adapters;
 legacy models need exact column maps and reproducible historical outputs.
-Phase 3 live-source access, real legacy-datastore migration/parity and production
-scheduling remain blocked. Phase 4 wealth planning remains unimplemented.
+Real legacy migration and production activation remain evidence/setup gates.
+[Implementation status](docs/implementation-status.md) separates delivered software
+from those dependencies. Live acquisition and optional AI are deferred by choice;
+wealth projections are deterministic and require supplied balances/assumptions.
 
 Tests cover hand-calculated cash/cost/returns, signed earnings bridges, bank/DCF
 values, coverage gates, revision history, dividend ex-date/split boundaries,

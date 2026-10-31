@@ -1,0 +1,116 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "accounting_basis": {
+      "enum": [
+        "STANDALONE",
+        "CONSOLIDATED"
+      ],
+      "title": "Accounting Basis",
+      "type": "string"
+    },
+    "amount": {
+      "anyOf": [
+        {
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+          "type": "string"
+        }
+      ],
+      "title": "Amount"
+    },
+    "effective_date": {
+      "format": "date",
+      "title": "Effective Date",
+      "type": "string"
+    },
+    "line_item": {
+      "minLength": 1,
+      "title": "Line Item",
+      "type": "string"
+    },
+    "locator": {
+      "minLength": 1,
+      "title": "Locator",
+      "type": "string"
+    },
+    "period_end": {
+      "format": "date",
+      "title": "Period End",
+      "type": "string"
+    },
+    "period_start": {
+      "format": "date",
+      "title": "Period Start",
+      "type": "string"
+    },
+    "record_id": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Record Id",
+      "type": "string"
+    },
+    "source_ids": {
+      "items": {
+        "maxLength": 100,
+        "pattern": "^[A-Za-z0-9_.-]+$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "supersedes": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes"
+    },
+    "ticker": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "units": {
+      "enum": [
+        "PKR",
+        "PKR_PER_SHARE",
+        "SHARES"
+      ],
+      "title": "Units",
+      "type": "string"
+    },
+    "valid_until": {
+      "format": "date",
+      "title": "Valid Until",
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_id",
+    "ticker",
+    "effective_date",
+    "valid_until",
+    "source_ids",
+    "period_start",
+    "period_end",
+    "accounting_basis",
+    "line_item",
+    "amount",
+    "units",
+    "locator"
+  ],
+  "title": "FinancialFact",
+  "type": "object"
+}

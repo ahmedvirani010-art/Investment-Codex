@@ -1,0 +1,20 @@
+{
+  "schema_version": "4.0",
+  "enabled": false,
+  "private_repository_verified": false,
+  "manual_parity_verified": false,
+  "dataset_id": "production",
+  "branch": "main",
+  "remote": "origin",
+  "auto_push": false,
+  "publication_authorized_by": null,
+  "allowed_workflows": ["daily", "valuation", "ic", "macro"],
+  "max_work_units": 2000,
+  "max_seconds": 300,
+  "required_macro_indicators": [
+    "SBP_POLICY_RATE", "SOVEREIGN_YIELD", "CPI", "PKR_USD", "FX_RESERVES",
+    "IMF_STATUS", "FISCAL_BALANCE", "OIL", "WESTERN_RATES", "SOVEREIGN_SPREADS",
+    "AI_CREDIT_STRESS", "CRE_CONSUMER"
+  ],
+  "source_strategy": "CONTROLLED_IMPORTS_ONLY"
+}

@@ -1,4 +1,4 @@
-"""Offline portfolio and research CLI. Validated local imports; later phases remain blocked."""
+"""Controlled offline research, portfolio and deterministic wealth-planning CLI."""
 
 import argparse
 import json
@@ -10,13 +10,37 @@ from .storage import LockBusy, PublicationError
 
 
 def main(argv=None):
-    parser = argparse.ArgumentParser(description="Evidence-linked investment workspace — Phase 3 integrated research")
+    parser = argparse.ArgumentParser(description="Evidence-linked investment workspace — Controlled research and wealth planning")
     parser.add_argument("--root", type=Path, default=Path.cwd(), help="Git workspace root")
     sub = parser.add_subparsers(dest="command", required=True)
     init = sub.add_parser("init", help="Publish the clearly labelled synthetic offline demo")
     init.add_argument("--offline", action="store_true", required=True)
+    init.add_argument("--phase4", action="store_true", help="Use the synthetic wealth-planning demo")
     init.add_argument("--phase3", action="store_true", help="Use the synthetic integrated workflows demo")
     init.add_argument("--phase2", action="store_true", help="Use the synthetic Phase 2 model/entitlement demo")
+    sub.add_parser('readiness', help='Read committed coverage, migration and deployment dependencies')
+    delta=sub.add_parser('changes',help='Compare committed revisions')
+    delta.add_argument('--since-run',required=True)
+    for command in ('import-evidence','import-wealth'):
+        intake=sub.add_parser(command,help='Import a controlled evidence/wealth JSON package')
+        intake.add_argument('--file',type=Path,required=True)
+        intake.add_argument('--as-of')
+    migrate=sub.add_parser('migrate-workbook',help='Reconcile an explicitly mapped workbook before acceptance')
+    migrate.add_argument('--file',type=Path,required=True)
+    migrate.add_argument('--mapping',type=Path,required=True)
+    operation=migrate.add_mutually_exclusive_group()
+    operation.add_argument('--dry-run',action='store_true')
+    operation.add_argument('--accept',action='store_true')
+    activate=sub.add_parser('activate-dataset',help='Archive a DEMO and explicitly initialize a real dataset')
+    activate.add_argument('--file',type=Path,required=True)
+    activate.add_argument('--author',required=True)
+    activate.add_argument('--reason',required=True)
+    activate.add_argument('--confirm-real-data',action='store_true',required=True)
+    automate=sub.add_parser('automation',help='Run only an explicitly activated production policy')
+    automate.add_argument('--workflow',choices=['daily','valuation','ic','macro'],required=True)
+    automate.add_argument('--as-of',required=True)
+    automate.add_argument('--dry-run',action='store_true')
+    automate.add_argument('--scheduled',action='store_true')
     imp = sub.add_parser("import-portfolio", help="Import a strict JSON bundle of snapshots, ledger, prices and sources")
     imp.add_argument("--file", type=Path, required=True)
     research = sub.add_parser("import-research", help="Import a sources/research JSON evidence packet")
@@ -34,10 +58,13 @@ def main(argv=None):
     analyze.add_argument("--offline", action="store_true")
     sub.add_parser("update-dividends", help="Recompute accepted dividend evidence and entitlement")
     run_parser = sub.add_parser("run", help="Recalculate the last accepted portfolio import")
-    run_parser.add_argument("workflow", choices=["daily", "portfolio", "valuation", "ic", "event", "timing", "macro", "watchlist"])
+    run_parser.add_argument("workflow", choices=["daily", "portfolio", "valuation", "ic", "event", "timing", "macro", "watchlist", "retirement", "cross-asset"])
     run_parser.add_argument("--source-file", type=Path, help="Event JSON sources/integration packet; never guesses PDF contents")
     run_parser.add_argument("--ticker")
     run_parser.add_argument("--offline", action="store_true")
+    run_parser.add_argument("--as-of")
+    run_parser.add_argument("--max-work-units",type=int)
+    run_parser.add_argument("--max-seconds",type=float)
     run_parser.add_argument("--scope", choices=["required"], default="required")
     run_parser.add_argument("--require-full-coverage", action="store_true")
     validate = sub.add_parser("validate", help="Check committed hashes and workbook parity")
@@ -62,7 +89,26 @@ def main(argv=None):
             from .storage import read_json
             if read_json(root, pipeline.STATE):
                 raise ValueError("workspace already has accepted data; init will not replace it with a demo")
-            result = pipeline.run(root, pipeline.fixture_bytes(args.phase2, args.phase3), workflow="init-demo")
+            result = pipeline.run(root, pipeline.fixture_bytes(args.phase2, args.phase3, args.phase4), workflow="init-demo")
+        elif args.command=='readiness':
+            from .readiness import committed_report
+            result=committed_report(root)
+        elif args.command=='changes':
+            result=pipeline.changes_since(root,args.since_run)
+        elif args.command=='import-evidence':
+            from .intake import import_package
+            result=import_package(root,args.file,as_of=args.as_of)
+        elif args.command=='import-wealth':
+            result=pipeline.import_wealth(root,args.file.read_bytes(),as_of=args.as_of)
+        elif args.command=='migrate-workbook':
+            from .intake import migrate_workbook
+            result=migrate_workbook(root,args.file,args.mapping,accept=args.accept)
+        elif args.command=='activate-dataset':
+            result=pipeline.run(root,args.file.read_bytes(),workflow='activate-dataset',activate_dataset={
+                'author':args.author,'reason':args.reason,'confirmed_real_data':args.confirm_real_data})
+        elif args.command=='automation':
+            from .automation import execute
+            result=execute(root,args.workflow,args.as_of,dry_run=args.dry_run,scheduled=args.scheduled)
         elif args.command == "import-portfolio":
             result = pipeline.run(root, args.file.read_bytes(), workflow="import-portfolio")
         elif args.command == "import-research":
@@ -102,9 +148,9 @@ def main(argv=None):
             if args.source_file:
                 if args.workflow != "event":
                     raise ValueError("--source-file is only supported for run event")
-                result = pipeline.import_integration(root, args.source_file.read_bytes(), workflow="event")
+                result = pipeline.import_integration(root, args.source_file.read_bytes(), workflow="event",as_of=args.as_of,max_units=args.max_work_units,max_seconds=args.max_seconds)
             else:
-                result = pipeline.run(root, pipeline.current_input(root), workflow=args.workflow)
+                result = pipeline.run(root, pipeline.current_input(root), workflow=args.workflow,as_of=args.as_of,max_units=args.max_work_units,max_seconds=args.max_seconds)
             if args.ticker:
                 result["requested_ticker"] = args.ticker
                 result["scope_note"] = "Shared dependents and full required coverage checked"
@@ -125,9 +171,10 @@ def main(argv=None):
         print(json.dumps(result, indent=2, sort_keys=True))
         if args.command == "run" and args.require_full_coverage:
             state = pipeline.read_json(root, pipeline.STATE)
-            if result.get("status") == "FAILED" or state.get("research", {}).get("summary", {}).get("valuation_status") != "COMPLETE":
+            from .readiness import workflow_status
+            if workflow_status(state,args.workflow)!='COMPLETE':
                 return 1
-        return 1 if result.get("status") == "FAILED" else 0
+        return 1 if result.get('status') in {'FAILED','BLOCKED','PUSH_FAILED'} or args.command=='automation' and result.get('status')=='PARTIAL' else 0
     except (ValueError, OSError, KeyError, TypeError, PublicationError, LockBusy) as exc:
         print(str(exc), file=sys.stderr)
         return 2

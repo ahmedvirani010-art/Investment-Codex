@@ -77,3 +77,13 @@ catalysts; user-authored candidates; and proposed IC actions. See the exact
 [Phase 3 equations, gates and limitations](phase3.md). Decimal values serialize
 as strings, unknowns stay null, histories retain superseded payloads and provenance,
 and all canonical outputs/workbook tables publish together.
+
+## Completion release extensions
+
+Optional dataset identity, financial facts, migration records, original-document
+catalogue and wealth records extend the input contract. Absent additive defaults
+are normalized for old evidence-ID comparisons; old snapshots are never rewritten.
+See [completion interfaces](completion.md), [wealth schemas](wealth-schema.json),
+and [implemented evidence rules](evidence_contract.md). Evaluation date is a run
+context separate from observation cutoff. Monetary input precision remains explicit;
+model/projection output Decimal strings retain intermediate precision.

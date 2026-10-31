@@ -1,4 +1,4 @@
 """Deterministic offline investment workspace. No network clients or trade execution."""
 
-__version__ = "0.3.0"
+__version__ = "0.4.0"
 

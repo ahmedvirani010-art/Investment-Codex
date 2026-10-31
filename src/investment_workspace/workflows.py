@@ -5,6 +5,8 @@ from decimal import Decimal, ROUND_FLOOR, localcontext
 from itertools import combinations
 
 from .storage import digest, dumps
+from .runtime import assessment_date, cached
+from .migration import verify_migrations
 from .timing import adjusted_bars, backtest, correlation, indicators, mean, rank_rows
 
 ZERO = Decimal(0)
@@ -50,6 +52,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             raise ValueError("accepted integration cannot be omitted")
         return
     cutoff = bundle.market_cutoff
+    assessment = assessment_date(bundle)
     sources = {s.source_id: s for s in bundle.sources}
     history = deepcopy(old.get("history", []))
     prior = {r["record_id"]: r for r in history}
@@ -84,7 +87,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
            **{key: [] for key in SHEETS.values()}}
 
     def good(record):
-        return bool(record and record.effective_date <= cutoff <= record.valid_until
+        return bool(record and record.effective_date <= assessment <= record.valid_until
                     and all(sources[s].evidence_label == "CONFIRMED" for s in record.source_ids))
 
     def meta(record, owner):
@@ -174,7 +177,8 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             current_price = next((p for p in bundle.prices if p.ticker == ticker), None)
             if current_price and current_price.session_date == latest and current_price.close != bars[-1]["close"]:
                 raise ValueError("current price conflicts with verified history")
-            row.update({**meta(h, "price_history"), **indicators(bars, bench, policy), "status": "ELIGIBLE", "reason": None,
+            row.update({**meta(h, "price_history"), **{k: Decimal(v) if k in {'price_return','benchmark_return','relative_performance','rs_momentum','short_sma','long_sma','sma_slope','extension','z_score','average_traded_value'} and v is not None else v
+                           for k,v in cached('timing', ticker, {'bars':bars,'benchmark':bench,'policy':policy}, lambda: indicators(bars, bench, policy)).items()}, "status": "ELIGIBLE", "reason": None,
                         "source_ids": sorted(set(h.source_ids + benchmark.source_ids + policy.source_ids + calendar.source_ids + membership.source_ids + [a.source_id for a in h.actions + benchmark.actions])),
                         "assumption_ids": [policy.record_id], "history_id": h.record_id,
                         "policy_id": policy.record_id, "membership_id": membership.record_id,
@@ -249,9 +253,23 @@ def _calculate(bundle, state, previous, run_id, input_hash):
         research["ranking"] = [{"rank": i, **row} for i, row in enumerate(sorted(
             [r for r in research["valuations"] if r["scenario"] == "base"],
             key=lambda r: (-Decimal(r["gross_return"]), r["ticker"])), 1)][:10]
-    out["macro"] = [{**meta(m, "macro_news"), **m.model_dump(mode="json")} for m in data.macro]
+    macro_groups={}
+    for observation in data.macro:
+        macro_groups.setdefault((observation.domain,observation.indicator),[]).append(observation)
+    selected_macro=[]
+    for key,observations in macro_groups.items():
+        latest_date=max(m.effective_date for m in observations)
+        latest_rows=[m for m in observations if m.effective_date==latest_date]
+        facts={(m.value,m.unit,m.evidence_kind,m.narrative if m.value is None else None) for m in latest_rows}
+        if len(facts)>1:
+            gap(None,'macro_news','CONFLICTING_MACRO_OBSERVATIONS','Resolve same-date competing observations for '+key[1],sorted({s for m in latest_rows for s in m.source_ids}))
+        else:
+            selected_macro.append(min(latest_rows, key=lambda row: row.record_id))
+    selected_ids={m.record_id for m in selected_macro}
+    out['macro']=[{**meta(m,'macro_news'),**m.model_dump(mode='json'),'selected_current':m.record_id in selected_ids,
+                   'view_status':'CURRENT_VIEW' if m.record_id in selected_ids else 'HISTORY_OR_CONFLICT'} for m in data.macro]
     out["scenarios"] = [{**meta(m, "macro_news"), **m.model_dump(mode="json"), "evidence_kind": "HYPOTHETICAL_SCENARIO"} for m in data.macro_scenarios]
-    for m in data.macro:
+    for m in selected_macro:
         if not good(m):
             gap(m.ticker, "macro_news", "STALE_OR_UNVERIFIED_MACRO", "Refresh dated observation", m.source_ids)
     method = data.alert_methodology
@@ -285,7 +303,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
         if any(c is None or c.ticker != candidate.ticker for c in catalyst_records):
             raise ValueError("candidate catalyst IDs must resolve to the same ticker")
         fresh_price = bool(p and p.close is not None and latest == p.session_date and sources[p.source_id].evidence_label == "CONFIRMED")
-        gates = {"evidence": good(candidate) and candidate.next_review >= cutoff and fresh_price and candidate.ticker not in uncertain_events,
+        gates = {"evidence": good(candidate) and candidate.next_review >= assessment and fresh_price and candidate.ticker not in uncertain_events,
             "valuation": bool(entry and candidate.desired_entry <= Decimal(entry["entry_ceiling"]) and candidate.ticker not in blocked_models),
             "portfolio_fit_risk": bool(entry and entry.get("resolved_risk_gate") == "PASSED") and risk_good and candidate.ticker in sizing and sizing[candidate.ticker]["quantity_cap"] is not None and sizing[candidate.ticker]["quantity_cap"] > 0,
             "catalyst": bool(catalyst_records) and all(good(c) and c.window_end >= cutoff and (c.window_start-cutoff).days <= 90 for c in catalyst_records),
@@ -327,11 +345,32 @@ def _calculate(bundle, state, previous, run_id, input_hash):
     if not data.macro:
         gap(None, "macro_news", "MISSING_MACRO_OBSERVATIONS", "Import Pakistan/global observations with source dates")
     # No legacy tabs/formulas were supplied. A new workbook must not masquerade as verified compatibility.
-    gap(None, "migration", "LEGACY_DATASTORE_NOT_MIGRATED", "Inspect and map the real PSX_Mean_Reversion_DataStore.xlsx before claiming parity")
+    proof_snapshot = {**state, 'integration': out}
+    legacy_verified = verify_migrations(bundle, proof_snapshot, previous)
+    state['migration_records'] = proof_snapshot['migration_records']
+    if not legacy_verified:
+        gap(None, "migration", "LEGACY_DATASTORE_NOT_MIGRATED", "Inspect and map the real PSX_Mean_Reversion_DataStore.xlsx before claiming parity")
     out["summary"] = {"integration_status": "PARTIAL" if out["refresh_queue"] else "COMPLETE",
         "required_timing_count": len(needed), "eligible_timing_count": len(eligible_rows),
         "latest_completed_session": latest.isoformat() if latest else None, "sizing_status": "ILLUSTRATIVE_ONLY" if bundle.mode == "DEMO" and risk_good else "RESEARCH_CAPS_ONLY" if risk_good else "BLOCKED",
-        "legacy_datastore_status": "NOT_MIGRATED", "schedules_active": False, "mode": bundle.mode}
+        "legacy_datastore_status": "VERIFIED" if legacy_verified else "NOT_MIGRATED", "schedules_active": False, "mode": bundle.mode}
+    timing_complete = bool(needed and len(eligible_rows)==len(needed) and all(r['rs_percentile'] is not None for r in eligible_rows))
+    macro_complete = bool({m.domain for m in selected_macro}=={'PAKISTAN','GLOBAL'} and len(selected_macro)==len(macro_groups) and all(good(m) and (m.value is not None or m.evidence_kind!='FACT' or m.unit.lower() in {'qualitative','status','text'}) for m in selected_macro) and not uncertain_events)
+    watch_complete = bool(all(good(c) and c.ticker in entry_rows and c.ticker in timing_rows and timing_rows[c.ticker]['status']=='ELIGIBLE' for c in data.candidates))
+    risk_summary = next((r for r in out['risk'] if r.get('row_kind')=='SUMMARY'),{})
+    risk_complete = bool(data.risk_limits and good(data.risk_limits) and data.risk_limits.user_confirmed and
+                         all(risk_summary.get(k)=='FULL' for k in ('price_history_coverage','factor_coverage','scenario_coverage')))
+    out['summary'].update({'timing_status':'COMPLETE' if timing_complete else 'PARTIAL',
+        'mean_reversion_status':'COMPLETE' if timing_complete and policy.calibration_status=='VALIDATED' else 'PROVISIONAL_OR_PARTIAL',
+        'macro_status':'COMPLETE' if macro_complete else 'PARTIAL',
+        'watchlist_status':'COMPLETE' if watch_complete and risk_complete else 'PARTIAL',
+        'ic_status':'COMPLETE' if risk_complete and all(good(p) for p in data.proposals) and not blocked_models else 'PARTIAL'})
+    if not all(out['summary'][key]=='COMPLETE' for key in ('timing_status','mean_reversion_status','macro_status','watchlist_status','ic_status')):
+        out['summary']['integration_status']='PARTIAL'
+    if not macro_complete and not any(r['field']=='macro_news' for r in out['refresh_queue']):
+        gap(None,'macro_news','INCOMPLETE_MACRO_COVERAGE','Import current Pakistan/global observations with compatible evidence and units')
+    if out['summary']['mean_reversion_status']!='COMPLETE':
+        gap(None,'timing','UNVALIDATED_MEAN_REVERSION_METHODOLOGY','Supply documented calibration before claiming integrated completion')
     all_input_sources = sorted({s for _, r in current for s in r.source_ids} | {a.source_id for h in data.histories for a in h.actions} | {p.source_id for p in bundle.prices}
                                | {bundle.opening.source_id, bundle.closing.source_id}
                                | {s for r in state.get("research", {}).get("valuations", []) for s in r["source_ids"]})
@@ -378,7 +417,7 @@ def risk_outputs(bundle, state, data, out, series, good, meta, gap):
     held = [h for h in state["holdings"] if Decimal(h["quantity"]) > 0]
     portfolio_ids = [bundle.opening.source_id, bundle.closing.source_id] + [t.source_id for t in bundle.transactions] + [p.source_id for p in bundle.prices]
     current = bool(assets and assets > 0 and cash is not None and not state["reconciliation"]
-                   and (bundle.market_cutoff-bundle.closing.timestamp.date()).days <= bundle.policy.holdings_max_age_days
+                   and (assessment_date(bundle)-bundle.closing.timestamp.date()).days <= bundle.policy.holdings_max_age_days
                    and all(h["freshness"] == "CURRENT" and h["market_value"] is not None for h in held)
                    and all(sources[s].evidence_label == "CONFIRMED" for s in portfolio_ids))
     limits_good = bool(good(limits) and limits.user_confirmed)

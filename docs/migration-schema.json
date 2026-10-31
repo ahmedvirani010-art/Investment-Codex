@@ -1,0 +1,210 @@
+{
+  "$defs": {
+    "SheetMapping": {
+      "additionalProperties": false,
+      "properties": {
+        "collection": {
+          "enum": [
+            "timing",
+            "mean_reversion",
+            "valuations",
+            "earnings",
+            "history"
+          ],
+          "title": "Collection",
+          "type": "string"
+        },
+        "columns": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "minProperties": 2,
+          "title": "Columns",
+          "type": "object"
+        },
+        "header_row": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Header Row",
+          "type": "integer"
+        },
+        "ignored_columns": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "title": "Ignored Columns",
+          "type": "object"
+        },
+        "key_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Key Fields",
+          "type": "array"
+        },
+        "price_basis": {
+          "default": "RAW",
+          "enum": [
+            "RAW",
+            "SPLIT_ADJUSTED"
+          ],
+          "title": "Price Basis",
+          "type": "string"
+        },
+        "sheet": {
+          "maxLength": 31,
+          "minLength": 1,
+          "title": "Sheet",
+          "type": "string"
+        }
+      },
+      "required": [
+        "sheet",
+        "collection",
+        "columns"
+      ],
+      "title": "SheetMapping",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "absolute_tolerance": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+          "type": "string"
+        }
+      ],
+      "default": "1E-8",
+      "title": "Absolute Tolerance"
+    },
+    "approved_by": {
+      "minLength": 1,
+      "title": "Approved By",
+      "type": "string"
+    },
+    "effective_date": {
+      "format": "date",
+      "title": "Effective Date",
+      "type": "string"
+    },
+    "ignored_sheets": {
+      "additionalProperties": {
+        "type": "string"
+      },
+      "title": "Ignored Sheets",
+      "type": "object"
+    },
+    "kind": {
+      "enum": [
+        "LEGACY_DATASTORE",
+        "MODEL_WORKBOOK"
+      ],
+      "title": "Kind",
+      "type": "string"
+    },
+    "mappings": {
+      "items": {
+        "$ref": "#/$defs/SheetMapping"
+      },
+      "minItems": 1,
+      "title": "Mappings",
+      "type": "array"
+    },
+    "methodology_reviewed": {
+      "default": false,
+      "title": "Methodology Reviewed",
+      "type": "boolean"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "record_id": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Record Id",
+      "type": "string"
+    },
+    "relative_tolerance": {
+      "anyOf": [
+        {
+          "minimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d{0,16}0*$",
+          "type": "string"
+        }
+      ],
+      "default": "1E-12",
+      "title": "Relative Tolerance"
+    },
+    "source_ids": {
+      "items": {
+        "maxLength": 100,
+        "pattern": "^[A-Za-z0-9_.-]+$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "store_permitted": {
+      "const": true,
+      "title": "Store Permitted",
+      "type": "boolean"
+    },
+    "supersedes": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes"
+    },
+    "ticker": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "valid_until": {
+      "format": "date",
+      "title": "Valid Until",
+      "type": "string"
+    },
+    "workbook_sha256": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Workbook Sha256",
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_id",
+    "ticker",
+    "effective_date",
+    "valid_until",
+    "source_ids",
+    "kind",
+    "workbook_sha256",
+    "mappings",
+    "approved_by",
+    "reason",
+    "store_permitted"
+  ],
+  "title": "WorkbookMigration",
+  "type": "object"
+}

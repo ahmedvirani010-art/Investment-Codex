@@ -1,6 +1,8 @@
 """Computed workbook cells; no Excel recalculation or implicit numerical overrides."""
 
 import json
+import math
+import hashlib
 from decimal import Decimal
 from pathlib import Path
 
@@ -11,20 +13,29 @@ from openpyxl.worksheet.table import Table, TableStyleInfo
 from .schemas import NoteOverride
 from .research import SHEETS
 from .workflows import SHEETS as INTEGRATION_SHEETS
+from .wealth import SHEETS as WEALTH_SHEETS
 
 NOTE_COLUMNS = ["override_id", "ticker", "field", "value", "author", "reason", "effective_date", "expires_at", "confirmed", "supersedes"]
 HOLDING_COLUMNS = ["record_id", "ticker", "sector", "quantity", "cost", "price", "price_date", "market_value", "unrealized_gain", "unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "freshness", "reconciliation_state", "run_id", "effective_date", "source_ids"]
-FUTURE_SHEETS = ["Retirement", "Cross_Asset"]
-NUMERIC_COLUMNS = {"quantity", "cost", "price", "market_value", "unrealized_gain", "unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "cash_after", "realized_gain", "amount", "fees", "taxes", "ratio", "present_fair_value", "horizon_exit_price", "horizon_dividends", "forward_eps", "normalized_eps", "reported_eps", "normalized_pat", "sustainable_dps", "entry_ceiling", "mos_entry_ceiling", "hurdle_entry_ceiling", "hurdle", "gross_return", "net_return", "annualized_return", "margin_of_safety", "dps", "eligible_quantity", "gross_entitlement", "net_entitlement", "gross_received", "net_received", "gross_pending", "payout_crosscheck", "horizon_years", "price_return", "benchmark_return", "relative_performance", "rs_momentum", "short_sma", "long_sma", "sma_slope", "extension", "z_score", "average_traded_value", "rs_percentile", "price_breadth", "rs_breadth", "average_relative_performance", "weight_total_sleeve", "max_weight", "scenario_assets", "income_return", "total_return", "correlation", "desired_entry", "stop_price", "approach_fraction", "ledger_quantity", "ledger_cost", "quantity_difference", "cost_difference", "cash_difference"}
+FUTURE_SHEETS = []
+NUMERIC_COLUMNS = {"quantity", "cost", "price", "market_value", "unrealized_gain", "unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "cash_after", "realized_gain", "amount", "fees", "taxes", "ratio", "present_fair_value", "horizon_exit_price", "horizon_dividends", "forward_eps", "normalized_eps", "reported_eps", "normalized_pat", "sustainable_dps", "entry_ceiling", "mos_entry_ceiling", "hurdle_entry_ceiling", "hurdle", "gross_return", "net_return", "annualized_return", "margin_of_safety", "dps", "eligible_quantity", "gross_entitlement", "net_entitlement", "gross_received", "net_received", "gross_pending", "payout_crosscheck", "horizon_years", "price_return", "benchmark_return", "relative_performance", "rs_momentum", "short_sma", "long_sma", "sma_slope", "extension", "z_score", "average_traded_value", "rs_percentile", "price_breadth", "rs_breadth", "average_relative_performance", "weight_total_sleeve", "max_weight", "scenario_assets", "income_return", "total_return", "correlation", "desired_entry", "stop_price", "approach_fraction", "balance_pkr", "spendable_now", "nominal_balance", "real_balance", "accessible_balance", "locked_balance", "growth", "net_inflows", "net_spending_required", "net_withdrawn", "funding_gap", "cumulative_funding_gap", "inflation_index", "ending_nominal_balance", "ending_real_balance", "holding_period_return", "revenue", "ebitda", "pretax", "tax_charge", "pat", "eps", "fcfe", "shares", "ledger_quantity", "ledger_cost", "quantity_difference", "cost_difference", "cash_difference"}
 
 
 def cell_value(value, column=""):
     if value is None:
         return "UNKNOWN"
-    if isinstance(value, (list, dict)):
-        return json.dumps(value, sort_keys=True, ensure_ascii=False)
+    if isinstance(value,(list,dict)):
+        raw=json.dumps(value,sort_keys=True,ensure_ascii=False)
+        if len(raw)>32000:
+            return json.dumps({'status':'FULL_VALUE_IN_CANONICAL_SNAPSHOT','items':len(value),
+                               'sha256':hashlib.sha256(raw.encode()).hexdigest()},sort_keys=True)
+        return raw
     if column in NUMERIC_COLUMNS:
-        return float(Decimal(str(value)))
+        exact=Decimal(str(value))
+        result=float(exact)
+        return result if math.isfinite(result) and (result!=0 or exact==0) else str(value)
+    if isinstance(value,str) and len(value)>32000:
+        return 'FULL_TEXT_IN_CANONICAL_SNAPSHOT sha256='+hashlib.sha256(value.encode()).hexdigest()
     return value
 
 
@@ -88,8 +99,20 @@ def export_workbook(path: Path, snapshot: dict):
         add_sheet(wb, name, snapshot.get("research", {}).get(key, []))
     for name, key in INTEGRATION_SHEETS.items():
         add_sheet(wb, name, snapshot.get("integration", {}).get(key, []))
+    for name,key in WEALTH_SHEETS.items():
+        add_sheet(wb,name,snapshot.get('wealth',{}).get(key,[]))
+    add_sheet(wb,'Financial_Facts',snapshot.get('financials',{}).get('facts',[]))
+    add_sheet(wb,'Evidence_Library',snapshot.get('documents',[]))
+    add_sheet(wb,'Readiness',[{'dimension':key,'value':value} for key,value in sorted(snapshot.get('readiness',{}).items())])
     for name in FUTURE_SHEETS:
         add_sheet(wb, name, [{"status": "NOT_IMPLEMENTED", "reason": "No accepted model or live data migrated; see docs/migration.md"}])
+    if 'url' in [c.value for c in wb['Sources'][1]]:
+        index=[c.value for c in wb['Sources'][1]].index('url')+1
+        for row in wb['Sources'].iter_rows(min_row=2):
+            cell=row[index-1]
+            if isinstance(cell.value,str) and cell.value.startswith(('https://','http://')):
+                cell.hyperlink=cell.value
+                cell.style='Hyperlink'
     path.parent.mkdir(parents=True, exist_ok=True)
     wb.save(path)
     wb.close()
@@ -120,10 +143,10 @@ def validate_workbook(path: Path, snapshot: dict):
         if dashboard["published_run_id"] != snapshot["published_run_id"]:
             raise ValueError("workbook revision differs from dataset")
         tables = {"Transactions": snapshot["transactions"], "Cash": [{k: snapshot["summary"].get(k) for k in ("cash", "ledger_cash", "cash_difference", "income_received", "realized_gain")}], "Sources": snapshot["sources"], "Coverage": snapshot["coverage"], "Data_Gaps": snapshot["data_gaps"], "Reconciliation": snapshot["reconciliation"], "Run_Log": snapshot["run_log"], "Change_Log": snapshot["changes"], "Usage": snapshot["usage"], "Notes": snapshot["notes"], "Assumptions": snapshot.get("assumptions", [])}
-        for module, sheets in (("research", SHEETS), ("integration", INTEGRATION_SHEETS)):
+        for module, sheets in (("research", SHEETS), ("integration", INTEGRATION_SHEETS), ("wealth", WEALTH_SHEETS)):
             for name, key in sheets.items():
                 if name not in wb:
-                    if snapshot.get(module):
+                    if key in snapshot.get(module,{}):
                         raise ValueError("workbook missing analytical sheet: " + name)
                     continue
                 legacy = list(wb[name].values)
@@ -131,6 +154,14 @@ def validate_workbook(path: Path, snapshot: dict):
                                and legacy[1][0] == "NOT_IMPLEMENTED")
                 if not placeholder:
                     tables[name] = snapshot.get(module, {}).get(key, [])
+        if snapshot.get('financials') and 'Financial_Facts' not in wb or snapshot.get('readiness') and 'Readiness' not in wb or snapshot.get('documents') and 'Evidence_Library' not in wb:
+            raise ValueError('workbook missing evidence/readiness table')
+        if 'Evidence_Library' in wb:
+            tables['Evidence_Library']=snapshot.get('documents',[])
+        if 'Financial_Facts' in wb:
+            tables['Financial_Facts']=snapshot.get('financials',{}).get('facts',[])
+        if 'Readiness' in wb:
+            tables['Readiness']=[{'dimension':key,'value':value} for key,value in sorted(snapshot.get('readiness',{}).items())]
         for name, records in tables.items():
             values = list(wb[name].values)
             headers = values[0]

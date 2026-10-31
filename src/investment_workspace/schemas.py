@@ -22,6 +22,20 @@ class Source(StrictModel):
     effective_date: date
     locator: str = Field(min_length=1)
     evidence_label: Literal["CONFIRMED", "ESTIMATE", "ASSUMPTION", "UNVERIFIED"]
+    url: str | None = Field(default=None, pattern=r"^https?://")
+    published_at: datetime | None = None
+    accessed_at: datetime | None = None
+    document_sha256: str | None = Field(default=None, pattern=r"^[a-f0-9]{64}$")
+    coverage_through: date | None = None
+    owner: str | None = None
+
+    @model_validator(mode="after")
+    def source_times(self):
+        if any(t is not None and t.tzinfo is None for t in (self.published_at, self.accessed_at)):
+            raise ValueError("source timestamps need timezone offsets")
+        if self.published_at and self.accessed_at and self.published_at > self.accessed_at:
+            raise ValueError("publication cannot follow access")
+        return self
 
 
 class Security(StrictModel):
@@ -130,6 +144,11 @@ class Bundle(StrictModel):
     policy: Policy = Field(default_factory=Policy)
     research: "Research | None" = None
     integration: "Integration | None" = None
+    dataset_id: Identifier | None = None
+    financials: list["FinancialFact"] = Field(default_factory=list)
+    migrations: list["WorkbookMigration"] = Field(default_factory=list)
+    wealth: "Wealth | None" = None
+    documents: list["EvidenceDocument"] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def links_and_dates(self):
@@ -165,6 +184,26 @@ class Bundle(StrictModel):
                               for r in (getattr(self.integration, name) if isinstance(getattr(self.integration, name), list) else [getattr(self.integration, name)]) if r}
             if research_ids & integrated_ids:
                 raise ValueError("record IDs cannot be reused across research and integration owners")
+        fact_groups={}
+        for fact in self.financials:
+            key=(fact.ticker,fact.period_start,fact.period_end,fact.accounting_basis,fact.line_item,fact.units)
+            if key in fact_groups and fact_groups[key]!=fact.amount:
+                raise ValueError('conflicting same-period financial facts require an explicit owned correction')
+            fact_groups[key]=fact.amount
+        owned=list(self.financials)+list(self.migrations)
+        if self.research:
+            owned += self.research.earnings+self.research.models+self.research.dividends+self.research.resolutions
+        if self.integration:
+            owned += [r for name in type(self.integration).model_fields if name!='schema_version' for r in
+                      (getattr(self.integration,name) if isinstance(getattr(self.integration,name),list) else [getattr(self.integration,name)]) if r]
+        if self.wealth:
+            owned += [r for name in ('assets','flows','scenarios','plans','histories') for r in getattr(self.wealth,name)]
+        if len({r.record_id for r in owned})!=len(owned):
+            raise ValueError('record IDs must be unique across all owners')
+        if len({(d.source_id,d.sha256,d.role) for d in self.documents})!=len(self.documents):
+            raise ValueError('duplicate evidence document')
+        if any(s.coverage_through and s.coverage_through>self.market_cutoff for s in self.sources):
+            raise ValueError('observed source coverage cannot extend beyond input cutoff')
         if any(s.effective_date > self.market_cutoff for s in self.sources):
             raise ValueError("source effective date after cutoff")
         return self
@@ -263,6 +302,17 @@ class Scenario(StrictModel):
     shares: Positive | None = None
     terminal_value: NonNegative | None = None
     payout_crosscheck: NonNegative | None = None
+    crosscheck_tolerance: Fraction | None = None
+    contract_years: int | None = Field(default=None, ge=1)
+    components: list["SOTPComponent"] = Field(default_factory=list)
+    parent_net_debt: Signed | None = None
+    parent_liabilities: NonNegative | None = None
+    minority_interests: NonNegative | None = None
+    normalized_operating_eps: Signed | None = None
+    earnings_multiple: Positive | None = None
+    surplus_cash_per_share: NonNegative | None = None
+    cash_income_excluded: bool | None = None
+    operating_forecasts: list["OperatingForecast"] = Field(default_factory=list)
     drivers: dict[str, str] = Field(min_length=1)
 
     @model_validator(mode="after")
@@ -274,11 +324,12 @@ class Scenario(StrictModel):
 
 class ValuationModel(ResearchRecord):
     earnings_id: Identifier
-    method: Literal["BANK_JUSTIFIED_PB", "FCFE_DCF", "UNSUPPORTED"]
+    method: Literal["BANK_JUSTIFIED_PB", "FCFE_DCF", "FINITE_LIFE_FCFE", "SOTP", "ROE_BOOK", "NORMALIZED_MULTIPLE", "UNSUPPORTED"]
     model_version: str = Field(min_length=1)
     certification: Literal["PROVISIONAL", "VALIDATED"] = "PROVISIONAL"
     origin: Literal["NEW_EXPLICIT_MODEL", "LEGACY_RECOVERED"]
     methodology_rationale: str = Field(min_length=1)
+    approval: "ModelApproval | None" = None
     legacy_column_map: dict[str, str] = Field(default_factory=dict)
     historical_outputs: dict[str, NonNegative] = Field(default_factory=dict)
     reproduction_tolerance: NonNegative = Decimal("0.000001")
@@ -309,6 +360,8 @@ class ValuationModel(ResearchRecord):
             raise ValueError("exactly one bear/base/bull scenario required")
         if len({s.scenario_id for s in self.scenarios}) != 3:
             raise ValueError("scenario IDs must be unique")
+        if self.event_checked_through and self.event_checked_through > self.effective_date:
+            raise ValueError("future event coverage")
         if self.benchmark_date > self.effective_date or self.share_basis_date > self.effective_date:
             raise ValueError("future benchmark/share basis")
         return self
@@ -623,6 +676,254 @@ class Integration(StrictModel):
         if probabilities and all(p is not None for p in probabilities) and sum(probabilities) != 1:
             raise ValueError("scenario probabilities must sum to one")
         return self
+
+
+
+
+UnitFraction = Annotated[Decimal, Field(ge=0, le=1, allow_inf_nan=False)]
+GrowthRate = Annotated[Decimal, Field(gt=-1, allow_inf_nan=False, max_digits=24, decimal_places=8)]
+
+
+class FinancialFact(ResearchRecord):
+    period_start: date
+    period_end: date
+    accounting_basis: Literal['STANDALONE', 'CONSOLIDATED']
+    line_item: str = Field(min_length=1)
+    amount: Signed
+    units: Literal['PKR', 'PKR_PER_SHARE', 'SHARES']
+    locator: str = Field(min_length=1)
+
+    @model_validator(mode='after')
+    def periods(self):
+        if not self.period_start <= self.period_end <= self.effective_date:
+            raise ValueError('invalid financial-fact period')
+        return self
+
+
+class OperatingForecast(StrictModel):
+    period: str = Field(min_length=1)
+    revenue_fact_id: Identifier
+    revenue_growth: GrowthRate
+    ebitda_margin: Signed
+    depreciation: NonNegative
+    net_interest_expense: Signed
+    other_income: Signed
+    tax_charge: Signed
+    capex: NonNegative
+    working_capital_increase: Signed
+    net_borrowing: Signed
+    shares: Positive
+    cash_income_included: bool
+
+
+class SOTPComponent(StrictModel):
+    component_id: Identifier
+    equity_value: NonNegative
+    ownership: UnitFraction
+    source_ids: list[Identifier] = Field(min_length=1)
+
+
+class ModelApproval(StrictModel):
+    approved_by: str = Field(min_length=1)
+    approved_date: date
+    model_version: str = Field(min_length=1)
+    methodology_validated: Literal[True]
+    source_ids: list[Identifier] = Field(min_length=1)
+    rationale: str = Field(min_length=1)
+
+
+class SheetMapping(StrictModel):
+    sheet: str = Field(min_length=1, max_length=31)
+    collection: Literal['timing', 'mean_reversion', 'valuations', 'earnings', 'history']
+    columns: dict[str, str] = Field(min_length=2)
+    key_fields: list[str] = Field(default_factory=lambda: ['ticker'])
+    header_row: int = Field(default=1, ge=1)
+    ignored_columns: dict[str,str] = Field(default_factory=dict)
+    price_basis: Literal['RAW','SPLIT_ADJUSTED'] = 'RAW'
+
+    @model_validator(mode='after')
+    def keys(self):
+        if any(not reason.strip() for reason in self.ignored_columns.values()) or set(self.ignored_columns)&set(self.columns.values()):
+            raise ValueError('ignored columns need explicit reasons and cannot be mapped')
+        if not set(self.key_fields) <= self.columns.keys() or len(set(self.columns.values())) != len(self.columns):
+            raise ValueError('mapping needs unique columns and mapped key fields')
+        return self
+
+
+class WorkbookMigration(ResearchRecord):
+    kind: Literal['LEGACY_DATASTORE', 'MODEL_WORKBOOK']
+    workbook_sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    mappings: list[SheetMapping] = Field(min_length=1)
+    approved_by: str = Field(min_length=1)
+    reason: str = Field(min_length=1)
+    store_permitted: Literal[True]
+    methodology_reviewed: bool = False
+    ignored_sheets: dict[str,str] = Field(default_factory=dict)
+    absolute_tolerance: NonNegative = Decimal('0.00000001')
+    relative_tolerance: Annotated[Decimal, Field(ge=0,allow_inf_nan=False,decimal_places=16)] = Decimal('0.000000000001')
+
+    @model_validator(mode='after')
+    def unique_sheets(self):
+        if any(not reason.strip() for reason in self.ignored_sheets.values()) or set(self.ignored_sheets)&{m.sheet for m in self.mappings}:
+            raise ValueError('ignored sheets need reasons and cannot be mapped')
+        if any(m.sheet=='_Workspace_Provenance' for m in self.mappings):
+            raise ValueError('reserved compatibility provenance sheet')
+        if len({m.sheet for m in self.mappings}) != len(self.mappings):
+            raise ValueError('one mapping per legacy sheet required')
+        return self
+
+
+class WealthAsset(ResearchRecord):
+    economic_id: Identifier
+    kind: Literal['CASH', 'GOLD', 'VPS', 'PF', 'GRATUITY', 'CRYPTO', 'OTHER', 'PSX_SLEEVE']
+    balance: NonNegative | None = None
+    currency: Literal['PKR', 'USD'] = 'PKR'
+    portfolio_link: Literal['TOTAL', 'EQUITY', 'CASH'] | None = None
+    available_from: date
+    fx_to_pkr: Positive | None = None
+    fx_date: date | None = None
+    fx_source_id: Identifier | None = None
+
+    @model_validator(mode='after')
+    def links(self):
+        if self.portfolio_link and (self.balance is not None or self.currency != 'PKR'):
+            raise ValueError('linked portfolio balances cannot be copied or FX converted')
+        if self.kind == 'PSX_SLEEVE' and not self.portfolio_link:
+            raise ValueError('PSX sleeve must reference the accepted portfolio')
+        if self.kind == 'GRATUITY' and self.balance not in (None, Decimal(0)):
+            raise ValueError('future gratuity belongs in a benefit flow, not current wealth')
+        if self.currency == 'PKR' and self.fx_to_pkr not in (None, Decimal(1)):
+            raise ValueError('PKR has no non-unit FX conversion')
+        return self
+
+
+class WealthFlow(ResearchRecord):
+    asset_key: Identifier | None = None
+    kind: Literal['CONTRIBUTION', 'BENEFIT', 'EXPENSE']
+    amount: NonNegative | None
+    amount_basis: Literal['NET'] = 'NET'
+    price_basis: Literal['NOMINAL', 'REAL_AT_START']
+    frequency: Literal['MONTHLY', 'ONCE']
+    starts: date
+    ends: date
+    economic_claim_id: Identifier | None = None
+
+    @model_validator(mode='after')
+    def dates(self):
+        if self.ends < self.starts or (self.frequency == 'ONCE' and self.starts != self.ends):
+            raise ValueError('invalid wealth cash-flow dates')
+        if self.kind != 'EXPENSE' and not self.asset_key:
+            raise ValueError('inflow needs an asset destination')
+        if self.kind == 'BENEFIT' and not self.economic_claim_id:
+            raise ValueError('benefit needs a unique economic claim ID')
+        return self
+
+
+class AssetReturn(StrictModel):
+    asset_key: Identifier
+    annual_nominal_return: GrowthRate | None
+    annual_fee_rate: Fraction | None
+    return_tax_rate: Fraction | None
+    withdrawal_tax_rate: Fraction | None
+
+
+class WealthScenario(ResearchRecord):
+    name: Literal['bear', 'base', 'bull']
+    annual_inflation: GrowthRate | None
+    returns: list[AssetReturn]
+
+    @model_validator(mode='after')
+    def unique_returns(self):
+        if len({r.asset_key for r in self.returns}) != len(self.returns):
+            raise ValueError('duplicate asset-return policy')
+        return self
+
+
+class RetirementPlan(ResearchRecord):
+    start_date: date
+    retirement_date: date
+    months: int = Field(ge=1, le=1200)
+    monthly_spending_real: NonNegative | None
+    withdrawal_order: list[Identifier]
+
+    @model_validator(mode='after')
+    def monthly(self):
+        if self.start_date.day != 1 or self.retirement_date.day != 1:
+            raise ValueError('retirement dates must be month starts')
+        if self.start_date < self.effective_date or self.retirement_date < self.start_date:
+            raise ValueError('invalid retirement start/retirement date')
+        if len(set(self.withdrawal_order)) != len(self.withdrawal_order):
+            raise ValueError('duplicate withdrawal-order asset')
+        return self
+
+
+class AssetQuote(StrictModel):
+    session_date: date
+    close: Positive | None
+    fx_to_pkr: Positive | None = None
+
+
+class CrossAssetHistory(ResearchRecord):
+    asset_key: Identifier
+    currency: Literal['PKR', 'USD']
+    return_basis: Literal['PRICE', 'TOTAL_RETURN']
+    fx_source_id: Identifier | None = None
+    quotes: list[AssetQuote] = Field(min_length=2)
+
+    @model_validator(mode='after')
+    def dates(self):
+        dates = [q.session_date for q in self.quotes]
+        if dates != sorted(set(dates)) or dates[-1] > self.effective_date:
+            raise ValueError('invalid cross-asset history dates')
+        return self
+
+
+class Wealth(StrictModel):
+    schema_version: Literal['4.0'] = '4.0'
+    include_crypto: bool = False
+    assets: list[WealthAsset] = Field(min_length=1)
+    flows: list[WealthFlow] = Field(default_factory=list)
+    scenarios: list[WealthScenario] = Field(default_factory=list)
+    plans: list[RetirementPlan] = Field(default_factory=list)
+    histories: list[CrossAssetHistory] = Field(default_factory=list)
+    min_correlation_observations: int = Field(default=12, ge=3)
+
+    @model_validator(mode='after')
+    def identities(self):
+        records = [r for g in (self.assets, self.flows, self.scenarios, self.plans, self.histories) for r in g]
+        if len({r.record_id for r in records}) != len(records):
+            raise ValueError('duplicate wealth record ID')
+        if len({a.ticker for a in self.assets}) != len(self.assets) or len({a.economic_id for a in self.assets}) != len(self.assets):
+            raise ValueError('duplicate wealth asset/economic balance')
+        if not self.include_crypto and any(a.kind == 'CRYPTO' for a in self.assets):
+            raise ValueError('crypto requires explicit opt-in')
+        links = [a.portfolio_link for a in self.assets if a.portfolio_link]
+        if len(set(links)) != len(links) or 'TOTAL' in links and len(links) != 1:
+            raise ValueError('portfolio equity/cash would be counted twice')
+        claims = [f.economic_claim_id for f in self.flows if f.kind == 'BENEFIT']
+        if len(set(claims)) != len(claims) or set(claims) & {a.economic_id for a in self.assets}:
+            raise ValueError('benefit claim already included in current assets or another flow')
+        keys = {a.ticker for a in self.assets}
+        if any(f.asset_key and f.asset_key not in keys for f in self.flows):
+            raise ValueError('cash flow references unknown asset')
+        if len({h.asset_key for h in self.histories}) != len(self.histories):
+            raise ValueError('one active cross-asset history per asset required')
+        if len({s.name for s in self.scenarios}) != len(self.scenarios):
+            raise ValueError('duplicate wealth scenario')
+        if any(set(p.withdrawal_order) != keys for p in self.plans):
+            raise ValueError('explicit withdrawal order must cover each wealth asset once')
+        if any(r.asset_key not in keys for s in self.scenarios for r in s.returns) or any(h.asset_key not in keys for h in self.histories):
+            raise ValueError('return/history references unknown wealth asset')
+        return self
+
+
+
+class EvidenceDocument(StrictModel):
+    source_id: Identifier
+    sha256: str = Field(pattern=r'^[a-f0-9]{64}$')
+    suffix: Literal['.pdf','.xlsx','.json','.csv','.md','.txt']
+    role: Literal['SOURCE_DOCUMENT','EVIDENCE_CONTRACT','REPLACEMENT_PROMPTS','VALUATION_RERUN'] = 'SOURCE_DOCUMENT'
+    store_permitted: Literal[True]
 
 
 Bundle.model_rebuild()
