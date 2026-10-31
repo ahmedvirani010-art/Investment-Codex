@@ -49,7 +49,9 @@ def reference_value(model, scenario, sector, bundle=None):
     missing = adapter['drivers'] - scenario.drivers.keys()
     if missing or any(not v.strip() for v in scenario.drivers.values()):
         raise ValueError('missing sector driver evidence: '+', '.join(sorted(missing)))
-    replacement = sector not in {'Bank','E&P','Industrial'} or model.method not in {'BANK_JUSTIFIED_PB','FCFE_DCF'}
+    if bundle is not None and bundle.mode=='USER_IMPORT' and sector in {'Bank','E&P','Industrial'} and not scenario.sector_forecasts:
+        raise ValueError('numerical sector forecast required for current certification')
+    replacement = bool(scenario.sector_forecasts) or sector not in {'Bank','E&P','Industrial'} or model.method not in {'BANK_JUSTIFIED_PB','FCFE_DCF'}
     if replacement:
         approval = model.approval
         sources = {s.source_id:s for s in bundle.sources} if bundle else {}
@@ -57,7 +59,22 @@ def reference_value(model, scenario, sector, bundle=None):
                 or not all(s in sources and sources[s].evidence_label=='CONFIRMED' and sources[s].effective_date<=approval.approved_date for s in approval.source_ids)):
             raise ValueError('replacement methodology provisional until version-matched sourced approval')
     s = scenario
-    bridges = [bridge(f,model,bundle) for f in s.operating_forecasts] if bundle else []
+    if s.sector_forecasts and s.operating_forecasts:
+        raise ValueError('choose one numerical forecast engine per scenario')
+    from .sector_engines import forecast
+    if len({f.period for f in s.sector_forecasts})!=len(s.sector_forecasts):
+        raise ValueError('duplicate sector forecast period would double count cash flows')
+    if any(f.engine!=sector for f in s.sector_forecasts):
+        raise ValueError('sector forecast engine does not match security sector')
+    bridges = [forecast(f,model,bundle) for f in s.sector_forecasts] if s.sector_forecasts else [bridge(f,model,bundle) for f in s.operating_forecasts] if bundle else []
+    if s.sector_forecasts and s.shares is None:
+        raise ValueError('numerical forecast requires an explicit valuation share count')
+    if s.sector_forecasts and sector=='Bank' and s.fcfe:
+        raise ValueError('bank numerical model cannot also supply FCFE flows')
+    if s.sector_forecasts and sector=='Bank':
+        b=bridges[0]
+        if any(getattr(s,k) is None or abs(getattr(s,k)-b[k])>Decimal('0.000001') for k in ('book_value_per_share','sustainable_roe','sustainable_dps')):
+            raise ValueError('bank ROE/book/dividend inputs do not reconcile to numerical engine')
     if bridges:
         if bridges[0]['period'] != model.forward_period or abs(bridges[0]['eps']-s.forward_eps) > Decimal('0.000001'):
             raise ValueError('forward EPS does not reconcile to numerical operating bridge')
@@ -65,8 +82,10 @@ def reference_value(model, scenario, sector, bundle=None):
             raise ValueError('operating bridge and valuation share basis mismatch')
         if s.fcfe and (len(s.fcfe)!=len(bridges) or any(abs(a-b['fcfe'])>Decimal('0.000001') for a,b in zip(s.fcfe,bridges))):
             raise ValueError('FCFE does not reconcile to numerical operating bridge')
-        if s.surplus_cash_per_share and any(f.cash_income_included for f in s.operating_forecasts):
+        if s.surplus_cash_per_share and any(getattr(f,'cash_income_included',False) for f in [*s.operating_forecasts,*s.sector_forecasts]):
             raise ValueError('cash income and surplus cash would be counted twice')
+    if s.sector_forecasts and sector=='E&P' and s.crosscheck_tolerance is None:
+        raise ValueError('numerical E&P engine requires an enforced payout cross-check tolerance')
     if model.method in {'BANK_JUSTIFIED_PB','ROE_BOOK'}:
         if s.book_value_per_share is None or s.sustainable_roe is None:
             raise ValueError('ROE/book model needs book value and sustainable ROE')

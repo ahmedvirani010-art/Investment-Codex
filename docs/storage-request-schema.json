@@ -1,0 +1,83 @@
+{
+  "$defs": {
+    "PullObject": {
+      "additionalProperties": false,
+      "properties": {
+        "key": {
+          "minLength": 1,
+          "title": "Key",
+          "type": "string"
+        },
+        "sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Sha256"
+        }
+      },
+      "required": [
+        "key"
+      ],
+      "title": "PullObject",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "objects": {
+      "items": {
+        "$ref": "#/$defs/PullObject"
+      },
+      "title": "Objects",
+      "type": "array"
+    },
+    "operation": {
+      "enum": [
+        "pull",
+        "push"
+      ],
+      "title": "Operation",
+      "type": "string"
+    },
+    "paths": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Paths",
+      "type": "array"
+    },
+    "request_id": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "run_id": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Run Id"
+    }
+  },
+  "required": [
+    "request_id",
+    "operation"
+  ],
+  "title": "StorageRequest",
+  "type": "object"
+}

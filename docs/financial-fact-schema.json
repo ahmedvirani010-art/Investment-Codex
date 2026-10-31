@@ -85,8 +85,17 @@
     "units": {
       "enum": [
         "PKR",
+        "USD",
         "PKR_PER_SHARE",
-        "SHARES"
+        "SHARES",
+        "FRACTION",
+        "BBL",
+        "MCF",
+        "MMBTU",
+        "TONNES",
+        "UNITS",
+        "PKR_PER_UNIT",
+        "USD_PER_UNIT"
       ],
       "title": "Units",
       "type": "string"

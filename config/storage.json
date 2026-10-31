@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "enabled": false,
+  "read_prefixes": [
+    "sources/",
+    "approved/"
+  ],
+  "archive_prefix": "archives/",
+  "max_objects": 50,
+  "max_object_bytes": 104857600,
+  "max_total_bytes": 524288000,
+  "max_seconds": 300,
+  "attempts": 3,
+  "private_repository_verified": false
+}

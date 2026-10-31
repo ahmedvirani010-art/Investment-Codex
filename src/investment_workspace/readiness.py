@@ -11,7 +11,7 @@ def workflow_status(state, workflow):
         return state.get('research', {}).get('summary', {}).get('valuation_status', 'BLOCKED_INPUT')
     if workflow == 'update-dividends':
         rows = state.get('research', {}).get('dividends', [])
-        return 'COMPLETE' if rows and not any(r['status'] in {'PENDING_CONFIRMATION','RECEIPT_EXCEPTION'} for r in rows) else 'PARTIAL'
+        return 'COMPLETE' if rows and all(r.get('net_pending') is not None for r in rows) and not any(r['status'] in {'PENDING_CONFIRMATION','RECEIPT_EXCEPTION','CORRECTION_PENDING'} for r in rows) else 'PARTIAL'
     if workflow in {'retirement', 'cross-asset'}:
         return state.get('wealth', {}).get('summary', {}).get('retirement_status' if workflow == 'retirement' else 'cross_asset_status', 'BLOCKED_INPUT')
     if workflow in {'timing','macro','watchlist','ic'}:
@@ -47,7 +47,7 @@ def report(state, *, schedules=None, production=None):
     production_ready = (state.get('dataset',{}).get('mode')=='USER_IMPORT' and compatibility=='VERIFIED'
                         and all(facts[k]=='COMPLETE' for k in ('portfolio','valuation','timing','macro','watchlist','ic'))
                         and state.get('integration',{}).get('summary',{}).get('mean_reversion_status')=='COMPLETE'
-                        and provenance_complete and not missing_contracts and not missing_indicators and production.get('enabled') is True and production.get('manual_parity_verified') is True)
+                        and bool(state.get('shared_scenarios',{}).get('input',{}).get('profiles')) and provenance_complete and not missing_contracts and not missing_indicators and production.get('enabled') is True and production.get('manual_parity_verified') is True)
     if not production_ready:
         dependencies.append({'owner':'deployment','reason':'NOT_ACTIVATED','next_action':'Confirm production dataset, manual parity, source coverage and publication policy'})
     return {'dataset':state.get('dataset'), 'calculation_status':state.get('attempt_status'),

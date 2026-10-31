@@ -27,3 +27,14 @@
   explicitly requests an update, with new record/source IDs and explicit supersession.
 - Read the committed receipt before reporting completion; show both module statuses
   and preserve missing assumptions as unknown. Never modify submitted request files.
+
+## Unified requests, R2 and numerical contracts
+
+- Read `docs/workspace-requests.md` for all-module GitHub requests and R2 operations.
+- R2 pulls stage inputs; only an explicit import of a pinned validated artifact may
+  update accepted records. Never place keys or arbitrary local paths in requests.
+- Read `docs/numerical-models-v1.md` for scenario mappings, provisional numerical
+  methodologies and append-only user IC decisions. Never infer missing tax, FX,
+  physical-unit conversion or capital assumptions.
+- Keep the remaining-sector numerical backlog and private-production/data gates
+  visible. Source code deployment does not certify real models or activate schedules.

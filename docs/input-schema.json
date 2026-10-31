@@ -321,6 +321,359 @@
       "title": "AssetReturn",
       "type": "object"
     },
+    "BankForecast": {
+      "additionalProperties": false,
+      "properties": {
+        "accounting_basis": {
+          "enum": [
+            "STANDALONE",
+            "CONSOLIDATED"
+          ],
+          "title": "Accounting Basis",
+          "type": "string"
+        },
+        "capital_movements": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Capital Movements"
+        },
+        "cash_available": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Cash Available"
+        },
+        "credit_charge": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Credit Charge"
+        },
+        "distributable_reserves": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Distributable Reserves"
+        },
+        "earning_assets": {
+          "items": {
+            "$ref": "#/$defs/RateBalance"
+          },
+          "minItems": 1,
+          "title": "Earning Assets",
+          "type": "array"
+        },
+        "eligible_oci": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Eligible Oci"
+        },
+        "engine": {
+          "const": "Bank",
+          "title": "Engine",
+          "type": "string"
+        },
+        "fact_bindings": {
+          "additionalProperties": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minProperties": 1,
+          "title": "Fact Bindings",
+          "type": "object"
+        },
+        "fact_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Fact Ids",
+          "type": "array"
+        },
+        "fees": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fees"
+        },
+        "funding": {
+          "items": {
+            "$ref": "#/$defs/RateBalance"
+          },
+          "minItems": 1,
+          "title": "Funding",
+          "type": "array"
+        },
+        "methodology_version": {
+          "const": "sector-numeric-v1",
+          "default": "sector-numeric-v1",
+          "title": "Methodology Version",
+          "type": "string"
+        },
+        "minimum_capital_ratio": {
+          "anyOf": [
+            {
+              "maximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Minimum Capital Ratio"
+        },
+        "oci": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Oci"
+        },
+        "opening_eligible_capital": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Opening Eligible Capital"
+        },
+        "opening_equity": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Opening Equity"
+        },
+        "operating_costs": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Operating Costs"
+        },
+        "period": {
+          "minLength": 1,
+          "title": "Period",
+          "type": "string"
+        },
+        "proposed_dividends": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Proposed Dividends"
+        },
+        "risk_weighted_assets": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Risk Weighted Assets"
+        },
+        "shares": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Shares"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "tax_charge": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tax Charge"
+        },
+        "treasury_income": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Treasury Income"
+        }
+      },
+      "required": [
+        "period",
+        "accounting_basis",
+        "source_ids",
+        "fact_ids",
+        "fact_bindings",
+        "shares",
+        "tax_charge",
+        "engine",
+        "earning_assets",
+        "funding",
+        "fees",
+        "treasury_income",
+        "operating_costs",
+        "credit_charge",
+        "opening_equity",
+        "oci",
+        "capital_movements",
+        "opening_eligible_capital",
+        "eligible_oci",
+        "risk_weighted_assets",
+        "minimum_capital_ratio",
+        "distributable_reserves",
+        "cash_available",
+        "proposed_dividends"
+      ],
+      "title": "BankForecast",
+      "type": "object"
+    },
     "Catalyst": {
       "additionalProperties": false,
       "properties": {
@@ -403,6 +756,178 @@
         "probability_basis"
       ],
       "title": "Catalyst",
+      "type": "object"
+    },
+    "CommodityVolume": {
+      "additionalProperties": false,
+      "properties": {
+        "fx_to_pkr": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fx To Pkr"
+        },
+        "inventory_release": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Inventory Release"
+        },
+        "name": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Name",
+          "type": "string"
+        },
+        "opening_reserves": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Opening Reserves"
+        },
+        "operating_cost_per_unit_pkr": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Operating Cost Per Unit Pkr"
+        },
+        "price_currency": {
+          "enum": [
+            "PKR",
+            "USD"
+          ],
+          "title": "Price Currency",
+          "type": "string"
+        },
+        "production": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Production"
+        },
+        "realized_price": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Realized Price"
+        },
+        "reserve_additions": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Reserve Additions"
+        },
+        "sold": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Sold"
+        },
+        "unit": {
+          "enum": [
+            "BBL",
+            "MCF",
+            "MMBTU",
+            "TONNES"
+          ],
+          "title": "Unit",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "unit",
+        "opening_reserves",
+        "reserve_additions",
+        "production",
+        "inventory_release",
+        "sold",
+        "price_currency",
+        "realized_price",
+        "fx_to_pkr",
+        "operating_cost_per_unit_pkr"
+      ],
+      "title": "CommodityVolume",
       "type": "object"
     },
     "CorporateAction": {
@@ -759,6 +1284,294 @@
         "dps"
       ],
       "title": "Dividend",
+      "type": "object"
+    },
+    "EPForecast": {
+      "additionalProperties": false,
+      "properties": {
+        "accounting_basis": {
+          "enum": [
+            "STANDALONE",
+            "CONSOLIDATED"
+          ],
+          "title": "Accounting Basis",
+          "type": "string"
+        },
+        "capex": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Capex"
+        },
+        "cash_income_included": {
+          "title": "Cash Income Included",
+          "type": "boolean"
+        },
+        "collections": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Collections"
+        },
+        "commodities": {
+          "items": {
+            "$ref": "#/$defs/CommodityVolume"
+          },
+          "minItems": 1,
+          "title": "Commodities",
+          "type": "array"
+        },
+        "depletion": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Depletion"
+        },
+        "engine": {
+          "const": "E&P",
+          "title": "Engine",
+          "type": "string"
+        },
+        "fact_bindings": {
+          "additionalProperties": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minProperties": 1,
+          "title": "Fact Bindings",
+          "type": "object"
+        },
+        "fact_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Fact Ids",
+          "type": "array"
+        },
+        "fixed_operating_costs": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fixed Operating Costs"
+        },
+        "methodology_version": {
+          "const": "sector-numeric-v1",
+          "default": "sector-numeric-v1",
+          "title": "Methodology Version",
+          "type": "string"
+        },
+        "net_borrowing": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Net Borrowing"
+        },
+        "net_interest": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Net Interest"
+        },
+        "opening_receivables": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Opening Receivables"
+        },
+        "other_income": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Other Income"
+        },
+        "other_wc_excludes_receivables": {
+          "const": true,
+          "title": "Other Wc Excludes Receivables",
+          "type": "boolean"
+        },
+        "other_working_capital_increase": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Other Working Capital Increase"
+        },
+        "period": {
+          "minLength": 1,
+          "title": "Period",
+          "type": "string"
+        },
+        "royalties": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Royalties"
+        },
+        "shares": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Shares"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "tax_charge": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tax Charge"
+        }
+      },
+      "required": [
+        "period",
+        "accounting_basis",
+        "source_ids",
+        "fact_ids",
+        "fact_bindings",
+        "shares",
+        "tax_charge",
+        "engine",
+        "commodities",
+        "royalties",
+        "fixed_operating_costs",
+        "depletion",
+        "net_interest",
+        "other_income",
+        "opening_receivables",
+        "collections",
+        "other_working_capital_increase",
+        "other_wc_excludes_receivables",
+        "capex",
+        "net_borrowing",
+        "cash_income_included"
+      ],
+      "title": "EPForecast",
       "type": "object"
     },
     "Earnings": {
@@ -1129,8 +1942,17 @@
         "units": {
           "enum": [
             "PKR",
+            "USD",
             "PKR_PER_SHARE",
-            "SHARES"
+            "SHARES",
+            "FRACTION",
+            "BBL",
+            "MCF",
+            "MMBTU",
+            "TONNES",
+            "UNITS",
+            "PKR_PER_UNIT",
+            "USD_PER_UNIT"
           ],
           "title": "Units",
           "type": "string"
@@ -1156,6 +1978,133 @@
         "locator"
       ],
       "title": "FinancialFact",
+      "type": "object"
+    },
+    "ICDecision": {
+      "additionalProperties": false,
+      "properties": {
+        "approved_quantity": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approved Quantity"
+        },
+        "decided_at": {
+          "format": "date-time",
+          "title": "Decided At",
+          "type": "string"
+        },
+        "decided_by": {
+          "minLength": 1,
+          "title": "Decided By",
+          "type": "string"
+        },
+        "decision": {
+          "enum": [
+            "APPROVE",
+            "REJECT",
+            "DEFER"
+          ],
+          "title": "Decision",
+          "type": "string"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "proposal_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Proposal Id",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "reviewed_basis_hash": {
+          "pattern": "^[a-f0-9]{64}$",
+          "title": "Reviewed Basis Hash",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "transaction_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Transaction Ids",
+          "type": "array"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "proposal_id",
+        "decision",
+        "decided_by",
+        "decided_at",
+        "reason",
+        "reviewed_basis_hash"
+      ],
+      "title": "ICDecision",
       "type": "object"
     },
     "ICProposal": {
@@ -1271,6 +2220,275 @@
         "opportunity_cost"
       ],
       "title": "ICProposal",
+      "type": "object"
+    },
+    "IndustrialForecast": {
+      "additionalProperties": false,
+      "properties": {
+        "accounting_basis": {
+          "enum": [
+            "STANDALONE",
+            "CONSOLIDATED"
+          ],
+          "title": "Accounting Basis",
+          "type": "string"
+        },
+        "capex": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Capex"
+        },
+        "cash_income_included": {
+          "title": "Cash Income Included",
+          "type": "boolean"
+        },
+        "depreciation": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Depreciation"
+        },
+        "engine": {
+          "const": "Industrial",
+          "title": "Engine",
+          "type": "string"
+        },
+        "fact_bindings": {
+          "additionalProperties": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minProperties": 1,
+          "title": "Fact Bindings",
+          "type": "object"
+        },
+        "fact_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Fact Ids",
+          "type": "array"
+        },
+        "fixed_operating_costs": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Fixed Operating Costs"
+        },
+        "inventory_increase": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Inventory Increase"
+        },
+        "methodology_version": {
+          "const": "sector-numeric-v1",
+          "default": "sector-numeric-v1",
+          "title": "Methodology Version",
+          "type": "string"
+        },
+        "midcycle_rationale": {
+          "minLength": 1,
+          "title": "Midcycle Rationale",
+          "type": "string"
+        },
+        "net_borrowing": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Net Borrowing"
+        },
+        "net_interest": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Net Interest"
+        },
+        "other_income": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Other Income"
+        },
+        "payables_increase": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Payables Increase"
+        },
+        "period": {
+          "minLength": 1,
+          "title": "Period",
+          "type": "string"
+        },
+        "products": {
+          "items": {
+            "$ref": "#/$defs/ProductVolume"
+          },
+          "minItems": 1,
+          "title": "Products",
+          "type": "array"
+        },
+        "receivables_increase": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Receivables Increase"
+        },
+        "shares": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Shares"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "tax_charge": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Tax Charge"
+        }
+      },
+      "required": [
+        "period",
+        "accounting_basis",
+        "source_ids",
+        "fact_ids",
+        "fact_bindings",
+        "shares",
+        "tax_charge",
+        "engine",
+        "products",
+        "fixed_operating_costs",
+        "depreciation",
+        "net_interest",
+        "other_income",
+        "receivables_increase",
+        "inventory_increase",
+        "payables_increase",
+        "capex",
+        "net_borrowing",
+        "midcycle_rationale",
+        "cash_income_included"
+      ],
+      "title": "IndustrialForecast",
       "type": "object"
     },
     "Integration": {
@@ -1638,6 +2856,17 @@
           ],
           "default": null,
           "title": "Probability"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScenarioLink"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "rationale": {
           "minLength": 1,
@@ -2493,6 +3722,124 @@
       "title": "Price",
       "type": "object"
     },
+    "ProductVolume": {
+      "additionalProperties": false,
+      "properties": {
+        "net_price_pkr": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Net Price Pkr"
+        },
+        "product": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Product",
+          "type": "string"
+        },
+        "unit": {
+          "enum": [
+            "UNITS",
+            "TONNES"
+          ],
+          "title": "Unit",
+          "type": "string"
+        },
+        "variable_cost_per_unit_pkr": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Variable Cost Per Unit Pkr"
+        },
+        "volume": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Volume"
+        }
+      },
+      "required": [
+        "product",
+        "unit",
+        "volume",
+        "net_price_pkr",
+        "variable_cost_per_unit_pkr"
+      ],
+      "title": "ProductVolume",
+      "type": "object"
+    },
+    "RateBalance": {
+      "additionalProperties": false,
+      "properties": {
+        "annual_rate": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Annual Rate"
+        },
+        "average_balance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Average Balance"
+        }
+      },
+      "required": [
+        "average_balance",
+        "annual_rate"
+      ],
+      "title": "RateBalance",
+      "type": "object"
+    },
     "Research": {
       "additionalProperties": false,
       "properties": {
@@ -3191,11 +4538,47 @@
           "default": null,
           "title": "Payout Crosscheck"
         },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScenarioLink"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "scenario_id": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
           "title": "Scenario Id",
           "type": "string"
+        },
+        "sector_forecasts": {
+          "items": {
+            "discriminator": {
+              "mapping": {
+                "Bank": "#/$defs/BankForecast",
+                "E&P": "#/$defs/EPForecast",
+                "Industrial": "#/$defs/IndustrialForecast"
+              },
+              "propertyName": "engine"
+            },
+            "oneOf": [
+              {
+                "$ref": "#/$defs/BankForecast"
+              },
+              {
+                "$ref": "#/$defs/EPForecast"
+              },
+              {
+                "$ref": "#/$defs/IndustrialForecast"
+              }
+            ]
+          },
+          "title": "Sector Forecasts",
+          "type": "array"
         },
         "shares": {
           "anyOf": [
@@ -3304,6 +4687,282 @@
         "drivers"
       ],
       "title": "Scenario",
+      "type": "object"
+    },
+    "ScenarioAssumption": {
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "ScenarioAssumption",
+      "type": "object"
+    },
+    "ScenarioLink": {
+      "additionalProperties": false,
+      "properties": {
+        "binding_units": {
+          "patternProperties": {
+            "^[A-Za-z0-9_.-]+$": {
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 100
+          },
+          "title": "Binding Units",
+          "type": "object"
+        },
+        "bindings": {
+          "patternProperties": {
+            "^[A-Za-z0-9_.-]+$": {
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 100
+          },
+          "title": "Bindings",
+          "type": "object"
+        },
+        "financial_basis": {
+          "minLength": 1,
+          "title": "Financial Basis",
+          "type": "string"
+        },
+        "horizon_years": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Horizon Years"
+        },
+        "mapping_rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mapping Rationale"
+        },
+        "overrides": {
+          "patternProperties": {
+            "^[A-Za-z0-9_.-]+$": {
+              "$ref": "#/$defs/ScenarioOverride"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 100
+          },
+          "title": "Overrides",
+          "type": "object"
+        },
+        "period": {
+          "minLength": 1,
+          "title": "Period",
+          "type": "string"
+        },
+        "profile_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "profile_id",
+        "financial_basis",
+        "period",
+        "horizon_years"
+      ],
+      "title": "ScenarioLink",
+      "type": "object"
+    },
+    "ScenarioOverride": {
+      "additionalProperties": false,
+      "properties": {
+        "assumption": {
+          "$ref": "#/$defs/ScenarioAssumption"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "assumption",
+        "rationale",
+        "source_ids"
+      ],
+      "title": "ScenarioOverride",
+      "type": "object"
+    },
+    "ScenarioProfile": {
+      "additionalProperties": false,
+      "properties": {
+        "assumptions": {
+          "minProperties": 1,
+          "patternProperties": {
+            "^[A-Za-z0-9_.-]+$": {
+              "$ref": "#/$defs/ScenarioAssumption"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 100
+          },
+          "title": "Assumptions",
+          "type": "object"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "financial_basis": {
+          "minLength": 1,
+          "title": "Financial Basis",
+          "type": "string"
+        },
+        "horizon_years": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Horizon Years"
+        },
+        "name": {
+          "enum": [
+            "bear",
+            "base",
+            "bull"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "period": {
+          "minLength": 1,
+          "title": "Period",
+          "type": "string"
+        },
+        "profile_version": {
+          "minLength": 1,
+          "title": "Profile Version",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "name",
+        "profile_version",
+        "financial_basis",
+        "period",
+        "horizon_years",
+        "assumptions"
+      ],
+      "title": "ScenarioProfile",
       "type": "object"
     },
     "Security": {
@@ -5026,6 +6685,17 @@
           "title": "Name",
           "type": "string"
         },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScenarioLink"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "record_id": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
@@ -5250,6 +6920,13 @@
       "default": null,
       "title": "Dataset Id"
     },
+    "decisions": {
+      "items": {
+        "$ref": "#/$defs/ICDecision"
+      },
+      "title": "Decisions",
+      "type": "array"
+    },
     "documents": {
       "items": {
         "$ref": "#/$defs/EvidenceDocument"
@@ -5318,6 +6995,13 @@
         }
       ],
       "default": null
+    },
+    "scenario_profiles": {
+      "items": {
+        "$ref": "#/$defs/ScenarioProfile"
+      },
+      "title": "Scenario Profiles",
+      "type": "array"
     },
     "schema_version": {
       "const": "1.0",

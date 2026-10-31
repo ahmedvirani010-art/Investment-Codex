@@ -44,8 +44,8 @@ def code_hash():
     return digest(b"".join(p.name.encode() + p.read_bytes() for p in sorted(root.glob("*.py"))))
 
 
-def fixture_bytes(phase2=False, phase3=False, phase4=False):
-    name = "phase4-demo.json" if phase4 else "phase3-demo.json" if phase3 else "phase2-demo.json" if phase2 else "demo.json"
+def fixture_bytes(phase2=False, phase3=False, phase4=False,completion=False):
+    name = "completion-demo.json" if completion else "phase4-demo.json" if phase4 else "phase3-demo.json" if phase3 else "phase2-demo.json" if phase2 else "demo.json"
     return files("investment_workspace").joinpath("fixtures/" + name).read_bytes()
 
 
@@ -75,10 +75,10 @@ def recover_abandoned_staging(root):
 
 def same_analytics(left, right):
     # Exclude lineage from change detection; original dates/IDs survive no-change runs.
-    keys = ("holdings", "transactions", "summary", "reconciliation", "data_gaps", "coverage", "notes", "research", "integration", "wealth", "financials", "dataset", "evaluation_as_of", "evidence_fingerprint", "migration_records", "documents")
+    keys = ("holdings", "transactions", "summary", "reconciliation", "data_gaps", "coverage", "notes", "research", "integration", "wealth", "financials", "dataset", "evaluation_as_of", "evidence_fingerprint", "migration_records", "documents", "shared_scenarios", "decisions")
     def clean(value):
         if isinstance(value, dict):
-            return {k: clean(v) for k, v in value.items() if not (k == "covered_event_ids" and v == []) and k not in {"run_id", "upstream_run_ids", "code_version", "input_hash", "confidence", "validation_status", "owner", "schema_version", "effective_date", "record_id", "market_cutoff_metadata", "import_source_id", "units", "assumption_ids", "source_ids"}}
+            return {k: clean(v) for k, v in value.items() if not (k == "covered_event_ids" and v == []) and k not in {"run_id", "upstream_run_ids", "code_version", "code_hash", "input_hash", "confidence", "validation_status", "owner", "schema_version", "effective_date", "record_id", "market_cutoff_metadata", "import_source_id", "units", "assumption_ids", "source_ids"}}
         if isinstance(value, list):
             return [clean(v) for v in value]
         return value
@@ -236,18 +236,18 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
                 facts["universe"] = {k: v for k, v in bundle.research.model_dump(mode="json").items() if k not in COLLECTIONS}
             elif source.source_id in all_sources and all_sources[source.source_id].get("bound_universe"):
                 facts["universe"] = all_sources[source.source_id]["bound_universe"]
-            integrated = {r["record_id"]: r["payload"] for r in previous.get("integration", {}).get("history", [])
+            integrated = {r["record_id"]: normalize(r["payload"]) for r in previous.get("integration", {}).get("history", [])
                           if source.source_id in r["payload"]["source_ids"] or any(a["source_id"] == source.source_id for a in r["payload"].get("actions", []))}
             for group, record in integration_records(bundle.integration):
                 if source.source_id in record.source_ids or any(a.source_id == source.source_id for a in getattr(record, "actions", [])):
                     payload_record = record_payload(record)
-                    if record.record_id in integrated and integrated[record.record_id] != payload_record:
+                    if record.record_id in integrated and normalize(integrated[record.record_id]) != payload_record:
                         raise ValueError("integration record ID is immutable")
                     integrated[record.record_id] = payload_record
             if integrated:
                 facts["integration"] = sorted(integrated.values(), key=lambda r: r["record_id"])
-            for module, incoming in (('financials',bundle.financials),('wealth',[r for g in ('assets','flows','scenarios','plans','histories') for r in getattr(bundle.wealth,g)] if bundle.wealth else [])):
-                prior_owned = {r['record_id']:r['payload'] for r in previous.get(module,{}).get('history',[])
+            for module, incoming in (('shared_scenarios',bundle.scenario_profiles),('decisions',bundle.decisions),('financials',bundle.financials),('wealth',[r for g in ('assets','flows','scenarios','plans','histories') for r in getattr(bundle.wealth,g)] if bundle.wealth else [])):
+                prior_owned = {r['record_id']:normalize(r['payload']) for r in previous.get(module,{}).get('history',[])
                                if source.source_id in r['payload']['source_ids'] or r['payload'].get('fx_source_id')==source.source_id}
                 for record in incoming:
                     if source.source_id in record.source_ids or getattr(record,'fx_source_id',None)==source.source_id:
@@ -266,7 +266,7 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
             fact_hash = digest(dumps(facts))
             if source.source_id in all_sources:
                 old = {k: all_sources[source.source_id].get(k) for k in payload}
-                has_facts = any(facts.get(k) for k in ("snapshots", "prices", "transactions", "research", "universe", "integration", "financials", "wealth", "migrations", "documents"))
+                has_facts = any(facts.get(k) for k in ("snapshots", "prices", "transactions", "research", "universe", "integration", "financials", "wealth", "migrations", "documents", "shared_scenarios", "decisions"))
                 if old != payload or (has_facts and all_sources[source.source_id].get('facts_bound',True) and all_sources[source.source_id].get("fact_hash") != fact_hash):
                     raise ValueError("source ID is immutable; revised evidence needs a new ID")
             if source.source_id not in all_sources or not all_sources[source.source_id].get('facts_bound',True):
@@ -297,6 +297,8 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
         if bundle.financials or financial_history:
             state['financials']={'input':{'facts':[{**record_payload(f), 'owner':'financials','run_id':next(r['run_id'] for r in financial_history if r['record_id']==f.record_id),'schema_version':'4.0','units':f.units,'input_hash':next(r['input_hash'] for r in financial_history if r['record_id']==f.record_id)} for f in bundle.financials]},'history':financial_history,
                                 'facts':[{**record_payload(f), 'owner':'financials','run_id':next(r['run_id'] for r in financial_history if r['record_id']==f.record_id),'schema_version':'4.0','units':f.units,'input_hash':next(r['input_hash'] for r in financial_history if r['record_id']==f.record_id)} for f in bundle.financials]}
+        from .scenarios import prepare
+        prepare(bundle,state,previous,run_id,input_hash)
         with runtime.phase('valuation'):
             calculate_research(bundle, state, previous, run_id, input_hash)
         if bundle.research:
@@ -310,6 +312,8 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
             calculate_workflows(bundle, state, previous, run_id, input_hash)
         if not bundle.integration:
             verify_migrations(bundle,state,previous)
+        from .decisions import calculate as calculate_decisions
+        calculate_decisions(bundle,state,previous,run_id,input_hash)
         with runtime.phase('wealth'):
             calculate_wealth(bundle,state,previous,run_id,input_hash)
         if not bundle.wealth and workflow in {'retirement','cross-asset'}:
@@ -327,6 +331,8 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
                         "source_ids": assumption.source_ids, "run_id": run_id, "evidence_label": "ASSUMPTION"})
         state['evidence_fingerprint']=digest(dumps([{k:v for k,v in source.items() if k not in {'content_hash','content_path'}}
                             for source in state['sources'] if not source['source_id'].startswith(('input.','manual.'))]))
+        from .lineage import stamp
+        stamp(state,root,run_id)
         unchanged = same_analytics(previous, state)
         if unchanged:
             registry = state["sources"]
@@ -449,6 +455,10 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
         payloads["feeds/latest/ic.json"] = dumps(state["integration"]["ic_actions"])
     if state.get('wealth'):
         payloads['data/canonical/wealth.json']=dumps(state['wealth'])
+    if state.get('decisions'):
+        payloads['data/canonical/decisions.json']=dumps(state['decisions'])
+    if state.get('shared_scenarios'):
+        payloads['data/canonical/scenario-profiles.json']=dumps(state['shared_scenarios'])
     if state.get('financials'):
         payloads['data/canonical/financials.json']=dumps(state['financials'])
     payloads['reports/latest/readiness.json']=dumps(state['readiness'])

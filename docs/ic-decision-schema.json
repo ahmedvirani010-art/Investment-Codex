@@ -1,0 +1,127 @@
+{
+  "additionalProperties": false,
+  "properties": {
+    "approved_quantity": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Approved Quantity"
+    },
+    "decided_at": {
+      "format": "date-time",
+      "title": "Decided At",
+      "type": "string"
+    },
+    "decided_by": {
+      "minLength": 1,
+      "title": "Decided By",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "APPROVE",
+        "REJECT",
+        "DEFER"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "effective_date": {
+      "format": "date",
+      "title": "Effective Date",
+      "type": "string"
+    },
+    "proposal_id": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Proposal Id",
+      "type": "string"
+    },
+    "reason": {
+      "minLength": 1,
+      "title": "Reason",
+      "type": "string"
+    },
+    "record_id": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Record Id",
+      "type": "string"
+    },
+    "reviewed_basis_hash": {
+      "pattern": "^[a-f0-9]{64}$",
+      "title": "Reviewed Basis Hash",
+      "type": "string"
+    },
+    "source_ids": {
+      "items": {
+        "maxLength": 100,
+        "pattern": "^[A-Za-z0-9_.-]+$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "supersedes": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes"
+    },
+    "ticker": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "transaction_ids": {
+      "items": {
+        "maxLength": 100,
+        "pattern": "^[A-Za-z0-9_.-]+$",
+        "type": "string"
+      },
+      "title": "Transaction Ids",
+      "type": "array"
+    },
+    "valid_until": {
+      "format": "date",
+      "title": "Valid Until",
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_id",
+    "ticker",
+    "effective_date",
+    "valid_until",
+    "source_ids",
+    "proposal_id",
+    "decision",
+    "decided_by",
+    "decided_at",
+    "reason",
+    "reviewed_basis_hash"
+  ],
+  "title": "ICDecision",
+  "type": "object"
+}

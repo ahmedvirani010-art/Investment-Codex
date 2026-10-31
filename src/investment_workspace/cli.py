@@ -15,9 +15,22 @@ def main(argv=None):
     sub = parser.add_subparsers(dest="command", required=True)
     init = sub.add_parser("init", help="Publish the clearly labelled synthetic offline demo")
     init.add_argument("--offline", action="store_true", required=True)
+    init.add_argument("--completion-demo",action="store_true",help="Use the versioned numerical/scenario completion fixture")
     init.add_argument("--phase4", action="store_true", help="Use the synthetic wealth-planning demo")
     init.add_argument("--phase3", action="store_true", help="Use the synthetic integrated workflows demo")
     init.add_argument("--phase2", action="store_true", help="Use the synthetic Phase 2 model/entitlement demo")
+    common=sub.add_parser('request',help='Process typed workspace requests')
+    selected=common.add_mutually_exclusive_group(required=True)
+    selected.add_argument('--file',type=Path)
+    selected.add_argument('--pending',action='store_true')
+    common.add_argument('--local-demo',action='store_true')
+    common.add_argument('--publish',action='store_true')
+    storage=sub.add_parser('storage',help='Bounded R2 transfers; no financial acceptance')
+    storage.add_argument('operation',choices=['pull','push','status'])
+    storage.add_argument('--file',type=Path)
+    storage.add_argument('--request-id')
+    storage.add_argument('--dry-run',action='store_true')
+    sub.add_parser('decision-basis',help='Show reviewed-basis hashes for current proposals')
     request=sub.add_parser('wealth-request',help='Process committed chat requests through the wealth policy')
     choice=request.add_mutually_exclusive_group(required=True)
     choice.add_argument('--file',type=Path)
@@ -101,7 +114,30 @@ def main(argv=None):
             from .storage import read_json
             if read_json(root, pipeline.STATE):
                 raise ValueError("workspace already has accepted data; init will not replace it with a demo")
-            result = pipeline.run(root, pipeline.fixture_bytes(args.phase2, args.phase3, args.phase4), workflow="init-demo")
+            result = pipeline.run(root, pipeline.fixture_bytes(args.phase2, args.phase3, args.phase4,completion=args.completion_demo), workflow="init-demo")
+        elif args.command=='request':
+            from .workspace_requests import execute,pending
+            if args.publish and not args.pending: raise ValueError('--publish requires --pending')
+            result=pending(root,local_demo=args.local_demo,push=args.publish) if args.pending else execute(root,args.file,local_demo=args.local_demo)
+        elif args.command=='storage':
+            from .object_storage import execute,StorageRequest
+            if args.operation=='status':
+                from .schemas import Identifier
+                from pydantic import TypeAdapter
+                TypeAdapter(Identifier).validate_python(args.request_id)
+                if args.request_id in {'.','..'}: raise ValueError('invalid storage request ID')
+                result=pipeline.read_json(root,'reports/storage/'+args.request_id+'.json')
+                if not result: raise ValueError('transfer receipt not found')
+            else:
+                if args.file is None: raise ValueError('--file is required')
+                spec=StorageRequest.model_validate_json(args.file.read_bytes())
+                if spec.operation!=args.operation: raise ValueError('storage operation mismatch')
+                result=execute(root,spec,dry_run=args.dry_run)
+        elif args.command=='decision-basis':
+            from .decisions import basis
+            state=pipeline.read_json(root,pipeline.STATE,{})
+            proposals=state.get('integration',{}).get('input',{}).get('proposals',[])
+            result={'proposals':[{'proposal_id':p['record_id'],'ticker':p['ticker'],'reviewed_basis_hash':basis(state,p['ticker'])} for p in proposals]}
         elif args.command=='wealth-request':
             from .wealth_requests import execute,pending
             if args.publish and not args.pending:
@@ -197,7 +233,7 @@ def main(argv=None):
             from .readiness import workflow_status
             if workflow_status(state,args.workflow)!='COMPLETE':
                 return 1
-        return 1 if result.get('status') in {'FAILED','BLOCKED','PUSH_FAILED','INVALID'} or args.command in {'automation','wealth-request'} and result.get('status')=='PARTIAL' else 0
+        return 1 if result.get('status') in {'FAILED','BLOCKED','PUSH_FAILED','INVALID'} or args.command in {'automation','wealth-request','request'} and result.get('status')=='PARTIAL' else 0
     except (ValueError, OSError, KeyError, TypeError, PublicationError, LockBusy) as exc:
         print(str(exc), file=sys.stderr)
         return 2

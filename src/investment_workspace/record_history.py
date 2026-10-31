@@ -1,6 +1,7 @@
 """Shared identity/evidence checks for new owned input collections."""
 
 from copy import deepcopy
+from .contracts import normalize
 
 
 def accept_records(groups, previous, bundle, run_id, input_hash):
@@ -20,7 +21,7 @@ def accept_records(groups, previous, bundle, run_id, input_hash):
             payload = record.model_dump(mode='json')
             old = known.get(record.record_id)
             if old:
-                if old['payload'] != payload or record.record_id not in active:
+                if normalize(old['payload']) != normalize(payload) or record.record_id not in active:
                     raise ValueError('owned record ID immutable; use explicit supersession')
                 continue
             if record.supersedes:

@@ -143,8 +143,10 @@ def gate(root, *, local_demo=False):
         if state.get('dataset',{}).get('mode')!='DEMO' or any(not s['source_id'].startswith(('demo.','synthetic.')) for s in data['sources']):
             raise ValueError('local-demo is restricted to synthetic demo datasets')
         return {'max_work_units':2000,'max_seconds':300,'max_request_bytes':5242880}
-    policy=read_json(root,'config/wealth-requests.json',{})
-    if (os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('WEALTH_PRIVATE_REPOSITORY')!='true'
+    policy=read_json(root,'config/workspace-requests.json',{})
+    if policy.get('enabled') is not True:
+        policy=read_json(root,'config/wealth-requests.json',{})
+    if (os.environ.get('GITHUB_ACTIONS')!='true' or os.environ.get('WORKSPACE_PRIVATE_REPOSITORY',os.environ.get('WEALTH_PRIVATE_REPOSITORY'))!='true'
             or policy.get('enabled') is not True):
         raise ValueError('wealth request processing disabled or repository privacy not verified by Actions')
     if policy.get('repository')!=os.environ.get('GITHUB_REPOSITORY'):

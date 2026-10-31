@@ -5,6 +5,7 @@ from decimal import Decimal, ROUND_FLOOR, localcontext
 from itertools import combinations
 
 from .storage import digest, dumps
+from .contracts import normalize
 from .runtime import assessment_date, cached
 from .migration import verify_migrations
 from .timing import adjusted_bars, backtest, correlation, indicators, mean, rank_rows
@@ -68,7 +69,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             raise ValueError("integration references an unregistered source")
         payload = record.model_dump(mode="json")
         if record.record_id in prior:
-            if prior[record.record_id]["payload"] != payload or record.record_id not in active:
+            if normalize(prior[record.record_id]["payload"]) != normalize(payload) or record.record_id not in active:
                 raise ValueError("integration record ID immutable; superseded records cannot be reactivated")
         else:
             if record.supersedes:
@@ -268,7 +269,14 @@ def _calculate(bundle, state, previous, run_id, input_hash):
     selected_ids={m.record_id for m in selected_macro}
     out['macro']=[{**meta(m,'macro_news'),**m.model_dump(mode='json'),'selected_current':m.record_id in selected_ids,
                    'view_status':'CURRENT_VIEW' if m.record_id in selected_ids else 'HISTORY_OR_CONFLICT'} for m in data.macro]
-    out["scenarios"] = [{**meta(m, "macro_news"), **m.model_dump(mode="json"), "evidence_kind": "HYPOTHETICAL_SCENARIO"} for m in data.macro_scenarios]
+    from .scenarios import resolve
+    for m in data.macro_scenarios:
+        try:
+            mapping=resolve(bundle,m)
+        except ValueError as exc:
+            mapping={'status':'BLOCKED','reason':str(exc)}
+            gap(m.ticker,'macro_news','SCENARIO_REQUIRES_REVISION',str(exc),m.source_ids)
+        out['scenarios'].append({**meta(m,'macro_news'),**m.model_dump(mode='json'),'scenario_mapping':mapping,'evidence_kind':'HYPOTHETICAL_SCENARIO'})
     for m in selected_macro:
         if not good(m):
             gap(m.ticker, "macro_news", "STALE_OR_UNVERIFIED_MACRO", "Refresh dated observation", m.source_ids)
@@ -295,8 +303,8 @@ def _calculate(bundle, state, previous, run_id, input_hash):
     catalyst_by_id = {c.record_id: c for c in data.catalysts}
     for c in data.catalysts:
         out["catalysts"].append({**meta(c, "ic_risk"), **c.model_dump(mode="json"),
-            "days_to_start": (c.window_start-cutoff).days,
-            "window_bucket": "30_DAY" if 0 <= (c.window_start-cutoff).days <= 30 else "90_DAY" if 0 <= (c.window_start-cutoff).days <= 90 else "OUTSIDE_90_DAYS_OR_PAST"})
+            "days_to_start": (c.window_start-assessment).days,
+            "window_bucket": "30_DAY" if 0 <= (c.window_start-assessment).days <= 30 else "90_DAY" if 0 <= (c.window_start-assessment).days <= 90 else "OUTSIDE_90_DAYS_OR_PAST"})
     for candidate in data.candidates:
         p, t, entry = current_prices.get(candidate.ticker), timing_rows.get(candidate.ticker), entry_rows.get(candidate.ticker)
         catalyst_records = [catalyst_by_id.get(i) for i in candidate.catalyst_ids]
@@ -306,7 +314,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
         gates = {"evidence": good(candidate) and candidate.next_review >= assessment and fresh_price and candidate.ticker not in uncertain_events,
             "valuation": bool(entry and candidate.desired_entry <= Decimal(entry["entry_ceiling"]) and candidate.ticker not in blocked_models),
             "portfolio_fit_risk": bool(entry and entry.get("resolved_risk_gate") == "PASSED") and risk_good and candidate.ticker in sizing and sizing[candidate.ticker]["quantity_cap"] is not None and sizing[candidate.ticker]["quantity_cap"] > 0,
-            "catalyst": bool(catalyst_records) and all(good(c) and c.window_end >= cutoff and (c.window_start-cutoff).days <= 90 for c in catalyst_records),
+            "catalyst": bool(catalyst_records) and all(good(c) and c.window_end >= assessment and (c.window_start-assessment).days <= 90 for c in catalyst_records),
             "timing": bool(entry and entry.get("resolved_timing_gate") == "PASSED" and t and t["status"] == "ELIGIBLE" and t["rs_percentile"] is not None and t["stage"] == "STAGE_2" and not t["extended"])}
         stage = candidate.requested_stage
         if stage == "READY" and not all(gates.values()):
@@ -356,6 +364,8 @@ def _calculate(bundle, state, previous, run_id, input_hash):
         "legacy_datastore_status": "VERIFIED" if legacy_verified else "NOT_MIGRATED", "schedules_active": False, "mode": bundle.mode}
     timing_complete = bool(needed and len(eligible_rows)==len(needed) and all(r['rs_percentile'] is not None for r in eligible_rows))
     macro_complete = bool({m.domain for m in selected_macro}=={'PAKISTAN','GLOBAL'} and len(selected_macro)==len(macro_groups) and all(good(m) and (m.value is not None or m.evidence_kind!='FACT' or m.unit.lower() in {'qualitative','status','text'}) for m in selected_macro) and not uncertain_events)
+    macro_complete = macro_complete and all(r.get('scenario_mapping',{}).get('status')!='BLOCKED' for r in out['scenarios'])
+    if bundle.mode=='USER_IMPORT': macro_complete=macro_complete and {r['name'] for r in out['scenarios']}=={'bear','base','bull'}
     watch_complete = bool(all(good(c) and c.ticker in entry_rows and c.ticker in timing_rows and timing_rows[c.ticker]['status']=='ELIGIBLE' for c in data.candidates))
     risk_summary = next((r for r in out['risk'] if r.get('row_kind')=='SUMMARY'),{})
     risk_complete = bool(data.risk_limits and good(data.risk_limits) and data.risk_limits.user_confirmed and
@@ -401,7 +411,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             old_row = next((r for r in old.get(key, []) if r.get("record_id") == row.get("record_id")
                             and r.get("ticker") == row.get("ticker") and r.get("scenario") == row.get("scenario")
                             and r.get("trade_index") == row.get("trade_index") and r.get("sector") == row.get("sector") and r.get("left") == row.get("left") and r.get("right") == row.get("right")), None)
-            ignored = {"run_id", "input_hash", "upstream_run_ids", "new_event"}
+            ignored = {"run_id", "input_hash", "upstream_run_ids", "new_event", "code_version", "code_hash"}
             if old_row and {k: v for k, v in row.items() if k not in ignored} == {k: v for k, v in old_row.items() if k not in ignored}:
                 out[key][i] = deepcopy(old_row)
     state["integration"] = out

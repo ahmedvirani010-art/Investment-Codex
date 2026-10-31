@@ -350,6 +350,166 @@
       "title": "RetirementPlan",
       "type": "object"
     },
+    "ScenarioAssumption": {
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "ScenarioAssumption",
+      "type": "object"
+    },
+    "ScenarioLink": {
+      "additionalProperties": false,
+      "properties": {
+        "binding_units": {
+          "patternProperties": {
+            "^[A-Za-z0-9_.-]+$": {
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 100
+          },
+          "title": "Binding Units",
+          "type": "object"
+        },
+        "bindings": {
+          "patternProperties": {
+            "^[A-Za-z0-9_.-]+$": {
+              "type": "string"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 100
+          },
+          "title": "Bindings",
+          "type": "object"
+        },
+        "financial_basis": {
+          "minLength": 1,
+          "title": "Financial Basis",
+          "type": "string"
+        },
+        "horizon_years": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            }
+          ],
+          "title": "Horizon Years"
+        },
+        "mapping_rationale": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Mapping Rationale"
+        },
+        "overrides": {
+          "patternProperties": {
+            "^[A-Za-z0-9_.-]+$": {
+              "$ref": "#/$defs/ScenarioOverride"
+            }
+          },
+          "propertyNames": {
+            "maxLength": 100
+          },
+          "title": "Overrides",
+          "type": "object"
+        },
+        "period": {
+          "minLength": 1,
+          "title": "Period",
+          "type": "string"
+        },
+        "profile_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "profile_id",
+        "financial_basis",
+        "period",
+        "horizon_years"
+      ],
+      "title": "ScenarioLink",
+      "type": "object"
+    },
+    "ScenarioOverride": {
+      "additionalProperties": false,
+      "properties": {
+        "assumption": {
+          "$ref": "#/$defs/ScenarioAssumption"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "assumption",
+        "rationale",
+        "source_ids"
+      ],
+      "title": "ScenarioOverride",
+      "type": "object"
+    },
     "WealthAsset": {
       "additionalProperties": false,
       "properties": {
@@ -708,6 +868,17 @@
           ],
           "title": "Name",
           "type": "string"
+        },
+        "profile": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ScenarioLink"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
         },
         "record_id": {
           "maxLength": 100,

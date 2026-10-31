@@ -161,7 +161,16 @@ def _calculate(bundle,state,previous,run_id,input_hash):
     for plan in data.plans:
         for scenario in data.scenarios:
             rates={r.asset_key:r for r in scenario.returns}
-            valid=(assets_good and flows_good and good(plan) and good(scenario) and plan.monthly_spending_real is not None
+            from .scenarios import resolve
+            try:
+                mapping=resolve(bundle,scenario,basis="NOMINAL_PKR")
+                if scenario.profile and scenario.profile.horizon_years<Decimal(plan.months)/12:
+                    raise ValueError('wealth scenario mapping does not cover plan horizon')
+                scenario_ok=True
+            except ValueError as exc:
+                scenario_ok=False
+                gap(plan.ticker,'SCENARIO_REQUIRES_REVISION: '+str(exc))
+            valid=(scenario_ok and assets_good and flows_good and good(plan) and good(scenario) and plan.monthly_spending_real is not None
                    and scenario.annual_inflation is not None and rates.keys()==assets.keys()
                    and all(all(getattr(r,k) is not None for k in ('annual_nominal_return','annual_fee_rate','return_tax_rate','withdrawal_tax_rate')) for r in rates.values()))
             if not valid:
@@ -182,6 +191,7 @@ def _calculate(bundle,state,previous,run_id,input_hash):
                 continue
             shared={**meta(plan),'assumption_ids':[scenario.record_id],
                     'source_ids':sorted({s for r in [plan,scenario,*data.assets,*data.flows] for s in r.source_ids}),
+                    'scenario_mapping':mapping,
                     'upstream_run_ids':sorted({provenance[r.record_id]['run_id'] for r in [plan,scenario,*data.assets,*data.flows]})}
             output['retirement'].extend({**shared,**row} for row in result['rows'])
             output['projections'].append({**shared,**result['summary']})
@@ -243,7 +253,7 @@ def _calculate(bundle,state,previous,run_id,input_hash):
         old_index={identity(r):r for r in old_rows}
         for index,row in enumerate(output[key]):
             old=old_index.get(identity(row))
-            ignored={'run_id','input_hash','upstream_run_ids'}
+            ignored={'run_id','input_hash','upstream_run_ids','code_version','code_hash'}
             if old and {k:v for k,v in old.items() if k not in ignored}=={k:v for k,v in row.items() if k not in ignored}:
                 output[key][index]=old
     state['wealth']=output

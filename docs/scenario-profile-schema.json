@@ -1,0 +1,149 @@
+{
+  "$defs": {
+    "ScenarioAssumption": {
+      "additionalProperties": false,
+      "properties": {
+        "unit": {
+          "minLength": 1,
+          "title": "Unit",
+          "type": "string"
+        },
+        "value": {
+          "anyOf": [
+            {
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Value"
+        }
+      },
+      "required": [
+        "value",
+        "unit"
+      ],
+      "title": "ScenarioAssumption",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "assumptions": {
+      "minProperties": 1,
+      "patternProperties": {
+        "^[A-Za-z0-9_.-]+$": {
+          "$ref": "#/$defs/ScenarioAssumption"
+        }
+      },
+      "propertyNames": {
+        "maxLength": 100
+      },
+      "title": "Assumptions",
+      "type": "object"
+    },
+    "effective_date": {
+      "format": "date",
+      "title": "Effective Date",
+      "type": "string"
+    },
+    "financial_basis": {
+      "minLength": 1,
+      "title": "Financial Basis",
+      "type": "string"
+    },
+    "horizon_years": {
+      "anyOf": [
+        {
+          "exclusiveMinimum": 0.0,
+          "type": "number"
+        },
+        {
+          "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+          "type": "string"
+        }
+      ],
+      "title": "Horizon Years"
+    },
+    "name": {
+      "enum": [
+        "bear",
+        "base",
+        "bull"
+      ],
+      "title": "Name",
+      "type": "string"
+    },
+    "period": {
+      "minLength": 1,
+      "title": "Period",
+      "type": "string"
+    },
+    "profile_version": {
+      "minLength": 1,
+      "title": "Profile Version",
+      "type": "string"
+    },
+    "record_id": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Record Id",
+      "type": "string"
+    },
+    "source_ids": {
+      "items": {
+        "maxLength": 100,
+        "pattern": "^[A-Za-z0-9_.-]+$",
+        "type": "string"
+      },
+      "minItems": 1,
+      "title": "Source Ids",
+      "type": "array"
+    },
+    "supersedes": {
+      "anyOf": [
+        {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Supersedes"
+    },
+    "ticker": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Ticker",
+      "type": "string"
+    },
+    "valid_until": {
+      "format": "date",
+      "title": "Valid Until",
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_id",
+    "ticker",
+    "effective_date",
+    "valid_until",
+    "source_ids",
+    "name",
+    "profile_version",
+    "financial_basis",
+    "period",
+    "horizon_years",
+    "assumptions"
+  ],
+  "title": "ScenarioProfile",
+  "type": "object"
+}

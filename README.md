@@ -1,7 +1,7 @@
 # Investment Workspace
 
-A private, Git-backed investment research workspace. **Version 0.5 implements
-Phases 1–4 with controlled offline imports**, with synthetic fixtures and evidence-gated research imports. It does not contain Ahmed's
+A private, Git-backed investment research workspace. **Version 0.6 provides controlled offline investment and wealth workflows**,
+first-wave numerical forecasts, typed chat requests and optional R2 transfers, with synthetic fixtures and evidence-gated research imports. It does not contain Ahmed's
 holdings, live PSX prices, validated valuations, or trading instructions.
 
 ## Quick start
@@ -246,3 +246,22 @@ and scheduled production automation ship disabled.
 `wealth-preflight --file …` validates inputs without changing accepted records.
 `benchmark-wealth` measures equivalent-scope synthetic full versus cached runs with
 output parity checks; unknown AI costs stay null.
+
+## PRD gap completion and R2
+
+[Unified ChatGPT/GitHub requests](docs/workspace-requests.md) cover every existing
+module, explicit input updates, IC decisions and staged R2 transfers.
+[Shared scenarios and numerical engines](docs/numerical-models-v1.md) document the
+Bank/E&P/Industrial reference calculations and remaining-sector backlog.
+[Dividend continuity](docs/dividend-continuity.md) explains historical entitlement,
+net pending balances, catalyst dates and compatible workbook formatting.
+
+```bash
+uv run --locked investment-workspace --root /tmp/completion-demo init --offline --completion-demo
+uv run --locked investment-workspace request --pending --local-demo
+uv run --locked investment-workspace storage pull --file inputs/private/pull.json --dry-run
+```
+
+Production, unified requests and R2 processing ship disabled. Real sources, explicit
+methodology approval, private repository access and live transfer verification remain
+required before operation. There is no trade execution or automatic live acquisition.

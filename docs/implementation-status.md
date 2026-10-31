@@ -18,3 +18,16 @@ capabilities; software readiness does not certify unavailable data or activate d
 Live acquisition, AI enrichment, stochastic retirement simulation and trade execution
 are outside this agreed delivery. No measured AI savings, recovered private equations,
 current holdings or scheduler activation are claimed. AI usage remains null.
+
+## Version 0.6 completion changes
+
+Historical entitlement/net pending and assessment-date catalysts are implemented.
+Shared profile mappings and typed Bank/E&P/Industrial numerical forecasts are
+implemented with sourced approval gates. User IC decisions and transaction links,
+uniform code lineage, native Excel date/rate/status formatting, all-module requests
+and optional boto3-backed R2 transfers are implemented. Current real-data certification
+requires the applicable new contracts; legacy snapshots remain replayable.
+
+The remaining twelve sector engines, actual source/methodology recovery, real legacy
+workbook parity, private production activation and real R2 connectivity are still
+open. Disabled configuration is intentional. See the operator guides for prerequisites.

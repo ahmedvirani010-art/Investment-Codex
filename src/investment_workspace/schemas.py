@@ -149,6 +149,8 @@ class Bundle(StrictModel):
     migrations: list["WorkbookMigration"] = Field(default_factory=list)
     wealth: "Wealth | None" = None
     documents: list["EvidenceDocument"] = Field(default_factory=list)
+    scenario_profiles: list["ScenarioProfile"] = Field(default_factory=list)
+    decisions: list["ICDecision"] = Field(default_factory=list)
 
     @model_validator(mode="after")
     def links_and_dates(self):
@@ -184,13 +186,15 @@ class Bundle(StrictModel):
                               for r in (getattr(self.integration, name) if isinstance(getattr(self.integration, name), list) else [getattr(self.integration, name)]) if r}
             if research_ids & integrated_ids:
                 raise ValueError("record IDs cannot be reused across research and integration owners")
+        if len({p.name for p in self.scenario_profiles})!=len(self.scenario_profiles):
+            raise ValueError('one active shared profile per scenario name; use supersession for revisions')
         fact_groups={}
         for fact in self.financials:
             key=(fact.ticker,fact.period_start,fact.period_end,fact.accounting_basis,fact.line_item,fact.units)
             if key in fact_groups and fact_groups[key]!=fact.amount:
                 raise ValueError('conflicting same-period financial facts require an explicit owned correction')
             fact_groups[key]=fact.amount
-        owned=list(self.financials)+list(self.migrations)
+        owned=list(self.financials)+list(self.migrations)+list(self.scenario_profiles)+list(self.decisions)
         if self.research:
             owned += self.research.earnings+self.research.models+self.research.dividends+self.research.resolutions
         if self.integration:
@@ -312,6 +316,8 @@ class Scenario(StrictModel):
     earnings_multiple: Positive | None = None
     surplus_cash_per_share: NonNegative | None = None
     cash_income_excluded: bool | None = None
+    profile: "ScenarioLink | None" = None
+    sector_forecasts: list["SectorForecast"] = Field(default_factory=list)
     operating_forecasts: list["OperatingForecast"] = Field(default_factory=list)
     drivers: dict[str, str] = Field(min_length=1)
 
@@ -540,6 +546,7 @@ class MacroObservation(ResearchRecord):
 
 
 class MacroScenario(ResearchRecord):
+    profile: "ScenarioLink | None" = None
     name: Literal["bear", "base", "bull"]
     probability: Fraction | None = None
     paths: dict[str, str] = Field(min_length=1)
@@ -690,7 +697,7 @@ class FinancialFact(ResearchRecord):
     accounting_basis: Literal['STANDALONE', 'CONSOLIDATED']
     line_item: str = Field(min_length=1)
     amount: Signed
-    units: Literal['PKR', 'PKR_PER_SHARE', 'SHARES']
+    units: Literal['PKR', 'USD', 'PKR_PER_SHARE', 'SHARES', 'FRACTION', 'BBL', 'MCF', 'MMBTU', 'TONNES', 'UNITS', 'PKR_PER_UNIT', 'USD_PER_UNIT']
     locator: str = Field(min_length=1)
 
     @model_validator(mode='after')
@@ -828,6 +835,7 @@ class AssetReturn(StrictModel):
 
 
 class WealthScenario(ResearchRecord):
+    profile: "ScenarioLink | None" = None
     name: Literal['bear', 'base', 'bull']
     annual_inflation: GrowthRate | None
     returns: list[AssetReturn]
@@ -924,6 +932,154 @@ class EvidenceDocument(StrictModel):
     suffix: Literal['.pdf','.xlsx','.json','.csv','.md','.txt']
     role: Literal['SOURCE_DOCUMENT','EVIDENCE_CONTRACT','REPLACEMENT_PROMPTS','VALUATION_RERUN'] = 'SOURCE_DOCUMENT'
     store_permitted: Literal[True]
+
+
+
+class ScenarioAssumption(StrictModel):
+    value: Signed | None
+    unit: str = Field(min_length=1)
+
+
+class ScenarioProfile(ResearchRecord):
+    name: Literal['bear','base','bull']
+    profile_version: str = Field(min_length=1)
+    financial_basis: str = Field(min_length=1)
+    period: str = Field(min_length=1)
+    horizon_years: Positive
+    assumptions: dict[Identifier,ScenarioAssumption] = Field(min_length=1)
+
+
+class ScenarioOverride(StrictModel):
+    assumption: ScenarioAssumption
+    rationale: str = Field(min_length=1)
+    source_ids: list[Identifier] = Field(min_length=1)
+
+
+class ScenarioLink(StrictModel):
+    profile_id: Identifier
+    financial_basis: str = Field(min_length=1)
+    period: str = Field(min_length=1)
+    horizon_years: Positive
+    mapping_rationale: str | None = None
+    source_ids: list[Identifier] = Field(default_factory=list)
+    overrides: dict[Identifier,ScenarioOverride] = Field(default_factory=dict)
+    bindings: dict[Identifier,str] = Field(default_factory=dict)
+    binding_units: dict[Identifier,str] = Field(default_factory=dict)
+
+
+class ForecastBase(StrictModel):
+    period: str = Field(min_length=1)
+    accounting_basis: Literal['STANDALONE','CONSOLIDATED']
+    source_ids: list[Identifier] = Field(min_length=1)
+    fact_ids: list[Identifier] = Field(min_length=1)
+    fact_bindings: dict[str,Identifier] = Field(min_length=1)
+    shares: Positive | None
+    tax_charge: Signed | None
+    methodology_version: Literal['sector-numeric-v1'] = 'sector-numeric-v1'
+
+
+class RateBalance(StrictModel):
+    average_balance: NonNegative | None
+    annual_rate: Signed | None
+
+
+class BankForecast(ForecastBase):
+    engine: Literal['Bank']
+    earning_assets: list[RateBalance] = Field(min_length=1)
+    funding: list[RateBalance] = Field(min_length=1)
+    fees: Signed | None
+    treasury_income: Signed | None
+    operating_costs: NonNegative | None
+    credit_charge: Signed | None
+    opening_equity: Positive | None
+    oci: Signed | None
+    capital_movements: Signed | None
+    opening_eligible_capital: NonNegative | None
+    eligible_oci: Signed | None
+    risk_weighted_assets: NonNegative | None
+    minimum_capital_ratio: UnitFraction | None
+    distributable_reserves: NonNegative | None
+    cash_available: NonNegative | None
+    proposed_dividends: NonNegative | None
+
+
+class CommodityVolume(StrictModel):
+    name: Identifier
+    unit: Literal['BBL','MCF','MMBTU','TONNES']
+    opening_reserves: NonNegative | None
+    reserve_additions: NonNegative | None
+    production: NonNegative | None
+    inventory_release: NonNegative | None
+    sold: NonNegative | None
+    price_currency: Literal['PKR','USD']
+    realized_price: NonNegative | None
+    fx_to_pkr: Positive | None
+    operating_cost_per_unit_pkr: NonNegative | None
+
+
+class EPForecast(ForecastBase):
+    engine: Literal['E&P']
+    commodities: list[CommodityVolume] = Field(min_length=1)
+    royalties: NonNegative | None
+    fixed_operating_costs: NonNegative | None
+    depletion: NonNegative | None
+    net_interest: Signed | None
+    other_income: Signed | None
+    opening_receivables: NonNegative | None
+    collections: NonNegative | None
+    other_working_capital_increase: Signed | None
+    other_wc_excludes_receivables: Literal[True]
+    capex: NonNegative | None
+    net_borrowing: Signed | None
+    cash_income_included: bool
+
+
+class ProductVolume(StrictModel):
+    product: Identifier
+    unit: Literal['UNITS','TONNES']
+    volume: NonNegative | None
+    net_price_pkr: NonNegative | None
+    variable_cost_per_unit_pkr: NonNegative | None
+
+
+class IndustrialForecast(ForecastBase):
+    engine: Literal['Industrial']
+    products: list[ProductVolume] = Field(min_length=1)
+    fixed_operating_costs: NonNegative | None
+    depreciation: NonNegative | None
+    net_interest: Signed | None
+    other_income: Signed | None
+    receivables_increase: Signed | None
+    inventory_increase: Signed | None
+    payables_increase: Signed | None
+    capex: NonNegative | None
+    net_borrowing: Signed | None
+    midcycle_rationale: str = Field(min_length=1)
+    cash_income_included: bool
+
+
+SectorForecast = Annotated[BankForecast | EPForecast | IndustrialForecast, Field(discriminator='engine')]
+
+
+class ICDecision(ResearchRecord):
+    proposal_id: Identifier
+    decision: Literal['APPROVE','REJECT','DEFER']
+    decided_by: str = Field(min_length=1)
+    decided_at: datetime
+    reason: str = Field(min_length=1)
+    reviewed_basis_hash: str = Field(pattern=r'^[a-f0-9]{64}$')
+    approved_quantity: Positive | None = None
+    transaction_ids: list[Identifier] = Field(default_factory=list)
+
+    @model_validator(mode='after')
+    def decision_fields(self):
+        if self.decided_at.tzinfo is None or self.decided_at.date()>self.effective_date:
+            raise ValueError('decision timestamp must have timezone and precede effective date')
+        if len(set(self.transaction_ids))!=len(self.transaction_ids):
+            raise ValueError('duplicate decision transaction link')
+        if self.decision!='APPROVE' and (self.transaction_ids or self.approved_quantity is not None):
+            raise ValueError('only approvals can link transactions or approve quantity')
+        return self
 
 
 Bundle.model_rebuild()

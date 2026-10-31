@@ -145,3 +145,10 @@ The owner must apply **Settings → General → Danger Zone → Change repositor
 visibility → Make private**, then verify metadata through the plugin. This release
 keeps `enabled: false` and `auto_push: false` until that prerequisite and the clean
 runner checks succeed. No source or financial request has been pushed by this release.
+
+## Unified interface in 0.6
+
+The compatible wealth commands remain available. New deployments use
+[workspace requests](workspace-requests.md), `config/workspace-requests.json`, and
+`request --pending`, scanning both request folders under the same writer group.
+R2 transfers and explicit portfolio/IC imports use that typed interface.

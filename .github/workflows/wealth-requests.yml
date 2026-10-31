@@ -1,8 +1,9 @@
-name: ChatGPT wealth requests
+name: ChatGPT workspace requests
 on:
   push:
     paths:
       - 'requests/wealth/*.json'
+      - 'requests/workspace/*.json'
   workflow_dispatch:
 permissions:
   contents: write
@@ -25,7 +26,7 @@ jobs:
           python - <<'PY'
           import json, os
           from pathlib import Path
-          config=json.loads(Path('config/wealth-requests.json').read_text())
+          config=json.loads(Path('config/workspace-requests.json').read_text())
           enabled=config.get('enabled') is True and config.get('auto_push') is True and bool(config.get('authorized_by'))
           with open(os.environ['GITHUB_OUTPUT'],'a') as output:
               output.write('enabled='+str(enabled).lower()+'\n')
@@ -44,8 +45,12 @@ jobs:
       - name: Process pending requests and publish results
         if: steps.policy.outputs.enabled == 'true'
         env:
-          WEALTH_PRIVATE_REPOSITORY: ${{ github.event.repository.private }}
-        run: uv run --locked investment-workspace wealth-request --pending --publish
+          WORKSPACE_PRIVATE_REPOSITORY: ${{ github.event.repository.private }}
+          R2_ENDPOINT_URL: ${{ vars.R2_ENDPOINT_URL }}
+          R2_BUCKET: ${{ vars.R2_BUCKET }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+        run: uv run --locked investment-workspace request --pending --publish
       - name: Retain local publication commits after failure
         if: failure() && steps.policy.outputs.enabled == 'true'
         run: |

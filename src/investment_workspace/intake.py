@@ -6,7 +6,7 @@ from pathlib import Path
 from pydantic import Field
 
 from .schemas import (StrictModel, Source, Bundle, Research, Integration, Wealth, FinancialFact,
-                      WorkbookMigration, EvidenceDocument)
+                      WorkbookMigration, EvidenceDocument, ScenarioProfile, ICDecision)
 from .storage import dumps, digest, read_json
 from .migration import compare_workbook
 
@@ -25,6 +25,8 @@ class EvidencePackage(StrictModel):
     integration: Integration | None = None
     wealth: Wealth | None = None
     financials: list[FinancialFact] | None = None
+    scenario_profiles: list[ScenarioProfile] | None = None
+    decisions: list[ICDecision] | None = None
     files: list[EvidenceFile] = Field(default_factory=list)
 
 
@@ -49,7 +51,7 @@ def import_package(root, path, *, as_of=None):
         merge_sources(data,package.sources)
         if package.market_cutoff:
             data['market_cutoff']=package.market_cutoff
-        for key in ('research','integration','wealth','financials'):
+        for key in ('research','integration','wealth','financials','scenario_profiles','decisions'):
             supplied=getattr(package,key)
             if supplied is not None:
                 data[key]=[v.model_dump(mode='json') for v in supplied] if isinstance(supplied,list) else supplied.model_dump(mode='json')

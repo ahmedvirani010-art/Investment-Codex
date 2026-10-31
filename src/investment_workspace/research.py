@@ -115,7 +115,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
             raise ValueError("accepted research record omitted without explicit supersession")
 
     output = {"input": research.model_dump(mode="json"), "history": history,
-              "earnings": [], "valuations": [], "entries": [], "dividends": [], "ranking": [], "forecasts": []}
+              "earnings": [], "valuations": [], "entries": [], "dividends": [], "ranking": [], "forecasts": [], "entitlements":list(previous.get("research",{}).get("entitlements",[]))}
     provenance = {r["record_id"]: r for r in history}
 
     def meta(record, owner):
@@ -166,14 +166,17 @@ def _calculate(bundle, state, previous, run_id, input_hash):
                     outcome, reason = "BLOCKED_MODEL", "Provisional model; excluded from ranking"
                 else:
                     for s in m.scenarios:
+                        from .scenarios import resolve
+                        resolve(bundle,s,basis=m.accounting_basis,period=m.forward_period,horizon=m.horizon_years)
                         from .models import bridge
-                        forecast_rows = [bridge(f,m,bundle) for f in s.operating_forecasts]
+                        from .sector_engines import forecast
+                        forecast_rows = [forecast(f,m,bundle) for f in s.sector_forecasts] if s.sector_forecasts else [bridge(f,m,bundle) for f in s.operating_forecasts]
                         for index, forecast in enumerate(forecast_rows):
                             output['forecasts'].append(_json_numbers({**meta(m,'valuation'), **forecast,
                                 'scenario':s.name,'year':index+1,'forecast_basis':m.forward_basis,'model_version':m.model_version}))
                         value = Decimal(cached('valuation', ticker + '.' + s.name,
                             {'model': record_payload(m), 'scenario': record_payload(s), 'sector': securities[ticker].sector,
-                             'financials': [record_payload(f) for f in bundle.financials if f.record_id in {of.revenue_fact_id for of in s.operating_forecasts}]},
+                             'financials': [record_payload(f) for f in bundle.financials if f.record_id in ({of.revenue_fact_id for of in s.operating_forecasts}|{i for of in s.sector_forecasts for i in of.fact_ids})]},
                             lambda: fair_value(m, s, securities[ticker].sector, bundle)))
                         if m.origin == "LEGACY_RECOVERED" and (not m.legacy_column_map
                                 or s.name not in m.historical_outputs
@@ -184,9 +187,11 @@ def _calculate(bundle, state, previous, run_id, input_hash):
                             "upstream_run_ids": sorted({provenance[e.record_id]["run_id"], provenance[m.record_id]["run_id"]}),
                             "source_ids": sorted(set(m.source_ids + e.source_ids + [a.source_id for a in e.adjustments] + [p.source_id]
                                 + (m.approval.source_ids if m.approval else []) + [src for component in s.components for src in component.source_ids]
-                                + [src for f in bundle.financials if f.record_id in {of.revenue_fact_id for of in s.operating_forecasts} for src in f.source_ids]) | set(research.universe_source_ids)),
+                                + [src for f in bundle.financials if f.record_id in ({of.revenue_fact_id for of in s.operating_forecasts}|{i for of in s.sector_forecasts for i in of.fact_ids}) for src in f.source_ids]) | set(research.universe_source_ids)),
                             "method": m.method, "model_version": m.model_version, "origin": m.origin, "certification": m.certification, "forward_period": m.forward_period,
                             "forward_basis": m.forward_basis, "reported_eps": e.reported_eps,
+                            "forecast_contract":"NUMERICAL_V1" if s.sector_forecasts else "LEGACY_REFERENCE",
+                            "scenario_mapping":resolve(bundle,s,basis=m.accounting_basis,period=m.forward_period,horizon=m.horizon_years),
                             "normalized_eps": next(r["normalized_eps"] for r in output["earnings"] if r["ticker"] == ticker),
                             "forward_eps": s.forward_eps, "sustainable_dps": s.sustainable_dps,
                             "present_fair_value": value, "horizon_exit_price": s.exit_price,
@@ -230,7 +235,11 @@ def _calculate(bundle, state, previous, run_id, input_hash):
         if len(ids) != len(d.receipt_transaction_ids) or ids & used_receipts:
             raise ValueError("dividend cash receipt cannot be linked twice")
         used_receipts |= ids
-        output["dividends"].append(dividend_result(d, bundle, state, meta(d, "dividends"), evidence_ok))
+        row=dividend_result(d, bundle, state, meta(d, "dividends"), evidence_ok, previous.get("research",{}))
+        output["dividends"].append(row)
+        basis=row.get("entitlement_basis")
+        if basis and not any(b["basis_id"]==basis["basis_id"] for b in output["entitlements"]):
+            output["entitlements"].append(basis)
     if not universe_ok:
         state["data_gaps"].append({"ticker": None, "field": "universe", "reason": "UNVERIFIED_UNIVERSE",
             "owner": "valuation", "next_action": "Supply dated verified constituents plus holdings/watchlist/requested names"})
@@ -246,7 +255,7 @@ def _calculate(bundle, state, previous, run_id, input_hash):
         for i, row in enumerate(output[key]):
             old = next((r for r in old_rows if r.get("record_id") == row.get("record_id")
                         and r.get("scenario") == row.get("scenario")), None)
-            ignored = {"run_id", "input_hash", "upstream_run_ids"}
+            ignored = {"run_id", "input_hash", "upstream_run_ids", "code_version", "code_hash"}
             if key == "entries" and bundle.integration:
                 ignored |= {"resolved_timing_gate", "resolved_risk_gate", "gate_upstream_ids", "gate_source_ids", "entry_status"}
             if old and {k: v for k, v in row.items() if k not in ignored} == {k: v for k, v in old.items() if k not in ignored}:
@@ -258,43 +267,6 @@ def _calculate(bundle, state, previous, run_id, input_hash):
     state["research"] = output
 
 
-def dividend_result(d, bundle, state, metadata, evidence_ok):
-    quantity = gross = net = None
-    status = "PENDING_CONFIRMATION"
-    receipts = [t for t in state["transactions"] if t["transaction_id"] in d.receipt_transaction_ids]
-    if len(receipts) != len(d.receipt_transaction_ids) or any(t["kind"] != "DIVIDEND" or t["ticker"] != d.ticker for t in receipts):
-        raise ValueError("receipt must reference an accepted DIVIDEND transaction for the same ticker")
-    verified = (evidence_ok(d.source_ids) and d.valid_until >= assessment_date(bundle) and d.dates_verified
-                and d.ex_date is not None and d.record_date is not None and d.settlement_rule == "SETTLED_BEFORE_EX")
-    # Only compute entitlement inside the reconciled ledger window. Current holdings prove nothing before opening.
-    if verified and bundle.opening.timestamp.date() < d.ex_date <= bundle.closing.timestamp.date() and not state["reconciliation"] and evidence_ok([bundle.opening.source_id, bundle.closing.source_id] + [t.source_id for t in bundle.transactions]):
-        quantity = next((p.quantity for p in bundle.opening.positions if p.ticker == d.ticker), ZERO)
-        for tx in sorted({t.transaction_id: t for t in bundle.transactions}.values(), key=lambda t: (t.timestamp, t.transaction_id)):
-            if tx.ticker != d.ticker or tx.settlement_date >= d.ex_date:
-                continue
-            if tx.kind == "BUY":
-                quantity += tx.quantity
-            elif tx.kind == "SELL":
-                quantity -= tx.quantity
-            elif tx.kind == "SPLIT":
-                quantity *= tx.ratio
-        gross = quantity * d.dps
-        net = gross * (1 - d.tax_rate) if d.tax_rate is not None else None
-        status = "NOT_ENTITLED" if quantity == 0 else "ENTITLED"
-        if quantity and d.payment_date:
-            status = "OVERDUE" if d.payment_date < assessment_date(bundle) else "RECEIVABLE"
-        if receipts:
-            total = sum((Decimal(t["amount"]) for t in receipts), ZERO)
-            withheld = sum((Decimal(t["taxes"]) for t in receipts), ZERO)
-            status = "RECEIVED" if total == gross and d.tax_rate is not None and withheld == gross * d.tax_rate else "RECEIPT_EXCEPTION"
-    received_gross = sum((Decimal(t["amount"]) for t in receipts), ZERO) if receipts else None
-    received_net = sum((Decimal(t["amount"]) - Decimal(t["taxes"]) - Decimal(t["fees"]) for t in receipts), ZERO) if receipts else None
-    row = {**metadata, **d.model_dump(mode="json"), "status": status, "eligible_quantity": quantity,
-           "gross_entitlement": gross, "net_entitlement": net,
-           "gross_received": received_gross, "net_received": received_net,
-           "gross_pending": max(ZERO, gross - (received_gross or ZERO)) if gross is not None else None,
-           "cash_treatment": "Receipt already included in portfolio cash; never added again"}
-    if status in {"PENDING_CONFIRMATION", "RECEIPT_EXCEPTION"}:
-        state["data_gaps"].append({"ticker": d.ticker, "field": "dividend", "reason": status,
-            "owner": "dividends", "next_action": "Verify dates, ledger window, settlement rule, tax and cash receipt"})
-    return _json_numbers(row)
+def dividend_result(d, bundle, state, metadata, evidence_ok, previous=None):
+    from .dividends import result
+    return result(d,bundle,state,metadata,evidence_ok,previous)
