@@ -1,0 +1,188 @@
+{
+  "ai_cost": null,
+  "dataset": "SYNTHETIC_ONLY",
+  "measurements": [
+    {
+      "cache_hits": 20,
+      "calculation_units": 20,
+      "case": "unchanged",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.006014,
+        "portfolio": 0.000746,
+        "valuation": 0.00588,
+        "wealth": 0.118028
+      },
+      "sample": 1,
+      "seconds": 6.4752742540003965
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 0,
+      "case": "unchanged",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.006723,
+        "portfolio": 0.000778,
+        "valuation": 0.005753,
+        "wealth": 0.077494
+      },
+      "sample": 1,
+      "seconds": 5.235594345002028
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 0,
+      "case": "unchanged",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.005029,
+        "portfolio": 0.001043,
+        "valuation": 0.005753,
+        "wealth": 0.05377
+      },
+      "sample": 2,
+      "seconds": 4.717266286002996
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 20,
+      "case": "unchanged",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.005371,
+        "portfolio": 0.000982,
+        "valuation": 0.005533,
+        "wealth": 0.078732
+      },
+      "sample": 2,
+      "seconds": 4.756615510996198
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 20,
+      "case": "unchanged",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.005489,
+        "portfolio": 0.000887,
+        "valuation": 0.006028,
+        "wealth": 0.079146
+      },
+      "sample": 3,
+      "seconds": 4.6779978590057
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 0,
+      "case": "unchanged",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.005349,
+        "portfolio": 0.001281,
+        "valuation": 0.005501,
+        "wealth": 0.111429
+      },
+      "sample": 3,
+      "seconds": 4.91431226900022
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 20,
+      "case": "one_assumption_changed",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.007226,
+        "portfolio": 0.00127,
+        "valuation": 0.009991,
+        "wealth": 0.095421
+      },
+      "sample": 1,
+      "seconds": 6.029527812999731
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 1,
+      "case": "one_assumption_changed",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.009348,
+        "portfolio": 0.002108,
+        "valuation": 0.01153,
+        "wealth": 0.11939
+      },
+      "sample": 1,
+      "seconds": 7.236752801996772
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 1,
+      "case": "one_assumption_changed",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.006705,
+        "portfolio": 0.001323,
+        "valuation": 0.005847,
+        "wealth": 0.061863
+      },
+      "sample": 2,
+      "seconds": 5.306545824998466
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 20,
+      "case": "one_assumption_changed",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.005105,
+        "portfolio": 0.000968,
+        "valuation": 0.006782,
+        "wealth": 0.08069
+      },
+      "sample": 2,
+      "seconds": 6.442174999996496
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 20,
+      "case": "one_assumption_changed",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.009099,
+        "portfolio": 0.00119,
+        "valuation": 0.007982,
+        "wealth": 0.156562
+      },
+      "sample": 3,
+      "seconds": 5.615494429999671
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 1,
+      "case": "one_assumption_changed",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.006234,
+        "portfolio": 0.00239,
+        "valuation": 0.00515,
+        "wealth": 0.074751
+      },
+      "sample": 3,
+      "seconds": 7.735494291999203
+    }
+  ],
+  "months": 360,
+  "one_assumption_changed": {
+    "cached_median_seconds": 7.236752801996772,
+    "full_median_seconds": 6.029527812999731,
+    "full_over_cached_ratio": 0.8331813975096756
+  },
+  "parity": "PASS",
+  "samples": 3,
+  "timing_scope": "sandbox clone, calculation, workbook, local commit and parity validation",
+  "unchanged": {
+    "cached_median_seconds": 4.91431226900022,
+    "full_median_seconds": 4.756615510996198,
+    "full_over_cached_ratio": 0.9679107168262826
+  }
+}

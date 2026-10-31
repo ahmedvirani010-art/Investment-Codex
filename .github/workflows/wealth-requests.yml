@@ -1,0 +1,61 @@
+name: ChatGPT wealth requests
+on:
+  push:
+    paths:
+      - 'requests/wealth/*.json'
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: investment-workspace-publication
+  cancel-in-progress: false
+jobs:
+  requests:
+    if: github.event.repository.private == true && github.ref_name == github.event.repository.default_branch
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.repository.default_branch }}
+          fetch-depth: 0
+      - name: Check explicit wealth policy
+        id: policy
+        run: |
+          python - <<'PY'
+          import json, os
+          from pathlib import Path
+          config=json.loads(Path('config/wealth-requests.json').read_text())
+          enabled=config.get('enabled') is True and config.get('auto_push') is True and bool(config.get('authorized_by'))
+          with open(os.environ['GITHUB_OUTPUT'],'a') as output:
+              output.write('enabled='+str(enabled).lower()+'\n')
+          print('Wealth request processing enabled:',enabled)
+          PY
+      - uses: actions/setup-python@v5
+        if: steps.policy.outputs.enabled == 'true'
+        with:
+          python-version: '3.12'
+      - uses: astral-sh/setup-uv@v6
+        if: steps.policy.outputs.enabled == 'true'
+        with:
+          version: '0.12.23'
+      - run: uv sync --locked
+        if: steps.policy.outputs.enabled == 'true'
+      - name: Process pending requests and publish results
+        if: steps.policy.outputs.enabled == 'true'
+        env:
+          WEALTH_PRIVATE_REPOSITORY: ${{ github.event.repository.private }}
+        run: uv run --locked investment-workspace wealth-request --pending --publish
+      - name: Retain local publication commits after failure
+        if: failure() && steps.policy.outputs.enabled == 'true'
+        run: |
+          mkdir -p .runtime
+          git bundle create .runtime/wealth-publication.bundle HEAD
+      - uses: actions/upload-artifact@v4
+        if: failure() && steps.policy.outputs.enabled == 'true'
+        with:
+          name: wealth-publication-recovery
+          path: .runtime/wealth-publication.bundle
+          retention-days: 7
+          include-hidden-files: true
+          if-no-files-found: error

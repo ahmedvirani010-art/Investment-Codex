@@ -18,6 +18,18 @@ def main(argv=None):
     init.add_argument("--phase4", action="store_true", help="Use the synthetic wealth-planning demo")
     init.add_argument("--phase3", action="store_true", help="Use the synthetic integrated workflows demo")
     init.add_argument("--phase2", action="store_true", help="Use the synthetic Phase 2 model/entitlement demo")
+    request=sub.add_parser('wealth-request',help='Process committed chat requests through the wealth policy')
+    choice=request.add_mutually_exclusive_group(required=True)
+    choice.add_argument('--file',type=Path)
+    choice.add_argument('--pending',action='store_true')
+    request.add_argument('--local-demo',action='store_true')
+    request.add_argument('--publish',action='store_true',help='Authorized private Actions normal push only')
+    preflight=sub.add_parser('wealth-preflight',help='Check a wealth packet without changing accepted records')
+    preflight.add_argument('--file',type=Path,required=True)
+    preflight.add_argument('--as-of')
+    benchmark=sub.add_parser('benchmark-wealth',help='Isolated equivalent-scope synthetic benchmark')
+    benchmark.add_argument('--samples',type=int,default=3)
+    benchmark.add_argument('--months',type=int,default=360)
     sub.add_parser('readiness', help='Read committed coverage, migration and deployment dependencies')
     delta=sub.add_parser('changes',help='Compare committed revisions')
     delta.add_argument('--since-run',required=True)
@@ -90,6 +102,17 @@ def main(argv=None):
             if read_json(root, pipeline.STATE):
                 raise ValueError("workspace already has accepted data; init will not replace it with a demo")
             result = pipeline.run(root, pipeline.fixture_bytes(args.phase2, args.phase3, args.phase4), workflow="init-demo")
+        elif args.command=='wealth-request':
+            from .wealth_requests import execute,pending
+            if args.publish and not args.pending:
+                raise ValueError('--publish requires --pending')
+            result=pending(root,local_demo=args.local_demo,push=args.publish) if args.pending else execute(root,args.file,local_demo=args.local_demo)
+        elif args.command=='wealth-preflight':
+            from .wealth_requests import preflight
+            result=preflight(root,json.loads(args.file.read_bytes()),as_of=args.as_of)
+        elif args.command=='benchmark-wealth':
+            from .wealth_benchmark import benchmark
+            result=benchmark(samples=args.samples,months=args.months)
         elif args.command=='readiness':
             from .readiness import committed_report
             result=committed_report(root)
@@ -174,7 +197,7 @@ def main(argv=None):
             from .readiness import workflow_status
             if workflow_status(state,args.workflow)!='COMPLETE':
                 return 1
-        return 1 if result.get('status') in {'FAILED','BLOCKED','PUSH_FAILED'} or args.command=='automation' and result.get('status')=='PARTIAL' else 0
+        return 1 if result.get('status') in {'FAILED','BLOCKED','PUSH_FAILED','INVALID'} or args.command in {'automation','wealth-request'} and result.get('status')=='PARTIAL' else 0
     except (ValueError, OSError, KeyError, TypeError, PublicationError, LockBusy) as exc:
         print(str(exc), file=sys.stderr)
         return 2

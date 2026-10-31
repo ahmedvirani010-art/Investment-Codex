@@ -43,12 +43,15 @@ class RunContext:
         self.deferred, self.timings, self.dependencies = [], {}, []
         self.artifacts, self.verify = artifacts or {}, verify
 
+    def defer(self, owner, key):
+        record = {"owner": owner, "key": key, "reason": "BUDGET_EXHAUSTED"}
+        if record not in self.deferred:
+            self.deferred.append(record)
+
     def consume(self, owner, key):
         if (self.max_units is not None and self.units >= self.max_units or
                 self.max_seconds is not None and time.monotonic() - self.began >= self.max_seconds):
-            record = {'owner': owner, 'key': key, 'reason': 'BUDGET_EXHAUSTED'}
-            if record not in self.deferred:
-                self.deferred.append(record)
+            self.defer(owner, key)
             raise BudgetExceeded('BUDGET_EXHAUSTED: ' + owner + ' ' + key)
         self.units += 1
 

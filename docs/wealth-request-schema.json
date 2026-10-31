@@ -1,0 +1,1087 @@
+{
+  "$defs": {
+    "AssetQuote": {
+      "additionalProperties": false,
+      "properties": {
+        "close": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Close"
+        },
+        "fx_to_pkr": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx To Pkr"
+        },
+        "session_date": {
+          "format": "date",
+          "title": "Session Date",
+          "type": "string"
+        }
+      },
+      "required": [
+        "session_date",
+        "close"
+      ],
+      "title": "AssetQuote",
+      "type": "object"
+    },
+    "AssetReturn": {
+      "additionalProperties": false,
+      "properties": {
+        "annual_fee_rate": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Annual Fee Rate"
+        },
+        "annual_nominal_return": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": -1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Annual Nominal Return"
+        },
+        "asset_key": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Asset Key",
+          "type": "string"
+        },
+        "return_tax_rate": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Return Tax Rate"
+        },
+        "withdrawal_tax_rate": {
+          "anyOf": [
+            {
+              "exclusiveMaximum": 1.0,
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*\\d*\\.?\\d*$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Withdrawal Tax Rate"
+        }
+      },
+      "required": [
+        "asset_key",
+        "annual_nominal_return",
+        "annual_fee_rate",
+        "return_tax_rate",
+        "withdrawal_tax_rate"
+      ],
+      "title": "AssetReturn",
+      "type": "object"
+    },
+    "CrossAssetHistory": {
+      "additionalProperties": false,
+      "properties": {
+        "asset_key": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Asset Key",
+          "type": "string"
+        },
+        "currency": {
+          "enum": [
+            "PKR",
+            "USD"
+          ],
+          "title": "Currency",
+          "type": "string"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "fx_source_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx Source Id"
+        },
+        "quotes": {
+          "items": {
+            "$ref": "#/$defs/AssetQuote"
+          },
+          "minItems": 2,
+          "title": "Quotes",
+          "type": "array"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "return_basis": {
+          "enum": [
+            "PRICE",
+            "TOTAL_RETURN"
+          ],
+          "title": "Return Basis",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "asset_key",
+        "currency",
+        "return_basis",
+        "quotes"
+      ],
+      "title": "CrossAssetHistory",
+      "type": "object"
+    },
+    "RetirementPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "monthly_spending_real": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Monthly Spending Real"
+        },
+        "months": {
+          "maximum": 1200,
+          "minimum": 1,
+          "title": "Months",
+          "type": "integer"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "retirement_date": {
+          "format": "date",
+          "title": "Retirement Date",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "start_date": {
+          "format": "date",
+          "title": "Start Date",
+          "type": "string"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        },
+        "withdrawal_order": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "title": "Withdrawal Order",
+          "type": "array"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "start_date",
+        "retirement_date",
+        "months",
+        "monthly_spending_real",
+        "withdrawal_order"
+      ],
+      "title": "RetirementPlan",
+      "type": "object"
+    },
+    "Source": {
+      "additionalProperties": false,
+      "properties": {
+        "accessed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Accessed At"
+        },
+        "coverage_through": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Coverage Through"
+        },
+        "document_sha256": {
+          "anyOf": [
+            {
+              "pattern": "^[a-f0-9]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Document Sha256"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "evidence_label": {
+          "enum": [
+            "CONFIRMED",
+            "ESTIMATE",
+            "ASSUMPTION",
+            "UNVERIFIED"
+          ],
+          "title": "Evidence Label",
+          "type": "string"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner"
+        },
+        "published_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Published At"
+        },
+        "publisher": {
+          "minLength": 1,
+          "title": "Publisher",
+          "type": "string"
+        },
+        "source_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Source Id",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        },
+        "url": {
+          "anyOf": [
+            {
+              "pattern": "^https?://",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Url"
+        }
+      },
+      "required": [
+        "source_id",
+        "title",
+        "publisher",
+        "effective_date",
+        "locator",
+        "evidence_label"
+      ],
+      "title": "Source",
+      "type": "object"
+    },
+    "Wealth": {
+      "additionalProperties": false,
+      "properties": {
+        "assets": {
+          "items": {
+            "$ref": "#/$defs/WealthAsset"
+          },
+          "minItems": 1,
+          "title": "Assets",
+          "type": "array"
+        },
+        "flows": {
+          "items": {
+            "$ref": "#/$defs/WealthFlow"
+          },
+          "title": "Flows",
+          "type": "array"
+        },
+        "histories": {
+          "items": {
+            "$ref": "#/$defs/CrossAssetHistory"
+          },
+          "title": "Histories",
+          "type": "array"
+        },
+        "include_crypto": {
+          "default": false,
+          "title": "Include Crypto",
+          "type": "boolean"
+        },
+        "min_correlation_observations": {
+          "default": 12,
+          "minimum": 3,
+          "title": "Min Correlation Observations",
+          "type": "integer"
+        },
+        "plans": {
+          "items": {
+            "$ref": "#/$defs/RetirementPlan"
+          },
+          "title": "Plans",
+          "type": "array"
+        },
+        "scenarios": {
+          "items": {
+            "$ref": "#/$defs/WealthScenario"
+          },
+          "title": "Scenarios",
+          "type": "array"
+        },
+        "schema_version": {
+          "const": "4.0",
+          "default": "4.0",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "assets"
+      ],
+      "title": "Wealth",
+      "type": "object"
+    },
+    "WealthAsset": {
+      "additionalProperties": false,
+      "properties": {
+        "available_from": {
+          "format": "date",
+          "title": "Available From",
+          "type": "string"
+        },
+        "balance": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Balance"
+        },
+        "currency": {
+          "default": "PKR",
+          "enum": [
+            "PKR",
+            "USD"
+          ],
+          "title": "Currency",
+          "type": "string"
+        },
+        "economic_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Economic Id",
+          "type": "string"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "fx_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx Date"
+        },
+        "fx_source_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx Source Id"
+        },
+        "fx_to_pkr": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Fx To Pkr"
+        },
+        "kind": {
+          "enum": [
+            "CASH",
+            "GOLD",
+            "VPS",
+            "PF",
+            "GRATUITY",
+            "CRYPTO",
+            "OTHER",
+            "PSX_SLEEVE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "portfolio_link": {
+          "anyOf": [
+            {
+              "enum": [
+                "TOTAL",
+                "EQUITY",
+                "CASH"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Portfolio Link"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "economic_id",
+        "kind",
+        "available_from"
+      ],
+      "title": "WealthAsset",
+      "type": "object"
+    },
+    "WealthFlow": {
+      "additionalProperties": false,
+      "properties": {
+        "amount": {
+          "anyOf": [
+            {
+              "minimum": 0.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Amount"
+        },
+        "amount_basis": {
+          "const": "NET",
+          "default": "NET",
+          "title": "Amount Basis",
+          "type": "string"
+        },
+        "asset_key": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Asset Key"
+        },
+        "economic_claim_id": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Economic Claim Id"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "ends": {
+          "format": "date",
+          "title": "Ends",
+          "type": "string"
+        },
+        "frequency": {
+          "enum": [
+            "MONTHLY",
+            "ONCE"
+          ],
+          "title": "Frequency",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "CONTRIBUTION",
+            "BENEFIT",
+            "EXPENSE"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "price_basis": {
+          "enum": [
+            "NOMINAL",
+            "REAL_AT_START"
+          ],
+          "title": "Price Basis",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "starts": {
+          "format": "date",
+          "title": "Starts",
+          "type": "string"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "kind",
+        "amount",
+        "price_basis",
+        "frequency",
+        "starts",
+        "ends"
+      ],
+      "title": "WealthFlow",
+      "type": "object"
+    },
+    "WealthPacket": {
+      "additionalProperties": false,
+      "properties": {
+        "market_cutoff": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Market Cutoff"
+        },
+        "sources": {
+          "items": {
+            "$ref": "#/$defs/Source"
+          },
+          "title": "Sources",
+          "type": "array"
+        },
+        "wealth": {
+          "$ref": "#/$defs/Wealth"
+        }
+      },
+      "required": [
+        "wealth"
+      ],
+      "title": "WealthPacket",
+      "type": "object"
+    },
+    "WealthScenario": {
+      "additionalProperties": false,
+      "properties": {
+        "annual_inflation": {
+          "anyOf": [
+            {
+              "exclusiveMinimum": -1.0,
+              "type": "number"
+            },
+            {
+              "pattern": "^(?!^[-+.]*$)[+-]?0*(?:\\d{0,16}|(?=[\\d.]{1,25}0*$)\\d{0,16}\\.\\d{0,8}0*$)",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Annual Inflation"
+        },
+        "effective_date": {
+          "format": "date",
+          "title": "Effective Date",
+          "type": "string"
+        },
+        "name": {
+          "enum": [
+            "bear",
+            "base",
+            "bull"
+          ],
+          "title": "Name",
+          "type": "string"
+        },
+        "record_id": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Record Id",
+          "type": "string"
+        },
+        "returns": {
+          "items": {
+            "$ref": "#/$defs/AssetReturn"
+          },
+          "title": "Returns",
+          "type": "array"
+        },
+        "source_ids": {
+          "items": {
+            "maxLength": 100,
+            "pattern": "^[A-Za-z0-9_.-]+$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Source Ids",
+          "type": "array"
+        },
+        "supersedes": {
+          "anyOf": [
+            {
+              "maxLength": 100,
+              "pattern": "^[A-Za-z0-9_.-]+$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Supersedes"
+        },
+        "ticker": {
+          "maxLength": 100,
+          "pattern": "^[A-Za-z0-9_.-]+$",
+          "title": "Ticker",
+          "type": "string"
+        },
+        "valid_until": {
+          "format": "date",
+          "title": "Valid Until",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "ticker",
+        "effective_date",
+        "valid_until",
+        "source_ids",
+        "name",
+        "annual_inflation",
+        "returns"
+      ],
+      "title": "WealthScenario",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "as_of": {
+      "format": "date",
+      "title": "As Of",
+      "type": "string"
+    },
+    "authorized_by": {
+      "maxLength": 200,
+      "minLength": 1,
+      "title": "Authorized By",
+      "type": "string"
+    },
+    "dataset_id": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Dataset Id",
+      "type": "string"
+    },
+    "expected_run_id": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Expected Run Id",
+      "type": "string"
+    },
+    "instruction": {
+      "maxLength": 2000,
+      "minLength": 1,
+      "title": "Instruction",
+      "type": "string"
+    },
+    "modules": {
+      "items": {
+        "enum": [
+          "retirement",
+          "cross-asset"
+        ],
+        "type": "string"
+      },
+      "maxItems": 2,
+      "minItems": 1,
+      "title": "Modules",
+      "type": "array"
+    },
+    "operation": {
+      "enum": [
+        "validate",
+        "simulate",
+        "accept-and-run"
+      ],
+      "title": "Operation",
+      "type": "string"
+    },
+    "package": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WealthPacket"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "request_id": {
+      "maxLength": 100,
+      "pattern": "^[A-Za-z0-9_.-]+$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "1.0",
+      "default": "1.0",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "request_id",
+    "operation",
+    "dataset_id",
+    "expected_run_id",
+    "as_of",
+    "instruction",
+    "authorized_by"
+  ],
+  "title": "WealthRequest",
+  "type": "object"
+}

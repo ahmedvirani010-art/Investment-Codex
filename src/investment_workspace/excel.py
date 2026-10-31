@@ -20,6 +20,9 @@ HOLDING_COLUMNS = ["record_id", "ticker", "sector", "quantity", "cost", "price",
 FUTURE_SHEETS = []
 NUMERIC_COLUMNS = {"quantity", "cost", "price", "market_value", "unrealized_gain", "unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "cash_after", "realized_gain", "amount", "fees", "taxes", "ratio", "present_fair_value", "horizon_exit_price", "horizon_dividends", "forward_eps", "normalized_eps", "reported_eps", "normalized_pat", "sustainable_dps", "entry_ceiling", "mos_entry_ceiling", "hurdle_entry_ceiling", "hurdle", "gross_return", "net_return", "annualized_return", "margin_of_safety", "dps", "eligible_quantity", "gross_entitlement", "net_entitlement", "gross_received", "net_received", "gross_pending", "payout_crosscheck", "horizon_years", "price_return", "benchmark_return", "relative_performance", "rs_momentum", "short_sma", "long_sma", "sma_slope", "extension", "z_score", "average_traded_value", "rs_percentile", "price_breadth", "rs_breadth", "average_relative_performance", "weight_total_sleeve", "max_weight", "scenario_assets", "income_return", "total_return", "correlation", "desired_entry", "stop_price", "approach_fraction", "balance_pkr", "spendable_now", "nominal_balance", "real_balance", "accessible_balance", "locked_balance", "growth", "net_inflows", "net_spending_required", "net_withdrawn", "funding_gap", "cumulative_funding_gap", "inflation_index", "ending_nominal_balance", "ending_real_balance", "holding_period_return", "revenue", "ebitda", "pretax", "tax_charge", "pat", "eps", "fcfe", "shares", "ledger_quantity", "ledger_cost", "quantity_difference", "cost_difference", "cash_difference"}
 
+NUMERIC_COLUMNS.update({"starting_wealth_pkr","monthly_spending_real","annual_inflation",
+                        "ending_accessible_balance","ending_locked_balance","left_common_return","right_common_return"})
+
 
 def cell_value(value, column=""):
     if value is None:
@@ -81,6 +84,7 @@ def export_workbook(path: Path, snapshot: dict):
     dashboard += [{"metric": key if key.startswith("integration_") else "integration_" + key, "value": value} for key, value in snapshot.get("integration", {}).get("summary", {}).items()]
     if not snapshot.get("integration"):
         dashboard.append({"metric": "integration_status", "value": "BLOCKED_INPUT — no integration imported"})
+    dashboard += [{"metric":"wealth_"+key,"value":value} for key,value in snapshot.get("wealth",{}).get("summary",{}).items()]
     add_sheet(wb, "Dashboard", dashboard, ["metric", "value"])
     add_sheet(wb, "Holdings", snapshot["holdings"], HOLDING_COLUMNS)
     add_sheet(wb, "Transactions", snapshot["transactions"])
@@ -140,6 +144,10 @@ def validate_workbook(path: Path, snapshot: dict):
         for key in ("cash", "total_assets", "market_cutoff", "sizing_status"):
             if dashboard.get(key) != cell_value(snapshot["summary"].get(key)):
                 raise ValueError(f"workbook dashboard parity failed: {key}")
+        if tuple(int(v) for v in snapshot["summary"].get("code_version","0").split(".")) >= (0,5):
+            for key,value in snapshot.get("wealth",{}).get("summary",{}).items():
+                if dashboard.get("wealth_"+key)!=cell_value(value):
+                    raise ValueError("workbook wealth dashboard parity failed: "+key)
         if dashboard["published_run_id"] != snapshot["published_run_id"]:
             raise ValueError("workbook revision differs from dataset")
         tables = {"Transactions": snapshot["transactions"], "Cash": [{k: snapshot["summary"].get(k) for k in ("cash", "ledger_cash", "cash_difference", "income_received", "realized_gain")}], "Sources": snapshot["sources"], "Coverage": snapshot["coverage"], "Data_Gaps": snapshot["data_gaps"], "Reconciliation": snapshot["reconciliation"], "Run_Log": snapshot["run_log"], "Change_Log": snapshot["changes"], "Usage": snapshot["usage"], "Notes": snapshot["notes"], "Assumptions": snapshot.get("assumptions", [])}

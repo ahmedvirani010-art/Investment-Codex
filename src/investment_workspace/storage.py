@@ -109,7 +109,7 @@ def rollback_pending(root: Path) -> dict | None:
         return None
     journal = json.loads(journal_path.read_bytes())
     stage = safe_path(root, journal["stage"])
-    manifest_path = f"runs/{journal['run_id']}/manifest.json"
+    manifest_path = journal.get("commit_marker", f"runs/{journal['run_id']}/manifest.json")
     expected = (stage / manifest_path).read_bytes()
     published = committed(root, manifest_path) == expected
     if not published and head(root) != journal["base_commit"]:
@@ -133,7 +133,7 @@ def rollback_pending(root: Path) -> dict | None:
     return {**journal, "committed": published}
 
 
-def publish(root: Path, stage: Path, paths: list[str], run_id: str, status: str) -> str:
+def publish(root: Path, stage: Path, paths: list[str], run_id: str, status: str, *, commit_marker=None) -> str:
     if (root / ".runtime/pending.json").exists():
         raise PublicationError("recover pending publication first")
     require_clean(root)
@@ -148,6 +148,8 @@ def publish(root: Path, stage: Path, paths: list[str], run_id: str, status: str)
             backup.parent.mkdir(parents=True, exist_ok=True)
             shutil.copyfile(target, backup)
     journal = {"run_id": run_id, "stage": str(stage.relative_to(root)), "paths": paths, "base_commit": base}
+    if commit_marker:
+        journal["commit_marker"] = commit_marker
     atomic_write(root / ".runtime/pending.json", dumps(journal))
     try:
         for relative in paths:

@@ -85,3 +85,15 @@ Wealth_Assets, Wealth_Flows, Retirement, Retirement_Summary, Cross_Asset and
 Asset_Correlations are generated from canonical wealth records and checked for
 Excel parity. Evidence, assumptions, history, cached projections and chosen-run
 replay use the same local publication boundary as the investment modules.
+
+## ChatGPT requests and completion improvements
+
+See [the GitHub-plugin operating guide](chatgpt-wealth.md) for typed simulation,
+validation and accepted-update requests. Results and workbooks are durable commits.
+The manual private-repository wealth policy is separate from disabled PSX schedules.
+
+Retirement summaries now expose starting wealth, retirement date, real spending,
+inflation and ending accessible/locked balances. Pair comparisons report common
+start/end dates and returns over identical observation endpoints. Individual history
+returns retain their own disclosed periods. Pair calculations are cached and budgeted;
+projection timeouts are queued for the next attempt.

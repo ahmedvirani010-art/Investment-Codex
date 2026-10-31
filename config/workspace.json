@@ -1,6 +1,6 @@
 {
   "schema_version": "1.0",
-  "phase": 3,
+  "phase": 4,
   "timezone": "Asia/Karachi",
   "currency": "PKR",
   "default_mode": "OFFLINE",

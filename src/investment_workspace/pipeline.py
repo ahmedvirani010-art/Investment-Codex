@@ -115,7 +115,7 @@ def merge_notes(previous, overrides, bundle, run_id, source_id):
 
 
 def run(root: Path, input_bytes: bytes, *, overrides=(), override_bytes=None, workflow="portfolio", validation_error=None,
-        as_of=None, max_units=None, max_seconds=None, artifacts=None, activate_dataset=False) -> dict:
+        as_of=None, max_units=None, max_seconds=None, artifacts=None, activate_dataset=False, recalculate=False) -> dict:
     root = root.resolve()
     run_id = new_id()
     began = time.monotonic()
@@ -129,7 +129,7 @@ def run(root: Path, input_bytes: bytes, *, overrides=(), override_bytes=None, wo
             require_clean(root)
             evaluated = date.fromisoformat(as_of) if isinstance(as_of,str) else as_of
             runtime = RunContext(root,code_hash(),read_json(root,STATE,{}),as_of=evaluated,max_units=max_units,
-                                 max_seconds=max_seconds,artifacts=artifacts,verify=workflow=='valuation')
+                                 max_seconds=max_seconds,artifacts=artifacts,verify=recalculate or workflow=='valuation')
             with context(runtime):
                 return _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, began, validation_error, activate_dataset)
     except Exception as exc:
@@ -158,7 +158,7 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
         atomic_write(stage / "request_error.json", dumps(validation_error))
     request_context = {'as_of':runtime.as_of.isoformat() if runtime.as_of else None,
                        'max_units':runtime.max_units,'max_seconds':runtime.max_seconds,'activate_dataset':activate_dataset,
-                       'artifacts':list(runtime.artifacts)}
+                       'artifacts':list(runtime.artifacts), 'recalculate':runtime.verify}
     atomic_write(stage / 'request_context.json', dumps(request_context))
     for path, raw in runtime.artifacts.items():
         name = Path(path).name
@@ -572,6 +572,8 @@ def recover(root: Path):
         if journal and not journal["committed"]:
             record_failure(root, journal["run_id"], "Interrupted publication rolled back before retry")
             stage = root / journal["stage"]
+            if journal.get("commit_marker"):
+                return {"status":"REQUEST_ROLLED_BACK", "retry":"wealth-request --pending", "run_id":journal["run_id"]}
             raw = (stage / "request.json").read_bytes()
             if (stage/'request_context.json').exists():
                 options=json.loads((stage/'request_context.json').read_bytes())

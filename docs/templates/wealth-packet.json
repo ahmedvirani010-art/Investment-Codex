@@ -1,0 +1,14 @@
+{
+  "sources": [],
+  "market_cutoff": null,
+  "wealth": {
+    "schema_version": "4.0",
+    "include_crypto": false,
+    "assets": [],
+    "flows": [],
+    "scenarios": [],
+    "plans": [],
+    "histories": [],
+    "min_correlation_observations": 12
+  }
+}

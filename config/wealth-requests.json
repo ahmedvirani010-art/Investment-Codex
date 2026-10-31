@@ -1,0 +1,10 @@
+{
+  "schema_version": "1.0",
+  "enabled": false,
+  "repository": "ahmedvirani010-art/Investment-Codex",
+  "authorized_by": null,
+  "auto_push": false,
+  "max_work_units": 2000,
+  "max_seconds": 300,
+  "max_request_bytes": 5242880
+}

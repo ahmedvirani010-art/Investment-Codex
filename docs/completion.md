@@ -209,3 +209,31 @@ Validation used the preinstalled locked environment (`uv run --locked --no-sync
 pytest`). A fresh offline `uv sync --locked` could not obtain the pinned setuptools
 build dependency from the local cache; clean dependency installation on the future
 runner remains an activation check.
+
+## Phase 4 chat interface (0.5)
+
+The manual wealth request workflow is implemented separately from PSX production
+activation. See [the ChatGPT operator guide](chatgpt-wealth.md) for the request
+contract, privacy prerequisite, queue processing, simulation isolation, accepted
+updates, committed results and journal recovery. Cross-asset pairs now share the
+retirement cache/budget mechanisms, and their returns disclose common endpoints.
+
+Release validation includes a real local runner against a temporary bare Git remote,
+with successful normal pushes, remote divergence, push failures and last-good data
+retention. These are local integration tests, not verification of deployed GitHub
+Actions. A separate synthetic chat-request workbook is generated for review.
+
+Deployment remains disabled: on 2026-10-27 the configured GitHub CLI's visibility
+PATCH returned `Forbidden`; the repository could not be made private through this
+session. No application code or financial request was pushed. The owner must set
+repository visibility to private in GitHub Settings before remote deployment.
+An isolated clean dependency installation with scoped network access also failed
+because the proxy blocked a PyPI wheel download. Installed dependency compatibility
+and locked resolution pass; fresh build/installation are still CI prerequisites.
+
+The final 0.5 offline release suite passes **192 tests**. All six prior committed
+revisions pass integrity and workbook parity. The request and packet JSON schemas
+match their implementation. Installed third-party dependencies pass `uv pip check`,
+and the lockfile passes offline resolution. The separate 360-month/3-sample synthetic
+benchmark passes full/incremental analytical parity; measured results are retained
+at `reports/benchmarks/phase4-synthetic-360-month.json` without a speedup claim.

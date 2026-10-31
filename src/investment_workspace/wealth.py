@@ -33,6 +33,7 @@ def project(plan, scenario, assets, flows, balances):
     for step in range(1,plan.months+1):
         ctx = current()
         if ctx and ctx.max_seconds is not None and time.monotonic()-ctx.began>=ctx.max_seconds:
+            ctx.defer('retirement', plan.record_id+'.'+scenario.name)
             raise BudgetExceeded('BUDGET_EXHAUSTED: retirement '+plan.record_id)
         month = month_at(plan.start_date,step-1)
         end = date(month.year,month.month,monthrange(month.year,month.month)[1])
@@ -82,6 +83,9 @@ def project(plan, scenario, assets, flows, balances):
             'unfunded_charges':unfunded_charges,'funding_gap':remaining,'cumulative_funding_gap':cumulative_gap,'inflation_index':inflation,
             'asset_balances':dict(current_balances)})
     return {'rows':rows,'summary':{'plan_id':plan.record_id,'scenario':scenario.name,'months':plan.months,
+            'starting_wealth_pkr':sum(balances.values(),ZERO),'retirement_date':plan.retirement_date.isoformat(),
+            'monthly_spending_real':plan.monthly_spending_real,'annual_inflation':scenario.annual_inflation,
+            'ending_accessible_balance':rows[-1]['accessible_balance'],'ending_locked_balance':rows[-1]['locked_balance'],
             'ending_nominal_balance':rows[-1]['nominal_balance'],'ending_real_balance':rows[-1]['real_balance'],
             'first_depletion_date':first_gap,'cumulative_funding_gap':cumulative_gap,
             'status':'FUNDED' if first_gap is None else 'FUNDING_SHORTFALL',
@@ -171,6 +175,8 @@ def _calculate(bundle,state,previous,run_id,input_hash):
                     {'plan':plan,'scenario':scenario,'assets':data.assets,'flows':data.flows,'balances':balances,'as_of':as_of},
                     lambda: project(plan,scenario,assets,data.flows,balances))
             except BudgetExceeded:
+                ctx=current()
+                if ctx: ctx.defer('retirement',plan.record_id+'.'+scenario.name)
                 retirement_good=False;gap(plan.ticker,'BUDGET_EXHAUSTED')
                 output['projections'].append({**meta(plan),'scenario':scenario.name,'status':'DEFERRED_BUDGET','ending_nominal_balance':None,'ending_real_balance':None})
                 continue
@@ -209,17 +215,19 @@ def _calculate(bundle,state,previous,run_id,input_hash):
             'status':'CALCULATED' if valid else 'BLOCKED_HISTORY','allocation_status':'COMPARISON_ONLY_NO_POSITION_CHANGE'})
     for left,right in combinations(sorted(histories),2):
         lh,a=histories[left];rh,b=histories[right]
-        common=sorted(a.keys()&b.keys())
-        basis_ok=lh.return_basis==rh.return_basis
-        x=[a[t]/a[s]-ONE for s,t in zip(common,common[1:])]
-        y=[b[t]/b[s]-ONE for s,t in zip(common,common[1:])]
-        result=correlation(x,y,data.min_correlation_observations) if basis_ok else None
-        if not basis_ok or len(x)<data.min_correlation_observations:
+        try:
+            result=cached('cross-asset', left+'.'+right,
+                {'left':lh,'right':rh,'minimum':data.min_correlation_observations},
+                lambda: compare_histories(lh,a,rh,b,data.min_correlation_observations))
+        except BudgetExceeded:
             cross_good=False
-        output['correlations'].append({**meta(lh),'left':left,'right':right,'correlation':result,'observations':len(x),
-            'return_basis':lh.return_basis if basis_ok else 'INCOMPATIBLE_BASES',
-            'source_ids':sorted(set(lh.source_ids+rh.source_ids+([lh.fx_source_id] if lh.fx_source_id else [])+([rh.fx_source_id] if rh.fx_source_id else []))),
-            'status':'CALCULATED' if result is not None else 'UNDEFINED_ZERO_VARIANCE' if basis_ok and len(x)>=data.min_correlation_observations else 'INSUFFICIENT_HISTORY_OR_BASIS_MISMATCH'})
+            gap(left+' / '+right,'BUDGET_EXHAUSTED')
+            result={'correlation':None,'observations':None,'status':'DEFERRED_BUDGET',
+                    'common_start':None,'common_end':None,'left_common_return':None,'right_common_return':None}
+        if result['status'] not in {'CALCULATED','UNDEFINED_ZERO_VARIANCE'}:
+            cross_good=False
+        output['correlations'].append({**meta(lh),'left':left,'right':right,**result,
+            'source_ids':sorted(set(lh.source_ids+rh.source_ids+([lh.fx_source_id] if lh.fx_source_id else [])+([rh.fx_source_id] if rh.fx_source_id else [])))})
     if not cross_good and data.histories:
         gap(None,'INCOMPLETE_CROSS_ASSET_COMPARISON')
     total=sum(balances.values(),ZERO) if assets_good else None
@@ -231,9 +239,26 @@ def _calculate(bundle,state,previous,run_id,input_hash):
     output=json_values(output)
     for key in SHEETS.values():
         old_rows=previous.get('wealth',{}).get(key,[])
+        identity=lambda r: tuple(r.get(k) for k in ('record_id','scenario','month','left','right'))
+        old_index={identity(r):r for r in old_rows}
         for index,row in enumerate(output[key]):
-            old=next((r for r in old_rows if all(r.get(k)==row.get(k) for k in ('record_id','scenario','month','left','right'))),None)
+            old=old_index.get(identity(row))
             ignored={'run_id','input_hash','upstream_run_ids'}
             if old and {k:v for k,v in old.items() if k not in ignored}=={k:v for k,v in row.items() if k not in ignored}:
                 output[key][index]=old
     state['wealth']=output
+
+
+def compare_histories(lh, left, rh, right, minimum):
+    common=sorted(left.keys() & right.keys())
+    basis_ok=lh.return_basis==rh.return_basis
+    x=[left[t]/left[s]-ONE for s,t in zip(common,common[1:])]
+    y=[right[t]/right[s]-ONE for s,t in zip(common,common[1:])]
+    value=correlation(x,y,minimum) if basis_ok else None
+    return {'correlation':value,'observations':len(x),
+        'return_basis':lh.return_basis if basis_ok else 'INCOMPATIBLE_BASES',
+        'common_start':common[0].isoformat() if common else None,
+        'common_end':common[-1].isoformat() if common else None,
+        'left_common_return':left[common[-1]]/left[common[0]]-ONE if basis_ok and len(common)>=2 else None,
+        'right_common_return':right[common[-1]]/right[common[0]]-ONE if basis_ok and len(common)>=2 else None,
+        'status':'CALCULATED' if value is not None else 'UNDEFINED_ZERO_VARIANCE' if basis_ok and len(x)>=minimum else 'INSUFFICIENT_HISTORY_OR_BASIS_MISMATCH'}

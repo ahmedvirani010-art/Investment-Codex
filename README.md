@@ -1,6 +1,6 @@
 # Investment Workspace
 
-A private, Git-backed investment research workspace. **Version 0.4 implements
+A private, Git-backed investment research workspace. **Version 0.5 implements
 Phases 1–4 with controlled offline imports**, with synthetic fixtures and evidence-gated research imports. It does not contain Ahmed's
 holdings, live PSX prices, validated valuations, or trading instructions.
 
@@ -235,3 +235,14 @@ wealth projections are deterministic and require supplied balances/assumptions.
 Tests cover hand-calculated cash/cost/returns, signed earnings bridges, bank/DCF
 values, coverage gates, revision history, dividend ex-date/split boundaries,
 receipt reconciliation, workbook parity/replay and interrupted publication.
+
+## Phase 4 from ChatGPT
+
+Use the GitHub plugin to submit a typed request and read the resulting reports and
+workbook. See [the operating guide](docs/chatgpt-wealth.md). This requires a verified
+private repository and an explicitly enabled manual wealth policy; request processing
+and scheduled production automation ship disabled.
+
+`wealth-preflight --file …` validates inputs without changing accepted records.
+`benchmark-wealth` measures equivalent-scope synthetic full versus cached runs with
+output parity checks; unknown AI costs stay null.
