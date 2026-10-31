@@ -1,6 +1,6 @@
 """Compatibility normalization: additive absent fields never rewrite old evidence IDs."""
 
-ADDITIONS = {'covered_event_ids', 'approval', 'crosscheck_tolerance', 'contract_years', 'components',
+ADDITIONS = {'quantity_unit', 'revision_kind', 'covered_event_ids', 'approval', 'crosscheck_tolerance', 'contract_years', 'components',
              'parent_net_debt', 'parent_liabilities', 'minority_interests', 'normalized_operating_eps',
              'earnings_multiple', 'surplus_cash_per_share', 'cash_income_excluded', 'operating_forecasts',
              'url', 'published_at', 'accessed_at', 'document_sha256', 'coverage_through', 'owner',

@@ -62,10 +62,12 @@ def reference_value(model, scenario, sector, bundle=None):
     if s.sector_forecasts and s.operating_forecasts:
         raise ValueError('choose one numerical forecast engine per scenario')
     from .sector_engines import forecast
+    from .forecast_contracts import validate_periods
     if len({f.period for f in s.sector_forecasts})!=len(s.sector_forecasts):
         raise ValueError('duplicate sector forecast period would double count cash flows')
     if any(f.engine!=sector for f in s.sector_forecasts):
         raise ValueError('sector forecast engine does not match security sector')
+    validate_periods(model,s.sector_forecasts)
     bridges = [forecast(f,model,bundle) for f in s.sector_forecasts] if s.sector_forecasts else [bridge(f,model,bundle) for f in s.operating_forecasts] if bundle else []
     if s.sector_forecasts and s.shares is None:
         raise ValueError('numerical forecast requires an explicit valuation share count')

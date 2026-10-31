@@ -708,6 +708,22 @@
           "title": "Record Id",
           "type": "string"
         },
+        "revision_kind": {
+          "anyOf": [
+            {
+              "enum": [
+                "RECEIPT_UPDATE",
+                "ENTITLEMENT_BASIS"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revision Kind"
+        },
         "settlement_rule": {
           "anyOf": [
             {

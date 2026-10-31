@@ -61,36 +61,44 @@ def client():
         config=Config(signature_version='s3v4',connect_timeout=5,read_timeout=30,retries={'max_attempts':0}))
 
 
-def _read(s3,bucket,key,limit,check_time):
+def _read(s3,bucket,key,limit,check_time,progress=None):
     response=s3.get_object(Bucket=bucket,Key=key)
     body=response['Body']
+    if progress is not None:
+        progress.update(bytes_read=0,observed_sha256=None,response_size=response.get('ContentLength'))
     try:
         if response.get('ContentLength',0)>limit: raise ValueError('object exceeds configured size limit')
-        out=bytearray()
+        out=bytearray();hasher=hashlib.sha256()
         while True:
             check_time();chunk=body.read(min(65536,limit+1-len(out)))
             if not chunk: break
-            out.extend(chunk)
+            out.extend(chunk);hasher.update(chunk)
+            if progress is not None:
+                progress.update(bytes_read=len(out),observed_sha256=hasher.hexdigest())
             if len(out)>limit: raise ValueError('object exceeds configured size limit')
         return bytes(out)
     finally:
         body.close()
 
 
-def transfer(root,request,*,dry_run=False,s3=None):
+def transfer(root,request,*,dry_run=False,s3=None,progress=None):
     request=StorageRequest.model_validate(request)
     p=policy(root,dry_run=dry_run)
     if request.request_id in {'.','..'}: raise ValueError('invalid request ID')
     if len(request.objects)>p['max_objects'] or len(request.paths)>p['max_objects']: raise ValueError('transfer object count exceeds limit')
-    start=time.monotonic();total=0
+    start=time.monotonic();total=0;active=None
     def deadline():
         if time.monotonic()-start>p['max_seconds']: raise ValueError('transfer deadline exhausted')
     def call(fn):
         for attempt in range(p['attempts']):
             deadline()
+            if active is not None:
+                active["attempts"]+=1
+                if attempt: active["retries"]+=1
             try: return fn()
             except ValueError: raise
             except Exception:
+                if active is not None: active["failures"]=active.get("failures",0)+1
                 if attempt+1==p['attempts']: raise ValueError('R2 operation failed after bounded retries; verify runner access') from None
                 time.sleep(min(2**attempt,4))
     planned=[];payloads={}
@@ -112,50 +120,84 @@ def transfer(root,request,*,dry_run=False,s3=None):
             payloads[key]=data
     if len({o['key'] for o in planned})!=len(planned): raise ValueError('duplicate transfer key')
     if dry_run: return {'status':'DRY_RUN','operation':request.operation,'objects':planned,'mutated':False}
+    if progress is not None: progress['objects']=planned
+    for item in planned: item.update(status='NOT_ATTEMPTED',attempts=0,retries=0,verified=False)
     s3=s3 or client();bucket=os.environ.get('R2_BUCKET')
     if not bucket: raise ValueError('R2_BUCKET missing')
     outputs=[]
     for item in planned:
+        active=item;item['status']='TRANSFERRING'
         deadline();key=item['key']
         if request.operation=='pull':
-            data=call(lambda:_read(s3,bucket,key,min(p['max_object_bytes'],p['max_total_bytes']-total),deadline))
+            data=call(lambda:_read(s3,bucket,key,min(p['max_object_bytes'],p['max_total_bytes']-total),deadline,item))
             sha=digest(data)
+            item.update(size=len(data),observed_sha256=sha,bytes_read=len(data))
             if item['expected_sha256'] and sha!=item['expected_sha256']: raise ValueError('download SHA-256 mismatch')
             total+=len(data)
             artifact_id=sha
             atomic_write(root/'.runtime/r2/artifacts'/artifact_id,data)
+            item.update(status='VERIFIED',verified=True)
             outputs.append({**item,'artifact_id':artifact_id,'sha256':sha,'size':len(data),'pinned':bool(item['expected_sha256'])})
+            item.update(outputs[-1])
         else:
             data=payloads[key];total+=len(data)
             if len(data)>p['max_object_bytes'] or total>p['max_total_bytes']: raise ValueError('upload exceeds configured transfer limits')
             # Content-addressed keys prevent naming collisions. Existing differing bytes are never overwritten.
-            try:
-                s3.head_object(Bucket=bucket,Key=key)
-                exists=True
-            except Exception as exc:
-                code=getattr(exc,'response',{}).get('Error',{}).get('Code')
-                if code not in {'404','NoSuchKey','NotFound'}: raise ValueError('cannot establish archive object existence') from None
-                exists=False
+            def exists_check():
+                try: s3.head_object(Bucket=bucket,Key=key);return True
+                except Exception as exc:
+                    if getattr(exc,'response',{}).get('Error',{}).get('Code') in {'404','NoSuchKey','NotFound'}:return False
+                    raise
+            exists=call(exists_check)
             if not exists: call(lambda:s3.put_object(Bucket=bucket,Key=key,Body=data))
-            check=call(lambda:_read(s3,bucket,key,p['max_object_bytes'],deadline))
+            check=call(lambda:_read(s3,bucket,key,p['max_object_bytes'],deadline,item))
             if digest(check)!=item['sha256']: raise ValueError('archive read-back SHA-256 mismatch')
-            outputs.append(item)
+            item.update(status='VERIFIED',verified=True)
+            outputs.append(item.copy())
     result={'status':'COMPLETE','operation':request.operation,'request_id':request.request_id,'objects':outputs,'bytes':total,
             'run_id':request.run_id,'financial_acceptance':False,'publication_authority':'GIT_RECEIPT'}
     if request.operation=='push':
-        content=dumps({'status':'ARTIFACTS_VERIFIED','run_id':request.run_id,'objects':outputs})
+        archive_objects=[{k:o[k] for k in ('key','sha256','size','path','source_revision')} for o in outputs]
+        content=dumps({'status':'ARTIFACTS_VERIFIED','run_id':request.run_id,'objects':archive_objects})
         key=p['archive_prefix']+request.run_id+'/'+digest(content)+'/manifest.json'
-        try:
-            s3.head_object(Bucket=bucket,Key=key)
-            exists=True
-        except Exception as exc:
-            if getattr(exc,'response',{}).get('Error',{}).get('Code') not in {'404','NoSuchKey','NotFound'}:
-                raise ValueError('cannot establish archive manifest existence') from None
-            exists=False
+        active={'key':key,'sha256':digest(content),'size':len(content),'status':'TRANSFERRING',
+                'attempts':0,'retries':0,'verified':False}
+        if progress is not None:progress['archive_manifest']=active
+        def manifest_exists():
+            try:s3.head_object(Bucket=bucket,Key=key);return True
+            except Exception as exc:
+                if getattr(exc,'response',{}).get('Error',{}).get('Code') in {'404','NoSuchKey','NotFound'}:return False
+                raise
+        exists=call(manifest_exists)
         if not exists: call(lambda:s3.put_object(Bucket=bucket,Key=key,Body=content))
-        if digest(call(lambda:_read(s3,bucket,key,p['max_object_bytes'],deadline)))!=digest(content): raise ValueError('archive manifest verification failed')
-        result['archive_manifest']={'key':key,'sha256':digest(content)}
+        if digest(call(lambda:_read(s3,bucket,key,p['max_object_bytes'],deadline,active)))!=digest(content): raise ValueError('archive manifest verification failed')
+        active.update(status='VERIFIED',verified=True)
+        result['archive_manifest']=active
     return result
+
+
+def transfer_receipt(root,request,*,s3=None):
+    """Attempt a transfer; callers publish its result using their existing journal."""
+    request=StorageRequest.model_validate(request)
+    fingerprint=digest(dumps(request.model_dump(mode='json')))
+    old=read_json(root,'reports/storage/'+request.request_id+'.json')
+    if old:
+        if old.get('request_hash')!=fingerprint:raise ValueError('storage request ID is immutable')
+        return {**old,'idempotent':True}
+    state=read_json(root,'data/canonical/portfolio.json',{})
+    context={'request_id':request.request_id,'operation':request.operation,'request_hash':fingerprint,
+             'source_head':head(root),'source_run_id':request.run_id or state.get('published_run_id'),
+             'financial_acceptance':False,'publication_authority':'GIT_RECEIPT'}
+    progress={'objects':[]}
+    try:result=transfer(root,request,s3=s3,progress=progress)
+    except (ValueError,OSError,ImportError) as exc:
+        for item in [*progress['objects'],progress.get('archive_manifest',{})]:
+            if item.get('status')=='TRANSFERRING':item['status']='FAILED'
+        message='R2 SDK unavailable; install the locked dependencies' if isinstance(exc,ImportError) else str(exc)
+        result={'status':'FAILED','errors':[message],**progress,
+                'bytes':sum(o.get('size',0) or 0 for o in progress['objects'] if o.get('verified')),
+                'run_id':request.run_id}
+    return {**result,**context}
 
 
 def execute(root,request,*,dry_run=False,s3=None):
@@ -167,11 +209,9 @@ def execute(root,request,*,dry_run=False,s3=None):
         fingerprint=digest(dumps(request.model_dump(mode='json')))
         old=read_json(root,relative)
         if old:
-            if old['request_hash']!=fingerprint: raise ValueError('storage request ID is immutable')
+            if old.get('request_hash')!=fingerprint: raise ValueError('storage request ID is immutable')
             return {**old,'idempotent':True}
-        try: result=transfer(root,request,s3=s3)
-        except (ValueError,OSError) as exc: result={'status':'FAILED','errors':[str(exc)],'financial_acceptance':False}
-        result.update(request_hash=fingerprint,request_id=request.request_id,source_head=head(root))
+        result=transfer_receipt(root,request,s3=s3)
         stage=root/'.runtime/storage-staging'/request.request_id
         atomic_write(stage/relative,dumps(result))
         sha=publish(root,stage,[relative],'storage-'+request.request_id,result['status'],commit_marker=relative)

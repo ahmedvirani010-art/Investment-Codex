@@ -1,0 +1,22 @@
+{
+  "schema_version": "1.0",
+  "status": "COMPLETE",
+  "transport": "CLOUDFLARE_PLUGIN",
+  "plugin_id": "plugin_asdk_app_6abc2a9552748191b465859a06e90da3",
+  "bucket": "investmentcodex",
+  "key": "approved/connectivity/2416285e69a7aaec2869f53b2e3b54b5a73327c0d18ac53a0135cf31ed45c705.json",
+  "sha256": "2416285e69a7aaec2869f53b2e3b54b5a73327c0d18ac53a0135cf31ed45c705",
+  "size": 133,
+  "upload_status": 200,
+  "download_status": 200,
+  "object_version": "7e5e6da6466776efae1c89e19bf0d522",
+  "uploaded_at": "2026-10-31T14:25:16.644Z",
+  "synthetic_only": true,
+  "financial_acceptance": false,
+  "scope": "Interactive plugin text-object connectivity only; not Python/GitHub Actions activation or binary-workbook transfer certification.",
+  "sha256_verification": "PASS",
+  "operation": "CONNECTIVITY_CHECK",
+  "managed_public_access_enabled": true,
+  "custom_domains_count": 0,
+  "production_storage_ready": false
+}

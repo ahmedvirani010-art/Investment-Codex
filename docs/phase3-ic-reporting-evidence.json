@@ -1,0 +1,73 @@
+{
+  "excel_bank_bridge": {
+    "pat": {
+      "value": 50,
+      "data_type": "n",
+      "format": "#,##0.00;[Red](#,##0.00)"
+    },
+    "interest_income": {
+      "value": 100,
+      "data_type": "n",
+      "format": "#,##0.00;[Red](#,##0.00)"
+    },
+    "funding_cost": {
+      "value": 30,
+      "data_type": "n",
+      "format": "#,##0.00;[Red](#,##0.00)"
+    },
+    "opening_equity": {
+      "value": 500,
+      "data_type": "n",
+      "format": "#,##0.00;[Red](#,##0.00)"
+    },
+    "closing_equity": {
+      "value": 540,
+      "data_type": "n",
+      "format": "#,##0.00;[Red](#,##0.00)"
+    },
+    "sustainable_roe": {
+      "value": 0.09615384615384616,
+      "data_type": "n",
+      "format": "0.00%"
+    },
+    "dividend_capacity": {
+      "value": 80,
+      "data_type": "n",
+      "format": "#,##0.00;[Red](#,##0.00)"
+    }
+  },
+  "ic_factor_change": {
+    "before_review": "CURRENT",
+    "after_review": "NEEDS_REVIEW",
+    "basis_unchanged": false,
+    "before_factors": [
+      {
+        "name": "CREDIT",
+        "weight_total_sleeve": "0.280347631062517521726941407345107933837959069246",
+        "limit_exceeded": false
+      },
+      {
+        "name": "DOMESTIC_CYCLE",
+        "weight_total_sleeve": "0.138772077375946173254835996635828427249789739277",
+        "limit_exceeded": false
+      },
+      {
+        "name": "OIL",
+        "weight_total_sleeve": "0.154191197084384636949817774039809363610877488085",
+        "limit_exceeded": false
+      }
+    ],
+    "after_factors": [
+      {
+        "name": "DOMESTIC_CYCLE",
+        "weight_total_sleeve": "0.138772077375946173254835996635828427249789739277",
+        "limit_exceeded": false
+      },
+      {
+        "name": "OIL",
+        "weight_total_sleeve": "0.434538828146902158676759181384917297448836557331",
+        "limit_exceeded": false
+      }
+    ]
+  }
+}

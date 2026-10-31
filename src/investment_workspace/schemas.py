@@ -388,6 +388,7 @@ class Dividend(ResearchRecord):
     settlement_rule: Literal["SETTLED_BEFORE_EX"] | None = None
     tax_rate: Fraction | None = None
     receipt_transaction_ids: list[Identifier] = Field(default_factory=list)
+    revision_kind: Literal["RECEIPT_UPDATE", "ENTITLEMENT_BASIS"] | None = None
 
     @model_validator(mode="after")
     def dates(self):
@@ -699,13 +700,16 @@ class FinancialFact(ResearchRecord):
     accounting_basis: Literal['STANDALONE', 'CONSOLIDATED']
     line_item: str = Field(min_length=1)
     amount: Signed
-    units: Literal['PKR', 'USD', 'PKR_PER_SHARE', 'SHARES', 'FRACTION', 'BBL', 'MCF', 'MMBTU', 'TONNES', 'UNITS', 'PKR_PER_UNIT', 'USD_PER_UNIT']
+    units: Literal['PKR', 'USD', 'PKR_PER_SHARE', 'SHARES', 'FRACTION', 'BBL', 'MCF', 'MMBTU', 'TONNES', 'UNITS', 'PKR_PER_UNIT', 'USD_PER_UNIT', 'PKR_PER_USD']
+    quantity_unit: Literal['BBL','MCF','MMBTU','TONNES','UNITS'] | None = None
     locator: str = Field(min_length=1)
 
     @model_validator(mode='after')
     def periods(self):
         if not self.period_start <= self.period_end <= self.effective_date:
             raise ValueError('invalid financial-fact period')
+        if self.quantity_unit is not None and self.units not in {'PKR_PER_UNIT','USD_PER_UNIT'}:
+            raise ValueError('physical price denominator requires a per-unit financial fact')
         return self
 
 

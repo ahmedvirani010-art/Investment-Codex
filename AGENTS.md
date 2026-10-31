@@ -38,3 +38,11 @@
   physical-unit conversion or capital assumptions.
 - Keep the remaining-sector numerical backlog and private-production/data gates
   visible. Source code deployment does not certify real models or activate schedules.
+
+## Selected Cloudflare plugin target
+
+- For interactive Cloudflare/R2 work, read `docs/cloudflare-r2-plugin.md` and
+  `config/storage-target.json`. The selected bucket is `investmentcodex`.
+- Keep plugin connectivity evidence separate from Python/Actions activation.
+  The live text-object probe passed, but managed r2.dev public access was enabled
+  at verification; resolve privacy before private financial uploads.

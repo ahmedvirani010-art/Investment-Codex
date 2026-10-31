@@ -11,7 +11,7 @@ from .schemas import (StrictModel,Identifier,Source,Research,Integration,Wealth,
 from .intake import merge_sources
 from .storage import (git,head,committed,read_json,digest,dumps,atomic_write,publish,writer_lock,rollback_pending,require_clean,PublicationError)
 from .wealth_requests import gate,error_text,execute as legacy_execute
-from .object_storage import StorageRequest,transfer,artifact
+from .object_storage import StorageRequest,transfer_receipt,artifact
 from .readiness import workflow_status
 
 Workflow=Literal['portfolio','valuation','update-dividends','timing','macro','watchlist','ic','retirement','cross-asset','daily','event']
@@ -144,8 +144,8 @@ def execute(root,path,*,local_demo=False,s3=None):
                 else:
                     if request.storage is None or request.storage.request_id!=rid or request.storage.operation!=request.operation.split('.')[1]:
                         raise ValueError('storage request operation/ID mismatch')
-                    result=transfer(root,request.storage,s3=s3)
-                    payloads['reports/storage/'+rid+'.json']=dumps({**result,'request_hash':digest(dumps(request.storage.model_dump(mode='json')))})
+                    result=transfer_receipt(root,request.storage,s3=s3)
+                    payloads['reports/storage/'+rid+'.json']=dumps(result)
                 receipt.update(status=result['status'],transfer=result,modules={})
             else:
                 if request.storage or request.transfer_receipt_id: raise ValueError('calculation cannot contain an unrelated storage operation')
@@ -181,17 +181,23 @@ def execute(root,path,*,local_demo=False,s3=None):
                 if request.archive_paths:
                     if request.operation=='validate': raise ValueError('validate does not upload archives')
                     try:
-                        archive=transfer(work,StorageRequest(request_id=rid,operation='push',run_id=result['run_id'],paths=request.archive_paths),s3=s3)
+                        archive=transfer_receipt(work,StorageRequest(request_id=rid,operation='push',run_id=result['run_id'],paths=request.archive_paths),s3=s3)
                         receipt['archive']=archive;payloads['reports/storage/'+rid+'.json']=dumps(archive)
+                        if archive['status']!='COMPLETE':receipt['status']='PARTIAL'
                     except (ValueError,OSError) as exc:
                         receipt['archive']={'status':'FAILED','errors':[str(exc)]};receipt['status']='PARTIAL'
         except (ValueError,OSError,TypeError,KeyError,PublicationError) as exc:
             payloads={};receipt.update(status='INVALID',errors=[error_text(exc)],accepted_inputs_changed=False)
         finally:
             if temp: temp.cleanup()
+        if 'transfer' in receipt:
+            receipt['transfer_receipt']='reports/storage/'+(request.transfer_receipt_id or rid)+'.json'
+        elif 'archive' in receipt and 'reports/storage/'+rid+'.json' in payloads:
+            receipt['transfer_receipt']='reports/storage/'+rid+'.json'
         payloads[marker]=dumps(receipt)
         payloads['reports/requests/'+rid+'.md']=('# Workspace request '+rid+'\n\nStatus: '+receipt['status']+'\n\n'+
-            '\n'.join('- '+m+': '+s for m,s in receipt.get('modules',{}).items())+'\n\nRead the adjacent JSON receipt for missing inputs, evidence, transfers and output links.\n').encode()
+            '\n'.join('- '+m+': '+s for m,s in receipt.get('modules',{}).items())+
+            ('\n\nTransfer: '+receipt.get('transfer',receipt.get('archive',{})).get('status','UNKNOWN')+'\nReceipt: '+receipt.get('transfer_receipt','See JSON receipt') if 'transfer' in receipt or 'archive' in receipt else '')+'\n\nRead the adjacent JSON receipt for missing inputs, evidence, transfers and output links.\n').encode()
         stage=root/'.runtime/staging'/('workspace-'+uuid4().hex)
         for name,blob in payloads.items(): atomic_write(stage/name,blob)
         commit=publish(root,stage,list(payloads),'workspace-'+rid,receipt['status'],commit_marker=marker)

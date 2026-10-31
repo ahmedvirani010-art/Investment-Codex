@@ -2,6 +2,7 @@
 from decimal import Decimal
 from .runtime import assessment_date
 from .scenarios import value_at
+from .forecast_contracts import binding_dimension
 Z=Decimal(0)
 VERSION='sector-numeric-v1'
 
@@ -20,19 +21,13 @@ def forecast(f,model,bundle):
     if set(f.fact_bindings.values())!=set(f.fact_ids): raise ValueError('forecast fact IDs must be bound to numerical inputs')
     for path,record_id in f.fact_bindings.items():
         fact=facts.get(record_id)
-        if (fact is None or fact.ticker!=model.ticker or fact.accounting_basis!=model.accounting_basis or fact.valid_until<assessment_date(bundle)
+        if (fact is None or fact.ticker!=model.ticker or fact.accounting_basis!=model.accounting_basis or not fact.effective_date<=assessment_date(bundle)<=fact.valid_until
                 or any(s not in sources or sources[s].evidence_label!='CONFIRMED' for s in fact.source_ids)):
             raise ValueError('current confirmed financial facts required for sector forecast')
+        unit, quantity_unit = binding_dimension(f,path)
+        if fact.units != unit or fact.quantity_unit != quantity_unit:
+            raise ValueError('financial fact units/currency/quantity basis differ from forecast binding: '+path)
         if value_at(f,path)!=fact.amount: raise ValueError('forecast input does not reconcile to its financial fact')
-        leaf=path.split('.')[-1]
-        unit='FRACTION' if 'rate' in leaf or leaf.endswith('ratio') else 'SHARES' if leaf=='shares' else None
-        if leaf in {'opening_reserves','reserve_additions','production','inventory_release','sold','volume'}:
-            parent=f.model_dump()
-            for part in path.split('.')[:-1]: parent=parent[int(part)] if isinstance(parent,list) else parent[part]
-            unit=parent.get('unit')
-        if unit and fact.units!=unit: raise ValueError('financial fact units differ from forecast binding')
-        if unit is None and leaf in {'opening_equity','opening_eligible_capital','opening_receivables','capex','fixed_operating_costs'} and fact.units!='PKR':
-            raise ValueError('monetary base fact must be PKR')
     rows={'period':f.period,'shares':f.shares,'source_ids':sorted(set(f.source_ids+[s for i in f.fact_ids for s in facts[i].source_ids])),
           'fact_ids':f.fact_ids,'method':VERSION,'engine':f.engine}
     if f.engine=='Bank':

@@ -1,0 +1,56 @@
+{
+  "status": "FAILED",
+  "errors": [],
+  "transfer_status": {
+    "status": "FAILED",
+    "errors": [
+      "R2 operation failed after bounded retries; verify runner access"
+    ],
+    "objects": [
+      {
+        "key": "approved/missing.json",
+        "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "status": "FAILED",
+        "attempts": 3,
+        "retries": 2,
+        "verified": false,
+        "failures": 3
+      }
+    ],
+    "bytes": 0,
+    "run_id": null,
+    "request_id": "audit.failed-pull",
+    "operation": "pull",
+    "request_hash": "039afa47b92aaca88d9e654856d85a2f42dbed1d3b4111cc02da1c26ed561b40",
+    "source_head": "c53d91d017caa34eab6cb2f9c67a6ff1cc7ee95e",
+    "source_run_id": "20261031T134112138352Z-0755a256",
+    "financial_acceptance": false,
+    "publication_authority": "GIT_RECEIPT"
+  },
+  "durable_storage_receipt": {
+    "bytes": 0,
+    "errors": [
+      "R2 operation failed after bounded retries; verify runner access"
+    ],
+    "financial_acceptance": false,
+    "objects": [
+      {
+        "attempts": 3,
+        "expected_sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+        "failures": 3,
+        "key": "approved/missing.json",
+        "retries": 2,
+        "status": "FAILED",
+        "verified": false
+      }
+    ],
+    "operation": "pull",
+    "publication_authority": "GIT_RECEIPT",
+    "request_hash": "039afa47b92aaca88d9e654856d85a2f42dbed1d3b4111cc02da1c26ed561b40",
+    "request_id": "audit.failed-pull",
+    "run_id": null,
+    "source_head": "c53d91d017caa34eab6cb2f9c67a6ff1cc7ee95e",
+    "source_run_id": "20261031T134112138352Z-0755a256",
+    "status": "FAILED"
+  }
+}

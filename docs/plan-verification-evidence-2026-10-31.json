@@ -1,0 +1,142 @@
+{
+  "audit_date": "2026-10-31",
+  "published_branch": "work",
+  "published_commit": "060d93280fed9222284ce6d9bf22d434af822abb",
+  "local_source_commit": "6f6a3cce3f5819e55d30510db4aaa061f2157464",
+  "verdict": "NOT_FULLY_IMPLEMENTED",
+  "ci": {
+    "run_id": 41186986205,
+    "conclusion": "success",
+    "tests_passed": 255
+  },
+  "repository": {
+    "private": false,
+    "default_branch": "work"
+  },
+  "existing_demo_validation": {
+    "integrity": "PASS",
+    "workbook_parity": "PASS"
+  },
+  "probe_outputs": {
+    "numerical_and_transfer": {
+      "failed_workspace_transfer": {
+        "durable_storage_receipt": null,
+        "errors": [
+          "R2 operation failed after bounded retries; verify runner access"
+        ],
+        "status": "INVALID",
+        "transfer_status": null
+      },
+      "incompatible_price_fact_unit": {
+        "bound_field": "commodities.0.realized_price",
+        "expected": "BLOCKED",
+        "fact_unit": "SHARES",
+        "observed": "ACCEPTED",
+        "valuation": "6.818181818181818181818181818"
+      },
+      "noncontiguous_cashflow_period": {
+        "FY28": {
+          "observed": "ACCEPTED",
+          "valuation": "13.01652892561983471074380165"
+        },
+        "FY37": {
+          "observed": "ACCEPTED",
+          "valuation": "13.01652892561983471074380165"
+        }
+      },
+      "shared_profile_metadata": {
+        "missing": [
+          "model_version",
+          "assumption_ids",
+          "upstream_run_ids"
+        ],
+        "profile_id": "shared.bear.v6"
+      }
+    },
+    "dividend_correction": {
+      "corrected_evidence_gross": "375.0",
+      "corrected_evidence_quantity": "150",
+      "corrected_opening_quantity": "150",
+      "error": null,
+      "original_quantity": "100",
+      "reconciliation": [],
+      "result_status": "PARTIAL",
+      "returned_gross": "250.0",
+      "returned_quantity": "100",
+      "same_old_basis": true
+    },
+    "ic_and_excel": {
+      "excel_bank_bridge": {
+        "closing_equity": {
+          "data_type": "s",
+          "format": "General",
+          "value": "540.00"
+        },
+        "dividend_capacity": {
+          "data_type": "s",
+          "format": "General",
+          "value": "80"
+        },
+        "funding_cost": {
+          "data_type": "s",
+          "format": "General",
+          "value": "30.00"
+        },
+        "interest_income": {
+          "data_type": "s",
+          "format": "General",
+          "value": "100.0"
+        },
+        "opening_equity": {
+          "data_type": "s",
+          "format": "General",
+          "value": "500"
+        },
+        "pat": {
+          "data_type": "n",
+          "format": "#,##0.00;[Red](#,##0.00)",
+          "value": 50
+        },
+        "sustainable_roe": {
+          "data_type": "s",
+          "format": "General",
+          "value": "0.0961538461538461538461538461538461538461538461538"
+        }
+      },
+      "ic_factor_change": {
+        "after_factors": [
+          {
+            "limit_exceeded": false,
+            "name": "DOMESTIC_CYCLE",
+            "weight_total_sleeve": "0.138772077375946173254835996635828427249789739277"
+          },
+          {
+            "limit_exceeded": false,
+            "name": "OIL",
+            "weight_total_sleeve": "0.434538828146902158676759181384917297448836557331"
+          }
+        ],
+        "after_review": "CURRENT",
+        "basis_unchanged": true,
+        "before_factors": [
+          {
+            "limit_exceeded": false,
+            "name": "CREDIT",
+            "weight_total_sleeve": "0.280347631062517521726941407345107933837959069246"
+          },
+          {
+            "limit_exceeded": false,
+            "name": "DOMESTIC_CYCLE",
+            "weight_total_sleeve": "0.138772077375946173254835996635828427249789739277"
+          },
+          {
+            "limit_exceeded": false,
+            "name": "OIL",
+            "weight_total_sleeve": "0.154191197084384636949817774039809363610877488085"
+          }
+        ],
+        "before_review": "CURRENT"
+      }
+    }
+  }
+}

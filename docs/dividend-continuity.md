@@ -27,3 +27,23 @@ are not rewritten. Date-only Excel fields use native dates; timezone-bearing
 source timestamps stay ISO text. Formatting distinguishes rates, ranks, correlations,
 confidence and compound blocked/stale states. Both old and new workbook formats
 are checked against their canonical values.
+
+## Phase 1 correction handling
+
+Superseding records now compare the opening snapshot and quantity-affecting settled
+transactions before carrying an old basis. A verified correction with available
+historical evidence creates a new immutable basis; the old basis and frozen
+snapshots remain in history. Unchanged evidence retains its original basis ID.
+
+Use `revision_kind: "ENTITLEMENT_BASIS"` when correcting the historical entitlement
+basis, including corrections with unchanged ex-date/DPS whose evidence is not yet
+available. Such a correction remains `CORRECTION_PENDING` with
+`previous_verified_result` until it can be verified and recalculated. Repeating the
+request or superseding another pending correction retains that verified proof.
+
+Use `revision_kind: "RECEIPT_UPDATE"` for a receipt-only update. It may carry the
+verified basis beyond the ledger window and current review expiry; contradictory
+changes to entitlement terms or available historical evidence are rejected. The
+field is optional for legacy records. Without it, changed provable evidence is
+recalculated and ordinary same-term receipt updates remain compatible. A basis
+correction outside the historical window must explicitly identify its intent.

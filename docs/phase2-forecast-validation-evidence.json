@@ -1,0 +1,16 @@
+{
+  "incompatible_price_fact_unit": {
+    "observed": "BLOCKED",
+    "error": "financial fact units/currency/quantity basis differ from forecast binding: commodities.0.realized_price"
+  },
+  "noncontiguous_cashflow_period": {
+    "FY28": {
+      "observed": "ACCEPTED",
+      "valuation": "13.01652892561983471074380165"
+    },
+    "FY37": {
+      "observed": "BLOCKED",
+      "error": "annual forecast periods must be ordered and contiguous on one year basis"
+    }
+  }
+}

@@ -1362,6 +1362,22 @@
           "title": "Record Id",
           "type": "string"
         },
+        "revision_kind": {
+          "anyOf": [
+            {
+              "enum": [
+                "RECEIPT_UPDATE",
+                "ENTITLEMENT_BASIS"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revision Kind"
+        },
         "settlement_rule": {
           "anyOf": [
             {
@@ -2077,6 +2093,25 @@
           "title": "Period Start",
           "type": "string"
         },
+        "quantity_unit": {
+          "anyOf": [
+            {
+              "enum": [
+                "BBL",
+                "MCF",
+                "MMBTU",
+                "TONNES",
+                "UNITS"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Quantity Unit"
+        },
         "record_id": {
           "maxLength": 100,
           "pattern": "^[A-Za-z0-9_.-]+$",
@@ -2126,7 +2161,8 @@
             "TONNES",
             "UNITS",
             "PKR_PER_UNIT",
-            "USD_PER_UNIT"
+            "USD_PER_UNIT",
+            "PKR_PER_USD"
           ],
           "title": "Units",
           "type": "string"

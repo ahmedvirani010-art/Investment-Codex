@@ -100,3 +100,14 @@ transactions or approve quantities. Corrections use superseding decisions.
 
 No order execution is implemented. IC_Decisions shows approval, review and
 fulfilment independently from IC_Actions' proposed recommendation.
+
+Phase 2 adds complete driver dimension checks and a contiguous annual forecast-grid
+contract. See [forecast validation](phase2-forecast-validation.md) for canonical units,
+physical price denominators, explicit FX, supported year labels and NTM restrictions.
+These checks tighten certification without rewriting historical source records.
+
+Phase 3 versions the IC reviewed basis to include numerical portfolio risk,
+correlations, source/record versions and sizing inputs. Historical review hashes
+remain preserved and require a fresh explicit review under the new contract.
+See [IC review and reporting](phase3-ic-review-reporting.md) for dependency
+invalidation, Excel type/format validation and historical workbook compatibility.

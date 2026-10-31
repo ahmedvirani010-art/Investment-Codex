@@ -1,0 +1,14 @@
+{
+  "schema_version": "1.0",
+  "bucket": "investmentcodex",
+  "preferred_interactive_transport": "CLOUDFLARE_PLUGIN",
+  "plugin_id": "plugin_asdk_app_6abc2a9552748191b465859a06e90da3",
+  "read_prefixes": [
+    "sources/",
+    "approved/"
+  ],
+  "archive_prefix": "archives/",
+  "connectivity_evidence": "reports/storage/cloudflare-plugin-connectivity-2026-10-31.json",
+  "purpose": "Saved operator selection. This file does not activate the Python runner or transfer processing.",
+  "account_id": "66c46ff40e612cb68793bb720bc56bad"
+}

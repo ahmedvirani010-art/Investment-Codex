@@ -2,8 +2,11 @@
 
 The GitHub plugin writes structured requests; GitHub Actions runs the existing
 Python calculators and publishes a JSON/Markdown receipt and workbook links.
-There is no new Cloudflare plugin or LLM API. Both application and R2 processing
-ship disabled. Existing wealth requests and CLI commands remain supported.
+The installed Cloudflare plugin supports interactive R2 operations; see
+[the selected bucket and connectivity evidence](cloudflare-r2-plugin.md). The
+Python/Actions request executor continues to use its separately configured boto3
+adapter. Application and R2 processing ship disabled. Existing wealth requests
+and CLI commands remain supported.
 
 ## Setup
 
@@ -152,3 +155,19 @@ under `reports/smoke/`. It cannot accept arbitrary packages, import financial da
 change canonical inputs or use R2 credentials. The private production guards remain
 in force. This verifies plugin → Actions → receipt routing; private activation and
 real R2 connectivity still require their own checks.
+
+## Failed transfers and retry receipts (Phase 4)
+
+An operational storage failure returns FAILED with an independent transfer outcome
+and a durable reports/storage/<request_id>.json record. storage.status can inspect
+it. Completed objects, partial read observations and manifest verification state are
+retained where available. Failed/partial pulls cannot supply importable artifacts.
+A calculation's optional archive failure writes the same kind of transfer receipt;
+valid calculation/import results remain published with independent module statuses.
+
+Rerunning an existing ID returns its original receipt. Use a new ID to retry a failed
+transfer, and for an accepted analytical run reference the existing result_run_id and
+manifest paths. Do not repeat an accepted financial import to retry its archive.
+See [transfer recovery](phase4-transfer-recovery.md) for progress fields and recovery
+checks. Missing SDK/configuration is a recorded transfer failure; it does not certify
+live connectivity or enable disabled processing.

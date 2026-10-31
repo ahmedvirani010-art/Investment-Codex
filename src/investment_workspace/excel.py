@@ -25,11 +25,23 @@ NUMERIC_COLUMNS.update({"starting_wealth_pkr","monthly_spending_real","annual_in
                         "ending_accessible_balance","ending_locked_balance","left_common_return","right_common_return"})
 
 
+# Added bridge outputs use semantic formats; historical workbooks remain readable.
+BRIDGE_MONEY_COLUMNS={'interest_income','funding_cost','opening_equity','closing_equity','oci',
+    'dividend_capacity','book_value_per_share','receivable_increase','closing_receivables',
+    'working_capital_increase','depreciation'}
+BRIDGE_FRACTION_COLUMNS={'sustainable_roe'}
+BRIDGE_NUMERIC_COLUMNS=BRIDGE_MONEY_COLUMNS | BRIDGE_FRACTION_COLUMNS
+NUMERIC_COLUMNS.update(BRIDGE_NUMERIC_COLUMNS)
+MONEY_FORMAT='#,##0.00;[Red](#,##0.00)'
+FRACTION_FORMAT='0.00%'
+WORKBOOK_FORMAT_VERSION='investment-workspace-excel-v3'
+
+
 DATE_COLUMNS={'effective_date','valid_until','price_date','market_cutoff','evaluation_as_of','ex_date','record_date','payment_date',
  'announcement_date','benchmark_date','share_basis_date','period_start','period_end','window_start','window_end','month_end',
  'planning_date','start_date','retirement_date','available_from','coverage_through','history_start','history_end','common_start','common_end',
  'expires_at','entry_date','exit_date','universe_date','latest_completed_session','next_review','starts','ends','first_depletion_date'}
-FRACTION_COLUMNS={'annual_inflation','left_common_return','right_common_return','holding_period_return'}
+FRACTION_COLUMNS={'annual_inflation','left_common_return','right_common_return','holding_period_return'} | BRIDGE_FRACTION_COLUMNS
 
 
 def date_column(column):
@@ -80,9 +92,9 @@ def add_sheet(wb, name, rows, columns=None):
         for row in ws.iter_rows(min_row=2, min_col=index, max_col=index):
             cell = row[0]
             if col in ({"unrealized_return_on_cost", "equity_weight", "total_sleeve_weight", "gross_return", "net_return", "annualized_return", "margin_of_safety", "hurdle", "price_return", "benchmark_return", "relative_performance", "rs_momentum", "sma_slope", "extension", "weight_total_sleeve", "max_weight", "price_breadth", "rs_breadth", "income_return", "total_return"} | FRACTION_COLUMNS) and isinstance(cell.value, (int, float)):
-                cell.number_format = "0.00%"
+                cell.number_format = FRACTION_FORMAT
             elif col in NUMERIC_COLUMNS and isinstance(cell.value, (int, float)):
-                cell.number_format = '#,##0.00;[Red](#,##0.00)'
+                cell.number_format = MONEY_FORMAT
             if date_column(col) and isinstance(cell.value,datetime): cell.number_format='yyyy-mm-dd'
             if col in {'amount','value'} and rows[cell.row-2].get('units',rows[cell.row-2].get('unit'))=='FRACTION' and isinstance(cell.value,(int,float)):
                 cell.number_format='0.00%'
@@ -106,6 +118,7 @@ def add_sheet(wb, name, rows, columns=None):
 
 def export_workbook(path: Path, snapshot: dict):
     wb = Workbook()
+    wb.properties.version=WORKBOOK_FORMAT_VERSION
     wb.remove(wb.active)
     dashboard = [{"metric": "workspace", "value": "SYNTHETIC DEMO — NOT AHMED'S HOLDINGS" if snapshot["summary"].get("mode") == "DEMO" else "USER IMPORT — CHECK GATES"}]
     dashboard += [{"metric": "attempt_status", "value": snapshot["attempt_status"]}, {"metric": "publication_status", "value": "LOCAL_ONLY"}, {"metric": "published_run_id", "value": snapshot["published_run_id"]}, {"metric": "analysis_run_id", "value": snapshot.get("analysis_run_id")}, {"metric": "valuation_status", "value": snapshot.get("research", {}).get("summary", {}).get("valuation_status", "BLOCKED_MODEL — no research imported")}]
@@ -166,7 +179,7 @@ def validate_workbook(path: Path, snapshot: dict):
         for actual, expected in zip(actual_rows[1:], expected_rows):
             for left, right in zip(actual, expected):
                 if isinstance(right, float):
-                    if not isinstance(left, (float, int)) or abs(left - right) > max(1e-8, abs(right) * 1e-12):
+                    if not isinstance(left, (float, int)) or not math.isfinite(left) or abs(left - right) > max(1e-8, abs(right) * 1e-12):
                         raise ValueError("workbook numeric parity failed")
                 elif comparable(left) != comparable(right):
                     raise ValueError("workbook record parity failed")
@@ -218,12 +231,28 @@ def validate_workbook(path: Path, snapshot: dict):
                 raise ValueError(f"workbook row count differs from canonical records: {name}")
             for actual, record in zip(values[1:], records):
                 expected = [cell_value(record.get(key), key) for key in headers]
-                for left, right in zip(actual, expected):
+                for key, left, right in zip(headers, actual, expected):
                     if isinstance(right, float):
-                        if not isinstance(left, (float, int)) or abs(left - right) > max(1e-8, abs(right) * 1e-12):
+                        if (wb.properties.version != WORKBOOK_FORMAT_VERSION and key in BRIDGE_NUMERIC_COLUMNS
+                                and isinstance(left,str)):
+                            try:
+                                converted=float(Decimal(left))
+                                if math.isfinite(converted): left=converted
+                            except ArithmeticError: pass
+                        if not isinstance(left, (float, int)) or not math.isfinite(left) or abs(left - right) > max(1e-8, abs(right) * 1e-12):
                             raise ValueError(f"workbook numeric parity failed: {name}")
                     elif comparable(left) != comparable(right):
                         raise ValueError(f"workbook record parity failed: {name}")
+        if wb.properties.version == WORKBOOK_FORMAT_VERSION:
+            for name,records in tables.items():
+                headers=[c.value for c in wb[name][1]]
+                for index,record in enumerate(records,2):
+                    for key in BRIDGE_NUMERIC_COLUMNS & set(headers):
+                        cell=wb[name].cell(index,headers.index(key)+1)
+                        if isinstance(cell_value(record.get(key),key),float):
+                            expected_format=FRACTION_FORMAT if key in BRIDGE_FRACTION_COLUMNS else MONEY_FORMAT
+                            if cell.data_type!='n' or cell.number_format!=expected_format:
+                                raise ValueError('workbook bridge type/format mismatch: '+name+'.'+key)
         for key, value in snapshot["summary"].items():
             if dashboard.get(key) != cell_value(value):
                 raise ValueError(f"workbook summary parity failed: {key}")
