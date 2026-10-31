@@ -1,7 +1,7 @@
 # Investment Workspace
 
-A private, Git-backed investment research workspace. **Version 0.1 implements
-Phase 1 only**, with synthetic offline fixtures. It does not contain Ahmed's
+A private, Git-backed investment research workspace. **Version 0.2 implements
+Phases 1–2 offline**, with synthetic fixtures and evidence-gated research imports. It does not contain Ahmed's
 holdings, live PSX prices, validated valuations, or trading instructions.
 
 ## Quick start
@@ -27,8 +27,8 @@ The main review artifact is
 Dashboard cells are computed in Python and readable without Excel recalculation.
 Unknown values display as `UNKNOWN`, never zero. The workbook contains holdings,
 transactions, cash, reconciliation, sources, assumptions, coverage, gaps, notes,
-run/change logs, and unknown usage telemetry. Later-phase tabs explicitly say
-`NOT_IMPLEMENTED`. `SUCCESS` means the **Phase 1 portfolio calculation** ran, not
+run/change logs, and unknown usage telemetry. Phase 3–4 tabs explicitly say
+`NOT_IMPLEMENTED`; Phase 2 tabs populate from accepted research. `SUCCESS` means the **Phase 1 portfolio calculation** ran, not
 that a valuation screen is complete or live investment decisions are ready.
 
 ## Import your own data
@@ -73,7 +73,7 @@ this baseline intentionally refuses silent rewrites.
 
 An unreconciled quantity/cost/cash, stale input, missing price, or unverified
 source appears as a gap. Missing aggregate market values remain unknown.
-Sizing remains blocked throughout Phase 1; risk limits are never invented.
+Sizing remains blocked through Phase 2; risk limits are never invented.
 Calendar-day freshness limits are operational input policy, not a verified PSX
 session calendar. No market session is inferred from today's weekday.
 
@@ -147,16 +147,48 @@ force-pushes. Failed pushes retain the local revision and an external retry log;
 they do not recalculate or repeat ingestion. On divergence, fetch and inspect
 the current canonical state before regenerating; do not merge binary workbooks.
 
+## Phase 2 research
+
+[Phase 2 guide](docs/phase2.md) documents the JSON evidence packet, reference
+model equations, evidence gates, dividend rules, migration limits and fixtures.
+
+```bash
+uv run --locked python -m investment_workspace import-research --file inputs/private/research.json
+uv run --locked python -m investment_workspace run valuation --offline --scope required --require-full-coverage
+uv run --locked python -m investment_workspace update-dividends
+```
+
+For an isolated synthetic demonstration (never overwrite real accepted data):
+
+```bash
+mkdir -p /tmp/investment-phase2-demo
+uv run --locked python -m investment_workspace --root /tmp/investment-phase2-demo init --offline --phase2
+uv run --locked python -m investment_workspace --root /tmp/investment-phase2-demo validate --run latest
+```
+
+Earnings_Bridge, Valuation, Entry_Levels, Dividend_Calendar and Top_10 are computed
+and checked against canonical records. Bank justified P/B and E&P/industrial
+FCFE DCF reference adapters use explicit sourced inputs. Reported, normalized
+and forward EPS stay separate. Gross/net horizon returns, MOS and entry ceilings
+remain separate. Tax unknowns remain null. Dividend entitlement uses verified
+dates/rules and the historical settled ledger; linked receipts are never added
+to cash twice. Model revisions require new IDs and explicit supersession.
+
+The Phase 2 fixture deliberately produces PARTIAL: three eligible synthetic
+models and one unsupported sector. Real legacy inputs and model equations were
+not supplied, so no actual PSX valuation has been migrated or certified.
+A complete coverage ledger with blocked names is never a COMPLETE screen.
+A strict valuation command exits 1 while coverage is incomplete, after publishing
+the coverage and gaps. Screening does not enable sizing or watchlist readiness.
+
 ## Remaining implementation
 
-[Migration inventory and blockers](docs/migration.md) lists missing source
-workbooks, evidence contracts, model inputs, holdings, feeds, tax/risk settings,
-and scheduler details. The supplied [PRD](docs/PRD.md) describes later phases;
-these are not implemented by placeholder worksheets. No valid model inputs were
-available to migrate Phase 2, so every demo valuation is `BLOCKED_MODEL`; no
-fair values, entry levels, Top 10 rankings, or COMPLETE screen are fabricated.
+[Migration inventory and blockers](docs/migration.md) lists the missing source
+workbooks, original evidence contract, model feeds, holdings, prices, tax/risk
+settings and scheduler details. Remaining sectors need validated adapters;
+legacy models need exact column maps and reproducible historical outputs.
+Phase 3 integrated workflows and Phase 4 wealth planning remain unimplemented.
 
-Tests cover hand-calculated cash/cost/returns, splits, duplicate/conflicting
-imports, stale/missing data, lineage, failed runs, note import, reproducibility,
-concurrent writers, workbook/commit failures, and push failures. CI runs the
-same locked offline suite.
+Tests cover hand-calculated cash/cost/returns, signed earnings bridges, bank/DCF
+values, coverage gates, revision history, dividend ex-date/split boundaries,
+receipt reconciliation, workbook parity/replay and interrupted publication.

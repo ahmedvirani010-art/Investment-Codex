@@ -56,3 +56,14 @@ Evidence blobs and historical run snapshots are append-only through the CLI.
 Git is the history mechanism; direct manual changes require explicit review.
 The inherited PSX evidence contract was unavailable. This document defines the
 implemented baseline and does **not** claim to replace or reproduce that source.
+
+## Phase 2 research contract
+
+Portfolio bundles accept optional `research` under the strict
+[research schema](research-schema.json). The [Phase 2 guide](phase2.md) specifies
+earnings normalization, explicit sector reference equations, forecast/scenario
+bases, signed returns, coverage/universe expiry, immutable supersessions and
+verified dividend entitlement. Unknown tax, entitlement and net-return fields
+remain null. Sources, record IDs and history are published with the portfolio
+and workbook as one revision. See the synthetic `phase2-demo.json` fixture for
+an end-to-end example; it is never a source of real holdings or PSX valuations.

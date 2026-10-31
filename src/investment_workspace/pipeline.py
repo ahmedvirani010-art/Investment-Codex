@@ -14,6 +14,7 @@ from . import __version__
 from .excel import export_workbook, read_notes, validate_workbook
 from .portfolio import calculate
 from .schemas import Bundle, NoteOverride, Transaction
+from .research import COLLECTIONS, calculate_research
 from pydantic import ValidationError
 from .storage import (LockBusy, PublicationError, atomic_write, committed, digest, dumps,
                       git, head, prepare_repository, publish, read_json, require_clean,
@@ -36,8 +37,9 @@ def code_hash():
     return digest(b"".join(p.name.encode() + p.read_bytes() for p in sorted(root.glob("*.py"))))
 
 
-def fixture_bytes():
-    return files("investment_workspace").joinpath("fixtures/demo.json").read_bytes()
+def fixture_bytes(phase2=False):
+    name = "phase2-demo.json" if phase2 else "demo.json"
+    return files("investment_workspace").joinpath("fixtures/" + name).read_bytes()
 
 
 def empty_state():
@@ -66,7 +68,7 @@ def recover_abandoned_staging(root):
 
 def same_analytics(left, right):
     # Exclude lineage from change detection; original dates/IDs survive no-change runs.
-    keys = ("holdings", "transactions", "summary", "reconciliation", "data_gaps", "coverage", "notes")
+    keys = ("holdings", "transactions", "summary", "reconciliation", "data_gaps", "coverage", "notes", "research")
     def clean(value):
         if isinstance(value, dict):
             return {k: clean(v) for k, v in value.items() if k not in {"run_id", "upstream_run_ids", "code_version", "input_hash", "confidence", "validation_status", "owner", "schema_version", "effective_date", "record_id", "market_cutoff_metadata", "import_source_id", "units", "assumption_ids", "source_ids"}}
@@ -165,13 +167,31 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
             payload = source.model_dump(mode="json")
             # Bind source IDs to the actual referenced facts, not merely their title.
             facts = {"source": payload, "snapshots": [s.model_dump(mode="json") for s in (bundle.opening, bundle.closing) if s.source_id == source.source_id], "prices": sorted([p.model_dump(mode="json") for p in bundle.prices if p.source_id == source.source_id], key=lambda p: p["ticker"]), "transactions": sorted({t.transaction_id: t.model_dump(mode="json") for t in bundle.transactions if t.source_id == source.source_id}.values(), key=lambda t: t["transaction_id"])}
+            research_facts = [r.model_dump(mode="json") for group in COLLECTIONS
+                              for r in getattr(bundle.research, group) if source.source_id in r.source_ids
+                              or any(a.source_id == source.source_id for a in getattr(r, "adjustments", []))] if bundle.research else []
+            prior_research = [r["payload"] for r in previous.get("research", {}).get("history", [])
+                              if source.source_id in r["payload"]["source_ids"] or
+                              any(a["source_id"] == source.source_id for a in r["payload"].get("adjustments", []))]
+            if research_facts or prior_research:
+                retained = {r["record_id"]: r for r in prior_research}
+                for record in research_facts:
+                    if record["record_id"] in retained and retained[record["record_id"]] != record:
+                        raise ValueError("research record ID is immutable")
+                    retained[record["record_id"]] = record
+                facts["research"] = sorted(retained.values(), key=lambda r: r["record_id"])
+            if bundle.research and source.source_id in bundle.research.universe_source_ids:
+                facts["universe"] = {k: v for k, v in bundle.research.model_dump(mode="json").items() if k not in COLLECTIONS}
+            elif source.source_id in all_sources and all_sources[source.source_id].get("bound_universe"):
+                facts["universe"] = all_sources[source.source_id]["bound_universe"]
             fact_hash = digest(dumps(facts))
             if source.source_id in all_sources:
                 old = {k: all_sources[source.source_id].get(k) for k in payload}
-                if old != payload or all_sources[source.source_id].get("fact_hash") != fact_hash:
+                has_facts = any(facts.get(k) for k in ("snapshots", "prices", "transactions", "research", "universe"))
+                if old != payload or (has_facts and all_sources[source.source_id].get("fact_hash") != fact_hash):
                     raise ValueError("source ID is immutable; revised evidence needs a new ID")
             if source.source_id not in all_sources:
-                all_sources[source.source_id] = {**payload, "fact_hash": fact_hash, "content_hash": input_hash, "content_path": source_path}
+                all_sources[source.source_id] = {**payload, "fact_hash": fact_hash, "content_hash": input_hash, "content_path": source_path, "bound_universe": facts.get("universe")}
         all_sources[source_id] = {"source_id": source_id, "title": "Immutable imported bundle", "publisher": "user" if bundle.mode == "USER_IMPORT" else "offline fixture", "effective_date": bundle.market_cutoff.isoformat(), "locator": source_path, "evidence_label": "UNVERIFIED" if bundle.mode == "USER_IMPORT" else "ASSUMPTION", "content_hash": input_hash, "content_path": source_path}
         override_id = "manual." + digest(override_bytes) if override_bytes is not None else source_id
         if override_bytes is not None:
@@ -182,6 +202,7 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
         policy_id = "policy." + digest(dumps(bundle.policy.model_dump(mode="json")))
         if not any(a["assumption_id"] == policy_id for a in state["assumptions"]):
             state["assumptions"].append({"assumption_id": policy_id, "owner": "validation", "scope": "input freshness and reconciliation tolerances; no investment recommendation", "effective_date": bundle.market_cutoff.isoformat(), "value": bundle.policy.model_dump(mode="json"), "source_ids": [source_id], "run_id": run_id, "evidence_label": "ASSUMPTION"})
+        calculate_research(bundle, state, previous, run_id, input_hash)
         unchanged = same_analytics(previous, state)
         if unchanged:
             registry = state["sources"]
@@ -216,6 +237,10 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
         state["data_gaps"] = [g for g in state["data_gaps"] if g.get("field") != "run_attempt"]
         state["data_gaps"].append({"ticker": None, "field": "run_attempt", "reason": "FAILED_INPUT_VALIDATION", "detail": error, "owner": "validation", "next_action": "Correct the import; last-good analytical values retained"})
         state["summary"]["sizing_status"] = "BLOCKED"
+    if not error and state.get("research") and status != "NO_MATERIAL_CHANGE":
+        status = "COMPLETE" if state["research"]["summary"]["valuation_status"] == "COMPLETE" and status != "PARTIAL" else "PARTIAL"
+    if not error and not state.get("research") and workflow in {"valuation", "update-dividends"}:
+        status = "PARTIAL"
     status = "FAILED" if error else status
     pending = queued_failures(root)
     logs = deepcopy(previous["run_log"])
@@ -237,6 +262,12 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
                     state["changes"].append({"run_id": run_id, "ticker": h["ticker"], "field": field, "previous": old, "new": h[field], "source_ids": h["source_ids"]})
         for ticker in sorted(set(before) - {h["ticker"] for h in state["holdings"]}):
             state["changes"].append({"run_id": run_id, "ticker": ticker, "field": "position", "previous": before[ticker], "new": None})
+        for collection in ("earnings", "valuations", "entries", "dividends"):
+            old_rows = previous.get("research", {}).get(collection, [])
+            new_rows = state.get("research", {}).get(collection, [])
+            if old_rows != new_rows:
+                state["changes"].append({"run_id": run_id, "ticker": None, "field": collection,
+                                          "previous": old_rows, "new": new_rows})
         old_notes = {n["override_id"] for n in previous["notes"]}
         for note in state["notes"]:
             if note["override_id"] not in old_notes:
@@ -244,6 +275,9 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
     state["usage"] = deepcopy(previous["usage"]) + [{"run_id": run_id, "runtime_seconds": None, "calculation_runtime_seconds": round(time.monotonic() - began, 6), "input_tokens": None, "cached_input_tokens": None, "output_tokens": None, "reasoning_tokens": None, "cost": None, "telemetry": "AI telemetry unknown; total wall time recorded externally after commit"}]
     prefix = f"runs/{run_id}"
     payloads = {STATE: dumps(state), f"{prefix}/snapshot.json": dumps(state), f"{prefix}/input.json": input_bytes, f"{prefix}/coverage.json": dumps(state["coverage"]), f"{prefix}/validation.json": dumps({"status": status, "error": error, "sizing_status": state["summary"]["sizing_status"], "workbook_parity": "PASS"}), f"{prefix}/changes.json": dumps([c for c in state["changes"] if c["run_id"] == run_id]), f"{prefix}/usage.json": dumps(state["usage"][-1]), "data/evidence/sources.json": dumps(state["sources"]), "reports/latest/summary.json": dumps({"run_id": run_id, "status": status, "summary": state["summary"], "gaps": state["data_gaps"]})}
+    if state.get("research"):
+        payloads["data/canonical/research.json"] = dumps(state["research"])
+        payloads["reports/latest/valuation.json"] = dumps(state["research"]["summary"])
     # Once content-addressed evidence exists, never rewrite it.
     if committed(root, source_path) is None:
         payloads[source_path] = input_bytes
@@ -264,7 +298,7 @@ def _run_locked(root, run_id, input_bytes, overrides, override_bytes, workflow, 
     paths = sorted([*payloads, WORKBOOK])
     hashes = {path: digest((stage / path).read_bytes()) for path in paths}
     lockfile = committed(root, "uv.lock")
-    manifest = {**entry, "schema_version": "1.0", "base_commit": head(root), "code_version": __version__, "code_hash": code_hash(), "dependency_lock_hash": digest(lockfile) if lockfile else None, "python_version": sys.version.split()[0], "dependencies": {name: version(name) for name in ("pydantic", "openpyxl")}, "policy_hash": digest(dumps(bundle.policy.model_dump(mode="json"))) if bundle else None, "offline": True, "scope": "Phase 1 portfolio only; valuation blocked", "output_hashes": hashes}
+    manifest = {**entry, "schema_version": "1.0", "base_commit": head(root), "code_version": __version__, "code_hash": code_hash(), "dependency_lock_hash": digest(lockfile) if lockfile else None, "python_version": sys.version.split()[0], "dependencies": {name: version(name) for name in ("pydantic", "openpyxl")}, "policy_hash": digest(dumps(bundle.policy.model_dump(mode="json"))) if bundle else None, "offline": True, "scope": "Phase 2 research and portfolio" if state.get("research") else "Phase 1 portfolio; valuation blocked", "output_hashes": hashes}
     manifest_path = f"{prefix}/manifest.json"
     atomic_write(stage / manifest_path, dumps(manifest))
     paths.append(manifest_path)
@@ -375,3 +409,22 @@ def push(root: Path, remote="origin", branch="main"):
         if status != "PUSHED":
             raise PublicationError("push failed or remote verification failed; local commit retained. Fetch and inspect current canonical data before rerunning; never force-push or merge XLSX")
         return log
+
+
+def import_research(root: Path, raw: bytes):
+    """Import sources and research into the accepted portfolio; publish failures normally."""
+    try:
+        packet = json.loads(raw)
+        if set(packet) != {"sources", "research"}:
+            raise ValueError("research packet requires exactly sources and research")
+        bundle = json.loads(current_input(root))
+        sources = {s["source_id"]: s for s in bundle["sources"]}
+        for source in packet["sources"]:
+            if source["source_id"] in sources and sources[source["source_id"]] != source:
+                raise ValueError("source ID is immutable")
+            sources[source["source_id"]] = source
+        bundle["sources"] = list(sources.values())
+        bundle["research"] = packet["research"]
+        return run(root, dumps(bundle), workflow="import-research")
+    except (ValueError, KeyError, TypeError) as exc:
+        return run(root, raw, workflow="import-research", validation_error=str(exc))

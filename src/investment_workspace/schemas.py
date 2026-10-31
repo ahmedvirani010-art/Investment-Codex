@@ -128,6 +128,7 @@ class Bundle(StrictModel):
     transactions: list[Transaction]
     prices: list[Price]
     policy: Policy = Field(default_factory=Policy)
+    research: "Research | None" = None
 
     @model_validator(mode="after")
     def links_and_dates(self):
@@ -181,3 +182,193 @@ class NoteOverride(StrictModel):
         if self.supersedes == self.override_id:
             raise ValueError("override cannot supersede itself")
         return self
+
+
+# Phase 2 imports are explicit evidence packets, never inferred market data.
+Signed = Annotated[Decimal, Field(allow_inf_nan=False, max_digits=24, decimal_places=8)]
+Fraction = Annotated[Decimal, Field(ge=0, lt=1, allow_inf_nan=False)]
+
+
+class ResearchRecord(StrictModel):
+    record_id: Identifier
+    ticker: Identifier
+    effective_date: date
+    valid_until: date
+    source_ids: list[Identifier] = Field(min_length=1)
+    supersedes: Identifier | None = None
+
+    @model_validator(mode="after")
+    def validity(self):
+        if self.valid_until < self.effective_date or self.supersedes == self.record_id:
+            raise ValueError("invalid research validity or supersession")
+        return self
+
+
+class Adjustment(StrictModel):
+    description: str = Field(min_length=1)
+    pretax_amount: Signed
+    tax_effect: Signed
+    rationale: str = Field(min_length=1)
+    recurring_test: Literal["GENUINE_ONE_OFF"]
+    source_id: Identifier
+    locator: str = Field(min_length=1)
+
+
+class Earnings(ResearchRecord):
+    period_start: date
+    period_end: date
+    period_label: str = Field(min_length=1)
+    basis: Literal["STANDALONE", "CONSOLIDATED"]
+    reported_pat: Signed
+    weighted_average_shares: Positive
+    reported_eps: Signed
+    share_basis_date: date
+    adjustments: list[Adjustment] = Field(default_factory=list)
+    quality: Literal["A", "B", "C", "D", "UNASSESSED"] = "UNASSESSED"
+    quality_rationale: str = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def bridge(self):
+        if not self.period_start <= self.period_end <= self.effective_date:
+            raise ValueError("invalid earnings period")
+        if self.share_basis_date > self.effective_date:
+            raise ValueError("future share basis")
+        if abs(self.reported_pat / self.weighted_average_shares - self.reported_eps) > Decimal("0.000001"):
+            raise ValueError("reported PAT / shares does not reconcile to EPS")
+        return self
+
+
+class Scenario(StrictModel):
+    scenario_id: Identifier
+    name: Literal["bear", "base", "bull"]
+    forward_eps: Signed
+    sustainable_dps: NonNegative
+    exit_price: NonNegative
+    horizon_dividends: NonNegative
+    exit_basis: Literal["EX_DISTRIBUTION"]
+    # Import modeled horizon dividends explicitly; never add pending receipts here.
+    dividends_rationale: str = Field(min_length=1)
+    discount_rate: Positive
+    terminal_growth: Signed
+    book_value_per_share: Positive | None = None
+    sustainable_roe: Signed | None = None
+    fcfe: list[Signed] = Field(default_factory=list)
+    shares: Positive | None = None
+    terminal_value: NonNegative | None = None
+    payout_crosscheck: NonNegative | None = None
+    drivers: dict[str, str] = Field(min_length=1)
+
+    @model_validator(mode="after")
+    def rates(self):
+        if self.terminal_growth >= self.discount_rate:
+            raise ValueError("terminal growth must be below discount rate")
+        return self
+
+
+class ValuationModel(ResearchRecord):
+    earnings_id: Identifier
+    method: Literal["BANK_JUSTIFIED_PB", "FCFE_DCF", "UNSUPPORTED"]
+    model_version: str = Field(min_length=1)
+    certification: Literal["PROVISIONAL", "VALIDATED"] = "PROVISIONAL"
+    origin: Literal["NEW_EXPLICIT_MODEL", "LEGACY_RECOVERED"]
+    methodology_rationale: str = Field(min_length=1)
+    legacy_column_map: dict[str, str] = Field(default_factory=dict)
+    historical_outputs: dict[str, NonNegative] = Field(default_factory=dict)
+    reproduction_tolerance: NonNegative = Decimal("0.000001")
+    forward_period: str = Field(min_length=1)
+    forward_basis: Literal["FY", "CY", "NTM"]
+    accounting_basis: Literal["STANDALONE", "CONSOLIDATED"]
+    share_basis_date: date
+    horizon_years: Positive
+    sovereign_benchmark: NonNegative
+    benchmark_date: date
+    equity_risk_premium: NonNegative
+    discount_rate_rationale: str = Field(min_length=1)
+    margin_of_safety: Fraction
+    timing_gate: Literal["PASSED", "BLOCKED", "UNKNOWN"] = "UNKNOWN"
+    risk_gate: Literal["PASSED", "BLOCKED", "UNKNOWN"] = "UNKNOWN"
+    event_checked_through: date | None = None
+    scenarios: list[Scenario]
+    dividend_tax_rate: Fraction | None = None
+    capital_gains_tax_rate: Fraction | None = None
+    entry_cost_rate: Fraction | None = None
+    exit_cost_rate: Fraction | None = None
+    liabilities_per_share: NonNegative | None = None
+
+    @model_validator(mode="after")
+    def scenario_set(self):
+        if sorted(s.name for s in self.scenarios) != ["base", "bear", "bull"]:
+            raise ValueError("exactly one bear/base/bull scenario required")
+        if len({s.scenario_id for s in self.scenarios}) != 3:
+            raise ValueError("scenario IDs must be unique")
+        if self.benchmark_date > self.effective_date or self.share_basis_date > self.effective_date:
+            raise ValueError("future benchmark/share basis")
+        return self
+
+
+class Dividend(ResearchRecord):
+    announcement_date: date
+    dividend_type: Literal["CASH"] = "CASH"
+    dps: NonNegative
+    ex_date: date | None = None
+    record_date: date | None = None
+    book_closure_start: date | None = None
+    book_closure_end: date | None = None
+    payment_date: date | None = None
+    dates_verified: bool = False
+    settlement_rule: Literal["SETTLED_BEFORE_EX"] | None = None
+    tax_rate: Fraction | None = None
+    receipt_transaction_ids: list[Identifier] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def dates(self):
+        if self.announcement_date > self.effective_date:
+            raise ValueError("future announcement")
+        if self.ex_date and self.ex_date < self.announcement_date:
+            raise ValueError("ex date precedes announcement")
+        if self.ex_date and self.record_date and self.record_date < self.ex_date:
+            raise ValueError("record date precedes ex date")
+        if self.book_closure_start and self.book_closure_end and self.book_closure_end < self.book_closure_start:
+            raise ValueError("invalid book closure")
+        if self.ex_date and self.payment_date and self.payment_date < self.ex_date:
+            raise ValueError("payment precedes ex date")
+        return self
+
+
+class LegacyResolution(ResearchRecord):
+    issue: Literal["POL_DPS", "BAHL_EPS", "OGDC_ENTITLEMENT", "INDU_CASH_INCOME", "AKBL_TREASURY_OCI"]
+    rationale: str = Field(min_length=1)
+
+
+class Research(StrictModel):
+    schema_version: Literal["2.0"] = "2.0"
+    universe_date: date
+    universe_valid_until: date
+    universe_source_ids: list[Identifier] = Field(min_length=1)
+    required_tickers: list[Identifier]
+    universe_basis: str = Field(min_length=1)
+    # A supplied list is not automatically a verified KSE-100 membership snapshot.
+    full_universe_verified: bool = False
+    earnings: list[Earnings] = Field(default_factory=list)
+    models: list[ValuationModel] = Field(default_factory=list)
+    dividends: list[Dividend] = Field(default_factory=list)
+    resolutions: list[LegacyResolution] = Field(default_factory=list)
+    exclusions: dict[Identifier, str] = Field(default_factory=dict)
+
+    @model_validator(mode="after")
+    def unique(self):
+        if self.universe_valid_until < self.universe_date:
+            raise ValueError("invalid universe validity window")
+        records = self.earnings + self.models + self.dividends + self.resolutions
+        if len({r.record_id for r in records}) != len(records):
+            raise ValueError("duplicate research record ID")
+        for group in (self.earnings, self.models):
+            if len({r.ticker for r in group}) != len(group):
+                raise ValueError("one active earnings/model per ticker required")
+        if len(set(self.required_tickers)) != len(self.required_tickers):
+            raise ValueError("duplicate required ticker")
+        return self
+
+
+# Resolve the optional forward annotation after all Phase 2 contracts exist.
+Bundle.model_rebuild()

@@ -1,0 +1,965 @@
+{
+  "schema_version": "1.0",
+  "mode": "DEMO",
+  "market_cutoff": "2026-10-09",
+  "sources": [
+    {
+      "source_id": "demo.opening.v1",
+      "title": "SYNTHETIC opening balances",
+      "publisher": "test fixture",
+      "effective_date": "2026-10-08",
+      "locator": "fixtures/demo.json#/opening",
+      "evidence_label": "CONFIRMED"
+    },
+    {
+      "source_id": "demo.ledger.v1",
+      "title": "SYNTHETIC settled ledger",
+      "publisher": "test fixture",
+      "effective_date": "2026-10-09",
+      "locator": "fixtures/demo.json#/transactions",
+      "evidence_label": "CONFIRMED"
+    },
+    {
+      "source_id": "demo.closing.v1",
+      "title": "SYNTHETIC closing balances",
+      "publisher": "test fixture",
+      "effective_date": "2026-10-09",
+      "locator": "fixtures/demo.json#/closing",
+      "evidence_label": "CONFIRMED"
+    },
+    {
+      "source_id": "demo.prices.v1",
+      "title": "SYNTHETIC current-share prices",
+      "publisher": "test fixture",
+      "effective_date": "2026-10-09",
+      "locator": "fixtures/demo.json#/prices",
+      "evidence_label": "CONFIRMED"
+    },
+    {
+      "source_id": "synthetic.research.v1",
+      "title": "SYNTHETIC research",
+      "publisher": "test fixture",
+      "effective_date": "2026-10-09",
+      "locator": "fixtures/phase2-demo.json#research",
+      "evidence_label": "CONFIRMED"
+    }
+  ],
+  "securities": [
+    {
+      "ticker": "DEMO-BANK",
+      "sector": "Bank",
+      "currency": "PKR"
+    },
+    {
+      "ticker": "DEMO-ENERGY",
+      "sector": "E&P",
+      "currency": "PKR"
+    },
+    {
+      "ticker": "DEMO-INDUSTRIAL",
+      "sector": "Industrial",
+      "currency": "PKR"
+    },
+    {
+      "ticker": "DEMO-LOSS",
+      "sector": "Loss-making synthetic case",
+      "currency": "PKR"
+    }
+  ],
+  "opening": {
+    "timestamp": "2026-10-08T18:00:00+05:00",
+    "source_id": "demo.opening.v1",
+    "cash": "20000.00",
+    "positions": [
+      {
+        "ticker": "DEMO-BANK",
+        "quantity": "100",
+        "cost": "10000.00"
+      },
+      {
+        "ticker": "DEMO-INDUSTRIAL",
+        "quantity": "20",
+        "cost": "4000.00"
+      },
+      {
+        "ticker": "DEMO-LOSS",
+        "quantity": "10",
+        "cost": "1000.00"
+      }
+    ]
+  },
+  "closing": {
+    "timestamp": "2026-10-09T18:00:00+05:00",
+    "source_id": "demo.closing.v1",
+    "cash": "15220.00",
+    "positions": [
+      {
+        "ticker": "DEMO-BANK",
+        "quantity": "80",
+        "cost": "8000.00"
+      },
+      {
+        "ticker": "DEMO-ENERGY",
+        "quantity": "50",
+        "cost": "5050.00"
+      },
+      {
+        "ticker": "DEMO-INDUSTRIAL",
+        "quantity": "40",
+        "cost": "4000.00"
+      },
+      {
+        "ticker": "DEMO-LOSS",
+        "quantity": "10",
+        "cost": "1000.00"
+      }
+    ]
+  },
+  "transactions": [
+    {
+      "transaction_id": "demo.withdrawal.1",
+      "timestamp": "2026-10-09T09:00:00+05:00",
+      "settlement_date": "2026-10-09",
+      "kind": "WITHDRAWAL",
+      "amount": "2300",
+      "source_id": "demo.ledger.v1"
+    },
+    {
+      "transaction_id": "demo.buy.1",
+      "timestamp": "2026-10-09T10:00:00+05:00",
+      "settlement_date": "2026-10-09",
+      "kind": "BUY",
+      "ticker": "DEMO-ENERGY",
+      "quantity": "50",
+      "price": "100",
+      "fees": "50",
+      "source_id": "demo.ledger.v1"
+    },
+    {
+      "transaction_id": "demo.sell.1",
+      "timestamp": "2026-10-09T11:00:00+05:00",
+      "settlement_date": "2026-10-09",
+      "kind": "SELL",
+      "ticker": "DEMO-BANK",
+      "quantity": "20",
+      "price": "120",
+      "fees": "30",
+      "source_id": "demo.ledger.v1"
+    },
+    {
+      "transaction_id": "demo.receipt.1",
+      "timestamp": "2026-10-09T12:00:00+05:00",
+      "settlement_date": "2026-10-09",
+      "kind": "DIVIDEND",
+      "ticker": "DEMO-BANK",
+      "amount": "250",
+      "taxes": "50",
+      "source_id": "demo.ledger.v1"
+    },
+    {
+      "transaction_id": "demo.split.1",
+      "timestamp": "2026-10-09T13:00:00+05:00",
+      "settlement_date": "2026-10-09",
+      "kind": "SPLIT",
+      "ticker": "DEMO-INDUSTRIAL",
+      "ratio": "2",
+      "source_id": "demo.ledger.v1"
+    }
+  ],
+  "prices": [
+    {
+      "ticker": "DEMO-BANK",
+      "session_date": "2026-10-09",
+      "close": "125",
+      "source_id": "demo.prices.v1"
+    },
+    {
+      "ticker": "DEMO-ENERGY",
+      "session_date": "2026-10-09",
+      "close": "110",
+      "source_id": "demo.prices.v1"
+    },
+    {
+      "ticker": "DEMO-INDUSTRIAL",
+      "session_date": "2026-10-09",
+      "close": "105",
+      "source_id": "demo.prices.v1"
+    },
+    {
+      "ticker": "DEMO-LOSS",
+      "session_date": "2026-10-09",
+      "close": "75",
+      "source_id": "demo.prices.v1"
+    }
+  ],
+  "research": {
+    "universe_date": "2026-10-09",
+    "universe_source_ids": [
+      "synthetic.research.v1"
+    ],
+    "required_tickers": [
+      "DEMO-BANK",
+      "DEMO-ENERGY",
+      "DEMO-INDUSTRIAL",
+      "DEMO-LOSS"
+    ],
+    "universe_basis": "Synthetic test membership",
+    "full_universe_verified": true,
+    "earnings": [
+      {
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "record_id": "DEMO-BANK.earnings.1",
+        "ticker": "DEMO-BANK",
+        "period_start": "2025-07-01",
+        "period_end": "2026-06-30",
+        "period_label": "FY26",
+        "basis": "STANDALONE",
+        "reported_pat": "1000",
+        "weighted_average_shares": "100",
+        "reported_eps": "10",
+        "share_basis_date": "2026-10-09",
+        "quality": "B",
+        "quality_rationale": "Synthetic independently reviewed bridge",
+        "adjustments": [
+          {
+            "description": "remove one-off gain",
+            "pretax_amount": "-100",
+            "tax_effect": "30",
+            "rationale": "non-recurring disposal",
+            "recurring_test": "GENUINE_ONE_OFF",
+            "source_id": "synthetic.research.v1",
+            "locator": "fixture adjustment"
+          }
+        ]
+      },
+      {
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "record_id": "DEMO-ENERGY.earnings.1",
+        "ticker": "DEMO-ENERGY",
+        "period_start": "2025-07-01",
+        "period_end": "2026-06-30",
+        "period_label": "FY26",
+        "basis": "STANDALONE",
+        "reported_pat": "1000",
+        "weighted_average_shares": "100",
+        "reported_eps": "10",
+        "share_basis_date": "2026-10-09",
+        "quality": "B",
+        "quality_rationale": "Synthetic independently reviewed bridge",
+        "adjustments": [
+          {
+            "description": "remove one-off gain",
+            "pretax_amount": "-100",
+            "tax_effect": "30",
+            "rationale": "non-recurring disposal",
+            "recurring_test": "GENUINE_ONE_OFF",
+            "source_id": "synthetic.research.v1",
+            "locator": "fixture adjustment"
+          }
+        ]
+      },
+      {
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "record_id": "DEMO-INDUSTRIAL.earnings.1",
+        "ticker": "DEMO-INDUSTRIAL",
+        "period_start": "2025-07-01",
+        "period_end": "2026-06-30",
+        "period_label": "FY26",
+        "basis": "STANDALONE",
+        "reported_pat": "1000",
+        "weighted_average_shares": "100",
+        "reported_eps": "10",
+        "share_basis_date": "2026-10-09",
+        "quality": "B",
+        "quality_rationale": "Synthetic independently reviewed bridge",
+        "adjustments": [
+          {
+            "description": "remove one-off gain",
+            "pretax_amount": "-100",
+            "tax_effect": "30",
+            "rationale": "non-recurring disposal",
+            "recurring_test": "GENUINE_ONE_OFF",
+            "source_id": "synthetic.research.v1",
+            "locator": "fixture adjustment"
+          }
+        ]
+      },
+      {
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "record_id": "DEMO-LOSS.earnings.1",
+        "ticker": "DEMO-LOSS",
+        "period_start": "2025-07-01",
+        "period_end": "2026-06-30",
+        "period_label": "FY26",
+        "basis": "STANDALONE",
+        "reported_pat": "-1000",
+        "weighted_average_shares": "100",
+        "reported_eps": "-10",
+        "share_basis_date": "2026-10-09",
+        "quality": "B",
+        "quality_rationale": "Synthetic independently reviewed bridge",
+        "adjustments": [
+          {
+            "description": "remove one-off gain",
+            "pretax_amount": "-100",
+            "tax_effect": "30",
+            "rationale": "non-recurring disposal",
+            "recurring_test": "GENUINE_ONE_OFF",
+            "source_id": "synthetic.research.v1",
+            "locator": "fixture adjustment"
+          }
+        ]
+      }
+    ],
+    "models": [
+      {
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "record_id": "DEMO-BANK.model.1",
+        "ticker": "DEMO-BANK",
+        "earnings_id": "DEMO-BANK.earnings.1",
+        "method": "BANK_JUSTIFIED_PB",
+        "model_version": "reference-v1",
+        "certification": "VALIDATED",
+        "origin": "NEW_EXPLICIT_MODEL",
+        "methodology_rationale": "Synthetic reference equation, not a recovered legacy model",
+        "forward_period": "FY27",
+        "forward_basis": "FY",
+        "accounting_basis": "STANDALONE",
+        "share_basis_date": "2026-10-09",
+        "horizon_years": "1",
+        "sovereign_benchmark": "0.1",
+        "benchmark_date": "2026-10-09",
+        "equity_risk_premium": "0.05",
+        "discount_rate_rationale": "Synthetic ke",
+        "margin_of_safety": "0.2",
+        "event_checked_through": "2026-10-09",
+        "scenarios": [
+          {
+            "name": "bear",
+            "scenario_id": "DEMO-BANK.bear",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.15",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          },
+          {
+            "name": "base",
+            "scenario_id": "DEMO-BANK.base",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.2",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          },
+          {
+            "name": "bull",
+            "scenario_id": "DEMO-BANK.bull",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.25",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          }
+        ]
+      },
+      {
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "record_id": "DEMO-ENERGY.model.1",
+        "ticker": "DEMO-ENERGY",
+        "earnings_id": "DEMO-ENERGY.earnings.1",
+        "method": "FCFE_DCF",
+        "model_version": "reference-v1",
+        "certification": "VALIDATED",
+        "origin": "NEW_EXPLICIT_MODEL",
+        "methodology_rationale": "Synthetic reference equation, not a recovered legacy model",
+        "forward_period": "FY27",
+        "forward_basis": "FY",
+        "accounting_basis": "STANDALONE",
+        "share_basis_date": "2026-10-09",
+        "horizon_years": "1",
+        "sovereign_benchmark": "0.1",
+        "benchmark_date": "2026-10-09",
+        "equity_risk_premium": "0.05",
+        "discount_rate_rationale": "Synthetic ke",
+        "margin_of_safety": "0.2",
+        "event_checked_through": "2026-10-09",
+        "scenarios": [
+          {
+            "name": "bear",
+            "scenario_id": "DEMO-ENERGY.bear",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.15",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          },
+          {
+            "name": "base",
+            "scenario_id": "DEMO-ENERGY.base",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.2",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          },
+          {
+            "name": "bull",
+            "scenario_id": "DEMO-ENERGY.bull",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.25",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          }
+        ]
+      },
+      {
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "record_id": "DEMO-INDUSTRIAL.model.1",
+        "ticker": "DEMO-INDUSTRIAL",
+        "earnings_id": "DEMO-INDUSTRIAL.earnings.1",
+        "method": "FCFE_DCF",
+        "model_version": "reference-v1",
+        "certification": "VALIDATED",
+        "origin": "NEW_EXPLICIT_MODEL",
+        "methodology_rationale": "Synthetic reference equation, not a recovered legacy model",
+        "forward_period": "FY27",
+        "forward_basis": "FY",
+        "accounting_basis": "STANDALONE",
+        "share_basis_date": "2026-10-09",
+        "horizon_years": "1",
+        "sovereign_benchmark": "0.1",
+        "benchmark_date": "2026-10-09",
+        "equity_risk_premium": "0.05",
+        "discount_rate_rationale": "Synthetic ke",
+        "margin_of_safety": "0.2",
+        "event_checked_through": "2026-10-09",
+        "scenarios": [
+          {
+            "name": "bear",
+            "scenario_id": "DEMO-INDUSTRIAL.bear",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.15",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          },
+          {
+            "name": "base",
+            "scenario_id": "DEMO-INDUSTRIAL.base",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.2",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          },
+          {
+            "name": "bull",
+            "scenario_id": "DEMO-INDUSTRIAL.bull",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.25",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          }
+        ]
+      },
+      {
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "record_id": "DEMO-LOSS.model.1",
+        "ticker": "DEMO-LOSS",
+        "earnings_id": "DEMO-LOSS.earnings.1",
+        "method": "FCFE_DCF",
+        "model_version": "reference-v1",
+        "certification": "VALIDATED",
+        "origin": "NEW_EXPLICIT_MODEL",
+        "methodology_rationale": "Synthetic reference equation, not a recovered legacy model",
+        "forward_period": "FY27",
+        "forward_basis": "FY",
+        "accounting_basis": "STANDALONE",
+        "share_basis_date": "2026-10-09",
+        "horizon_years": "1",
+        "sovereign_benchmark": "0.1",
+        "benchmark_date": "2026-10-09",
+        "equity_risk_premium": "0.05",
+        "discount_rate_rationale": "Synthetic ke",
+        "margin_of_safety": "0.2",
+        "event_checked_through": "2026-10-09",
+        "scenarios": [
+          {
+            "name": "bear",
+            "scenario_id": "DEMO-LOSS.bear",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.15",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          },
+          {
+            "name": "base",
+            "scenario_id": "DEMO-LOSS.base",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.2",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          },
+          {
+            "name": "bull",
+            "scenario_id": "DEMO-LOSS.bull",
+            "forward_eps": "12",
+            "sustainable_dps": "4",
+            "exit_price": "125",
+            "horizon_dividends": "5",
+            "exit_basis": "EX_DISTRIBUTION",
+            "dividends_rationale": "Explicit horizon cash distribution",
+            "discount_rate": "0.1",
+            "terminal_growth": "0.02",
+            "book_value_per_share": "100",
+            "sustainable_roe": "0.25",
+            "fcfe": [
+              "100",
+              "110"
+            ],
+            "shares": "10",
+            "terminal_value": "1210",
+            "payout_crosscheck": "120",
+            "drivers": {
+              "dividend_capacity": "synthetic explicit evidence input",
+              "capital": "synthetic explicit evidence input",
+              "credit_costs": "synthetic explicit evidence input",
+              "treasury_gains": "synthetic explicit evidence input",
+              "oci": "synthetic explicit evidence input",
+              "capex": "synthetic explicit evidence input",
+              "payout": "synthetic explicit evidence input",
+              "collections": "synthetic explicit evidence input",
+              "depletion": "synthetic explicit evidence input",
+              "reserves": "synthetic explicit evidence input",
+              "realized_prices": "synthetic explicit evidence input",
+              "tax": "synthetic explicit evidence input",
+              "production": "synthetic explicit evidence input",
+              "net_debt": "synthetic explicit evidence input",
+              "midcycle_margins": "synthetic explicit evidence input",
+              "working_capital": "synthetic explicit evidence input",
+              "operating_drivers": "synthetic explicit evidence input"
+            }
+          }
+        ]
+      }
+    ],
+    "dividends": [
+      {
+        "record_id": "div.bank",
+        "ticker": "DEMO-BANK",
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "announcement_date": "2026-10-08",
+        "dps": "2.5",
+        "ex_date": "2026-10-09",
+        "record_date": "2026-10-09",
+        "payment_date": "2026-10-09",
+        "dates_verified": true,
+        "settlement_rule": "SETTLED_BEFORE_EX",
+        "tax_rate": "0.2",
+        "receipt_transaction_ids": [
+          "demo.receipt.1"
+        ]
+      },
+      {
+        "record_id": "div.energy",
+        "ticker": "DEMO-ENERGY",
+        "effective_date": "2026-10-09",
+        "valid_until": "2026-10-12",
+        "source_ids": [
+          "synthetic.research.v1"
+        ],
+        "announcement_date": "2026-10-08",
+        "dps": "2.5",
+        "ex_date": "2026-10-09",
+        "record_date": "2026-10-09",
+        "payment_date": "2026-10-09",
+        "dates_verified": true,
+        "settlement_rule": "SETTLED_BEFORE_EX",
+        "tax_rate": "0.2"
+      }
+    ],
+    "universe_valid_until": "2026-10-12"
+  }
+}
