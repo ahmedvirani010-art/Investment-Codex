@@ -1,0 +1,908 @@
+{
+  "analysis_run_id": "20261026T152031546516Z-5f77f1ad",
+  "assumptions": [
+    {
+      "assumption_id": "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b",
+      "effective_date": "2026-10-09",
+      "evidence_label": "ASSUMPTION",
+      "owner": "validation",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "scope": "input freshness and reconciliation tolerances; no investment recommendation",
+      "source_ids": [
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "value": {
+        "cash_tolerance": "0.01",
+        "cost_tolerance": "0.01",
+        "holdings_max_age_days": 3,
+        "max_position_weight": null,
+        "price_max_age_days": 3,
+        "quantity_tolerance": "0.000001"
+      }
+    }
+  ],
+  "attempt_status": "SUCCESS",
+  "changes": [
+    {
+      "field": "quantity",
+      "new": "80",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-BANK"
+    },
+    {
+      "field": "cost",
+      "new": "8000.00",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-BANK"
+    },
+    {
+      "field": "price",
+      "new": "125",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-BANK"
+    },
+    {
+      "field": "market_value",
+      "new": "10000",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-BANK"
+    },
+    {
+      "field": "quantity",
+      "new": "50",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-ENERGY"
+    },
+    {
+      "field": "cost",
+      "new": "5050.00",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-ENERGY"
+    },
+    {
+      "field": "price",
+      "new": "110",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-ENERGY"
+    },
+    {
+      "field": "market_value",
+      "new": "5500",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-ENERGY"
+    },
+    {
+      "field": "quantity",
+      "new": "40",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-INDUSTRIAL"
+    },
+    {
+      "field": "cost",
+      "new": "4000.00",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-INDUSTRIAL"
+    },
+    {
+      "field": "price",
+      "new": "105",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-INDUSTRIAL"
+    },
+    {
+      "field": "market_value",
+      "new": "4200",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-INDUSTRIAL"
+    },
+    {
+      "field": "quantity",
+      "new": "10",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-LOSS"
+    },
+    {
+      "field": "cost",
+      "new": "1000.00",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-LOSS"
+    },
+    {
+      "field": "price",
+      "new": "75",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-LOSS"
+    },
+    {
+      "field": "market_value",
+      "new": "750",
+      "previous": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-LOSS"
+    }
+  ],
+  "coverage": [
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_version": "0.2.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff_metadata": "2026-10-09",
+      "outcome": "BLOCKED_MODEL",
+      "owner": "valuation",
+      "reason": "No accepted Phase 2 model and verified inputs supplied",
+      "record_id": "coverage.0",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
+      "schema_version": "1.0",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-BANK",
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_version": "0.2.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff_metadata": "2026-10-09",
+      "outcome": "BLOCKED_MODEL",
+      "owner": "valuation",
+      "reason": "No accepted Phase 2 model and verified inputs supplied",
+      "record_id": "coverage.1",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
+      "schema_version": "1.0",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-ENERGY",
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_version": "0.2.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff_metadata": "2026-10-09",
+      "outcome": "BLOCKED_MODEL",
+      "owner": "valuation",
+      "reason": "No accepted Phase 2 model and verified inputs supplied",
+      "record_id": "coverage.2",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
+      "schema_version": "1.0",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-INDUSTRIAL",
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_version": "0.2.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff_metadata": "2026-10-09",
+      "outcome": "BLOCKED_MODEL",
+      "owner": "valuation",
+      "reason": "No accepted Phase 2 model and verified inputs supplied",
+      "record_id": "coverage.3",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
+      "schema_version": "1.0",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-LOSS",
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    }
+  ],
+  "data_gaps": [
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_version": "0.2.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "field": "risk_limits",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff_metadata": "2026-10-09",
+      "next_action": "Confirm portfolio limits before sizing",
+      "owner": "validation",
+      "reason": "UNCONFIGURED_RISK_LIMITS",
+      "record_id": "data_gaps.0",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
+      "schema_version": "1.0",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": null,
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    }
+  ],
+  "holdings": [
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_version": "0.1.0",
+      "confidence": "SYNTHETIC",
+      "cost": "8000.00",
+      "effective_date": "2026-10-09",
+      "equity_weight": "0.4889975550122249388753056234718826405867970660146699266503667482",
+      "freshness": "CURRENT",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "ledger_cost": "8000.00",
+      "ledger_quantity": "80",
+      "market_cutoff_metadata": "2026-10-09",
+      "market_value": "10000",
+      "owner": "portfolio",
+      "price": "125",
+      "price_date": "2026-10-09",
+      "quantity": "80",
+      "reconciliation_state": "RECONCILED",
+      "record_id": "holding.DEMO-BANK",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "schema_version": "1.0",
+      "sector": "Bank",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-BANK",
+      "total_sleeve_weight": "0.2803476310625175217269414073451079338379590692458648724418278666",
+      "units": "PKR / shares / fraction as named",
+      "unrealized_gain": "2000.00",
+      "unrealized_return_on_cost": "0.25",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_version": "0.1.0",
+      "confidence": "SYNTHETIC",
+      "cost": "5050.00",
+      "effective_date": "2026-10-09",
+      "equity_weight": "0.2689486552567237163814180929095354523227383863080684596577017115",
+      "freshness": "CURRENT",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "ledger_cost": "5050",
+      "ledger_quantity": "50",
+      "market_cutoff_metadata": "2026-10-09",
+      "market_value": "5500",
+      "owner": "portfolio",
+      "price": "110",
+      "price_date": "2026-10-09",
+      "quantity": "50",
+      "reconciliation_state": "RECONCILED",
+      "record_id": "holding.DEMO-ENERGY",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "schema_version": "1.0",
+      "sector": "E&P",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-ENERGY",
+      "total_sleeve_weight": "0.1541911970843846369498177740398093636108774880852256798430053266",
+      "units": "PKR / shares / fraction as named",
+      "unrealized_gain": "450.00",
+      "unrealized_return_on_cost": "0.08910891089108910891089108910891089108910891089108910891089108911",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_version": "0.1.0",
+      "confidence": "SYNTHETIC",
+      "cost": "4000.00",
+      "effective_date": "2026-10-09",
+      "equity_weight": "0.2053789731051344743276283618581907090464547677261613691931540342",
+      "freshness": "CURRENT",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "ledger_cost": "4000.00",
+      "ledger_quantity": "40",
+      "market_cutoff_metadata": "2026-10-09",
+      "market_value": "4200",
+      "owner": "portfolio",
+      "price": "105",
+      "price_date": "2026-10-09",
+      "quantity": "40",
+      "reconciliation_state": "RECONCILED",
+      "record_id": "holding.DEMO-INDUSTRIAL",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "schema_version": "1.0",
+      "sector": "Industrial",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-INDUSTRIAL",
+      "total_sleeve_weight": "0.1177460050462573591253153910849453322119428090832632464255677040",
+      "units": "PKR / shares / fraction as named",
+      "unrealized_gain": "200.00",
+      "unrealized_return_on_cost": "0.05",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_version": "0.1.0",
+      "confidence": "SYNTHETIC",
+      "cost": "1000.00",
+      "effective_date": "2026-10-09",
+      "equity_weight": "0.03667481662591687041564792176039119804400977995110024449877750611",
+      "freshness": "CURRENT",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "ledger_cost": "1000.00",
+      "ledger_quantity": "10",
+      "market_cutoff_metadata": "2026-10-09",
+      "market_value": "750",
+      "owner": "portfolio",
+      "price": "75",
+      "price_date": "2026-10-09",
+      "quantity": "10",
+      "reconciliation_state": "RECONCILED",
+      "record_id": "holding.DEMO-LOSS",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "schema_version": "1.0",
+      "sector": "Loss-making synthetic case",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "ticker": "DEMO-LOSS",
+      "total_sleeve_weight": "0.02102607232968881412952060555088309503784693019343986543313708999",
+      "units": "PKR / shares / fraction as named",
+      "unrealized_gain": "-250.00",
+      "unrealized_return_on_cost": "-0.25",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    }
+  ],
+  "notes": [],
+  "published_run_id": "20261026T152031546516Z-5f77f1ad",
+  "reconciliation": [],
+  "run_log": [
+    {
+      "analysis_run_id": "20261012T105838714078Z-1be18ab3",
+      "attempted_at": "2026-10-12T10:58:38.726657+00:00",
+      "error": null,
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff": "2026-10-09",
+      "publication_status": "LOCAL_ONLY",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "status": "SUCCESS",
+      "workflow": "init-demo"
+    },
+    {
+      "analysis_run_id": "20261012T105838714078Z-1be18ab3",
+      "attempted_at": "2026-10-12T10:58:53.352046+00:00",
+      "error": null,
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff": "2026-10-09",
+      "publication_status": "LOCAL_ONLY",
+      "run_id": "20261012T105853333493Z-a85bcecf",
+      "status": "NO_MATERIAL_CHANGE",
+      "workflow": "portfolio"
+    },
+    {
+      "analysis_run_id": "20261026T152031546516Z-5f77f1ad",
+      "attempted_at": "2026-10-26T15:20:31.594301+00:00",
+      "error": null,
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff": "2026-10-09",
+      "publication_status": "LOCAL_ONLY",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
+      "status": "SUCCESS",
+      "workflow": "export-excel"
+    }
+  ],
+  "schema_version": "1.0",
+  "sources": [
+    {
+      "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+      "effective_date": "2026-10-08",
+      "evidence_label": "ASSUMPTION",
+      "fact_hash": "9f7272a24e85877f29c7222088166a4118c4a3b9df9cabc472924e3fe318ec26",
+      "locator": "fixtures/demo.json#/opening",
+      "publisher": "test fixture",
+      "source_id": "demo.opening.v1",
+      "title": "SYNTHETIC opening balances"
+    },
+    {
+      "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+      "effective_date": "2026-10-09",
+      "evidence_label": "ASSUMPTION",
+      "fact_hash": "dcfc56993c1908cc67699a96615ce1dc790be3687a3fa868a728c43b08fbf898",
+      "locator": "fixtures/demo.json#/transactions",
+      "publisher": "test fixture",
+      "source_id": "demo.ledger.v1",
+      "title": "SYNTHETIC settled ledger"
+    },
+    {
+      "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+      "effective_date": "2026-10-09",
+      "evidence_label": "ASSUMPTION",
+      "fact_hash": "948754cc02565c9a3ae080a86ee67e451aa505f986413084c03ed5f458748550",
+      "locator": "fixtures/demo.json#/closing",
+      "publisher": "test fixture",
+      "source_id": "demo.closing.v1",
+      "title": "SYNTHETIC closing balances"
+    },
+    {
+      "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+      "effective_date": "2026-10-09",
+      "evidence_label": "ASSUMPTION",
+      "fact_hash": "e1fbabeb97d82a9b1d532996813d0c644982dcdf66577074f1c3c77443b988ed",
+      "locator": "fixtures/demo.json#/prices",
+      "publisher": "test fixture",
+      "source_id": "demo.prices.v1",
+      "title": "SYNTHETIC current-share prices"
+    },
+    {
+      "content_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "content_path": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+      "effective_date": "2026-10-09",
+      "evidence_label": "ASSUMPTION",
+      "locator": "data/evidence/blobs/f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892.json",
+      "publisher": "offline fixture",
+      "source_id": "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "title": "Immutable imported bundle"
+    }
+  ],
+  "summary": {
+    "assumption_ids": [
+      "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+    ],
+    "cash": "15220.00",
+    "cash_difference": "0.00",
+    "code_version": "0.2.0",
+    "confidence": "SYNTHETIC",
+    "cost": "18050.00",
+    "data_gate_status": "BLOCKED",
+    "effective_date": "2026-10-09",
+    "effective_positions": "2.817079537225711928057796264798504572169549182398410265909971202",
+    "equity_value": "20450",
+    "hhi": "0.3549775527405981551999330467895337784924767307703803779269612210",
+    "holdings_timestamp": "2026-10-09T18:00:00+05:00",
+    "income_received": "200",
+    "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "ledger_cash": "15220.00",
+    "market_cutoff": "2026-10-09",
+    "market_cutoff_metadata": "2026-10-09",
+    "mode": "DEMO",
+    "owner": "portfolio",
+    "realized_gain": "370.00",
+    "reconciliation_state": "RECONCILED",
+    "return_window_end": "2026-10-09T18:00:00+05:00",
+    "return_window_start": "2026-10-08T18:00:00+05:00",
+    "run_id": "20261026T152031546516Z-5f77f1ad",
+    "schema_version": "1.0",
+    "sizing_reason": "Executable sizing and integrated risk review require Phase 3",
+    "sizing_status": "BLOCKED",
+    "source_ids": [
+      "demo.closing.v1",
+      "demo.ledger.v1",
+      "demo.opening.v1",
+      "demo.prices.v1",
+      "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+    ],
+    "total_assets": "35670.00",
+    "units": "PKR / shares / fraction as named",
+    "upstream_run_ids": [],
+    "validation_status": "VALIDATED"
+  },
+  "transactions": [
+    {
+      "amount": "2300",
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "cash_after": "17700.00",
+      "code_version": "0.1.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "fees": "0",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "kind": "WITHDRAWAL",
+      "market_cutoff_metadata": "2026-10-09",
+      "owner": "portfolio",
+      "price": "0",
+      "quantity": "0",
+      "ratio": null,
+      "realized_gain": "0",
+      "record_id": "transactions.0",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "schema_version": "1.0",
+      "settlement_date": "2026-10-09",
+      "source_id": "demo.ledger.v1",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "taxes": "0",
+      "ticker": null,
+      "timestamp": "2026-10-09T09:00:00+05:00",
+      "transaction_id": "demo.withdrawal.1",
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "amount": "0",
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "cash_after": "12650.00",
+      "code_version": "0.1.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "fees": "50",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "kind": "BUY",
+      "market_cutoff_metadata": "2026-10-09",
+      "owner": "portfolio",
+      "price": "100",
+      "quantity": "50",
+      "ratio": null,
+      "realized_gain": "0",
+      "record_id": "transactions.1",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "schema_version": "1.0",
+      "settlement_date": "2026-10-09",
+      "source_id": "demo.ledger.v1",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "taxes": "0",
+      "ticker": "DEMO-ENERGY",
+      "timestamp": "2026-10-09T10:00:00+05:00",
+      "transaction_id": "demo.buy.1",
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "amount": "0",
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "cash_after": "15020.00",
+      "code_version": "0.1.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "fees": "30",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "kind": "SELL",
+      "market_cutoff_metadata": "2026-10-09",
+      "owner": "portfolio",
+      "price": "120",
+      "quantity": "20",
+      "ratio": null,
+      "realized_gain": "370.00",
+      "record_id": "transactions.2",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "schema_version": "1.0",
+      "settlement_date": "2026-10-09",
+      "source_id": "demo.ledger.v1",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "taxes": "0",
+      "ticker": "DEMO-BANK",
+      "timestamp": "2026-10-09T11:00:00+05:00",
+      "transaction_id": "demo.sell.1",
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "amount": "250",
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "cash_after": "15220.00",
+      "code_version": "0.1.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "fees": "0",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "kind": "DIVIDEND",
+      "market_cutoff_metadata": "2026-10-09",
+      "owner": "portfolio",
+      "price": "0",
+      "quantity": "0",
+      "ratio": null,
+      "realized_gain": "0",
+      "record_id": "transactions.3",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "schema_version": "1.0",
+      "settlement_date": "2026-10-09",
+      "source_id": "demo.ledger.v1",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "taxes": "50",
+      "ticker": "DEMO-BANK",
+      "timestamp": "2026-10-09T12:00:00+05:00",
+      "transaction_id": "demo.receipt.1",
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "amount": "0",
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "cash_after": "15220.00",
+      "code_version": "0.1.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "fees": "0",
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "kind": "SPLIT",
+      "market_cutoff_metadata": "2026-10-09",
+      "owner": "portfolio",
+      "price": "0",
+      "quantity": "0",
+      "ratio": "2",
+      "realized_gain": "0",
+      "record_id": "transactions.4",
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "schema_version": "1.0",
+      "settlement_date": "2026-10-09",
+      "source_id": "demo.ledger.v1",
+      "source_ids": [
+        "demo.closing.v1",
+        "demo.ledger.v1",
+        "demo.opening.v1",
+        "demo.prices.v1",
+        "input.f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892"
+      ],
+      "taxes": "0",
+      "ticker": "DEMO-INDUSTRIAL",
+      "timestamp": "2026-10-09T13:00:00+05:00",
+      "transaction_id": "demo.split.1",
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    }
+  ],
+  "usage": [
+    {
+      "cached_input_tokens": null,
+      "calculation_runtime_seconds": 0.012568,
+      "cost": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "reasoning_tokens": null,
+      "run_id": "20261012T105838714078Z-1be18ab3",
+      "runtime_seconds": null,
+      "telemetry": "AI telemetry unknown; total wall time recorded externally after commit"
+    },
+    {
+      "cached_input_tokens": null,
+      "calculation_runtime_seconds": 0.018608,
+      "cost": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "reasoning_tokens": null,
+      "run_id": "20261012T105853333493Z-a85bcecf",
+      "runtime_seconds": null,
+      "telemetry": "AI telemetry unknown; total wall time recorded externally after commit"
+    },
+    {
+      "cached_input_tokens": null,
+      "calculation_runtime_seconds": 0.04806,
+      "cost": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "reasoning_tokens": null,
+      "run_id": "20261026T152031546516Z-5f77f1ad",
+      "runtime_seconds": null,
+      "telemetry": "AI telemetry unknown; total wall time recorded externally after commit"
+    }
+  ]
+}

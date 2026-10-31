@@ -1,5 +1,5 @@
 {
-  "analysis_run_id": "20261012T105838714078Z-1be18ab3",
+  "analysis_run_id": "20261026T152031546516Z-5f77f1ad",
   "assumptions": [
     {
       "assumption_id": "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b",
@@ -21,7 +21,7 @@
       }
     }
   ],
-  "attempt_status": "NO_MATERIAL_CHANGE",
+  "attempt_status": "SUCCESS",
   "changes": [
     {
       "field": "quantity",
@@ -249,16 +249,16 @@
       "assumption_ids": [
         "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
       ],
-      "code_version": "0.1.0",
+      "code_version": "0.2.0",
       "confidence": "SYNTHETIC",
       "effective_date": "2026-10-09",
       "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
       "market_cutoff_metadata": "2026-10-09",
       "outcome": "BLOCKED_MODEL",
       "owner": "valuation",
-      "reason": "Phase 2 adapter and verified inputs not supplied",
+      "reason": "No accepted Phase 2 model and verified inputs supplied",
       "record_id": "coverage.0",
-      "run_id": "20261012T105838714078Z-1be18ab3",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
       "schema_version": "1.0",
       "source_ids": [
         "demo.closing.v1",
@@ -276,16 +276,16 @@
       "assumption_ids": [
         "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
       ],
-      "code_version": "0.1.0",
+      "code_version": "0.2.0",
       "confidence": "SYNTHETIC",
       "effective_date": "2026-10-09",
       "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
       "market_cutoff_metadata": "2026-10-09",
       "outcome": "BLOCKED_MODEL",
       "owner": "valuation",
-      "reason": "Phase 2 adapter and verified inputs not supplied",
+      "reason": "No accepted Phase 2 model and verified inputs supplied",
       "record_id": "coverage.1",
-      "run_id": "20261012T105838714078Z-1be18ab3",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
       "schema_version": "1.0",
       "source_ids": [
         "demo.closing.v1",
@@ -303,16 +303,16 @@
       "assumption_ids": [
         "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
       ],
-      "code_version": "0.1.0",
+      "code_version": "0.2.0",
       "confidence": "SYNTHETIC",
       "effective_date": "2026-10-09",
       "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
       "market_cutoff_metadata": "2026-10-09",
       "outcome": "BLOCKED_MODEL",
       "owner": "valuation",
-      "reason": "Phase 2 adapter and verified inputs not supplied",
+      "reason": "No accepted Phase 2 model and verified inputs supplied",
       "record_id": "coverage.2",
-      "run_id": "20261012T105838714078Z-1be18ab3",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
       "schema_version": "1.0",
       "source_ids": [
         "demo.closing.v1",
@@ -330,16 +330,16 @@
       "assumption_ids": [
         "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
       ],
-      "code_version": "0.1.0",
+      "code_version": "0.2.0",
       "confidence": "SYNTHETIC",
       "effective_date": "2026-10-09",
       "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
       "market_cutoff_metadata": "2026-10-09",
       "outcome": "BLOCKED_MODEL",
       "owner": "valuation",
-      "reason": "Phase 2 adapter and verified inputs not supplied",
+      "reason": "No accepted Phase 2 model and verified inputs supplied",
       "record_id": "coverage.3",
-      "run_id": "20261012T105838714078Z-1be18ab3",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
       "schema_version": "1.0",
       "source_ids": [
         "demo.closing.v1",
@@ -359,7 +359,7 @@
       "assumption_ids": [
         "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
       ],
-      "code_version": "0.1.0",
+      "code_version": "0.2.0",
       "confidence": "SYNTHETIC",
       "effective_date": "2026-10-09",
       "field": "risk_limits",
@@ -369,7 +369,7 @@
       "owner": "validation",
       "reason": "UNCONFIGURED_RISK_LIMITS",
       "record_id": "data_gaps.0",
-      "run_id": "20261012T105838714078Z-1be18ab3",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
       "schema_version": "1.0",
       "source_ids": [
         "demo.closing.v1",
@@ -542,7 +542,7 @@
     }
   ],
   "notes": [],
-  "published_run_id": "20261012T105853333493Z-a85bcecf",
+  "published_run_id": "20261026T152031546516Z-5f77f1ad",
   "reconciliation": [],
   "run_log": [
     {
@@ -566,6 +566,17 @@
       "run_id": "20261012T105853333493Z-a85bcecf",
       "status": "NO_MATERIAL_CHANGE",
       "workflow": "portfolio"
+    },
+    {
+      "analysis_run_id": "20261026T152031546516Z-5f77f1ad",
+      "attempted_at": "2026-10-26T15:20:31.594301+00:00",
+      "error": null,
+      "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+      "market_cutoff": "2026-10-09",
+      "publication_status": "LOCAL_ONLY",
+      "run_id": "20261026T152031546516Z-5f77f1ad",
+      "status": "SUCCESS",
+      "workflow": "export-excel"
     }
   ],
   "schema_version": "1.0",
@@ -631,7 +642,7 @@
     ],
     "cash": "15220.00",
     "cash_difference": "0.00",
-    "code_version": "0.1.0",
+    "code_version": "0.2.0",
     "confidence": "SYNTHETIC",
     "cost": "18050.00",
     "data_gate_status": "BLOCKED",
@@ -651,9 +662,9 @@
     "reconciliation_state": "RECONCILED",
     "return_window_end": "2026-10-09T18:00:00+05:00",
     "return_window_start": "2026-10-08T18:00:00+05:00",
-    "run_id": "20261012T105838714078Z-1be18ab3",
+    "run_id": "20261026T152031546516Z-5f77f1ad",
     "schema_version": "1.0",
-    "sizing_reason": "Phase 1 does not implement executable sizing or risk review",
+    "sizing_reason": "Executable sizing and integrated risk review require Phase 3",
     "sizing_status": "BLOCKED",
     "source_ids": [
       "demo.closing.v1",
@@ -879,6 +890,17 @@
       "output_tokens": null,
       "reasoning_tokens": null,
       "run_id": "20261012T105853333493Z-a85bcecf",
+      "runtime_seconds": null,
+      "telemetry": "AI telemetry unknown; total wall time recorded externally after commit"
+    },
+    {
+      "cached_input_tokens": null,
+      "calculation_runtime_seconds": 0.04806,
+      "cost": null,
+      "input_tokens": null,
+      "output_tokens": null,
+      "reasoning_tokens": null,
+      "run_id": "20261026T152031546516Z-5f77f1ad",
       "runtime_seconds": null,
       "telemetry": "AI telemetry unknown; total wall time recorded externally after commit"
     }
