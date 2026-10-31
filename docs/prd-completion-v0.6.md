@@ -53,3 +53,53 @@ data and demonstrate manual parity. The current public repository and restricted
 local network do not satisfy these gates. Do not enable policies merely because
 unit tests pass. Original documents, real legacy datastore migration and live
 schedules remain pending; the Monday macro time and special monitors are not guessed.
+
+## Recorded verification — 31 October 2026
+
+The fixed synthetic GitHub submission passed [Actions run 41186668176](https://github.com/ahmedvirani010-art/Investment-Codex/actions/runs/41186668176).
+The plugin created request commit `00906027ce6194fe7d56452e362775870760e8a8`;
+Actions published proof commit `9ce264025d06550b933f8dfda7aae10741d428b9`.
+The [receipt](https://github.com/ahmedvirani010-art/Investment-Codex/blob/codex/prd-completion-v06/reports/smoke/verify-v06/receipt.json)
+reports valuation, retirement and cross-asset COMPLETE, `synthetic_only: true`,
+`canonical_unchanged: true`, and `accepted_inputs_changed: false`.
+Its workbook and snapshot are stored beside it. This public synthetic route proves
+submission → calculation → committed receipt, and does not prove private production
+or live R2 access.
+
+That CI run completed a clean locked installation, dependency compatibility check,
+wheel/source build, installed-version check and all 244 then-present tests, including
+the real boto3 client-configuration test without external service calls. The final
+inventory contains 255 tests: the original 192 and 63 added cases. The additional
+11 boundary/operation cases passed locally and are included in full CI. The offline
+local full run had 243 passes and one SDK-only skip before those additions.
+
+| Evidence | Relevant regression tests in `tests/test_prd_completion_v6.py` |
+| --- | --- |
+| F01–F02 | `test_dividend_roll_preserves_verified_entitlement_and_cash`, `test_partial_receipts_and_unknown_tax_do_not_invent_pending`, `test_correction_outside_window_keeps_previous_proof`, `test_expired_historical_entitlement_late_partial_and_excess_receipts` |
+| F03 | `test_catalyst_uses_assessment_not_old_cutoff`, `test_catalyst_bucket_boundaries_keep_market_cutoff` (past, today, 30, 31, 90, 91 days) |
+| F04 | `test_shared_profile_overrides_units_expiry_and_dependency`, `test_shared_assumption_revision_blocks_owned_forecast_not_mutates_eps` |
+| F05 | `test_first_wave_engines_hand_calculated` (PAT/EPS: 50/5, 100/10, 70/7; FCFE: 75/54), missing-driver, capital, collections, share-basis, duplicate-period and payout guards |
+| F06 | Decision basis/history, transaction lifecycle, no-double-link and request-review-status tests |
+| F07–F08 | Uniform-lineage, native-date/status formatting, original historical workbook/integrity/parity tests |
+| R2 | Pinned pulls, immutable archives, hash/limit/path restrictions, interrupted/retried reads, corrupted content and ephemeral rehydration tests |
+| Requests | All eleven workflow simulations; every nine operation types published against a temporary bare Git remote; normal push/divergence and optional archive-failure tests |
+
+The refreshed accepted demo export `20261031T085618170933Z-fbe64605` passed
+integrity and numerical/record workbook parity with NO_MATERIAL_CHANGE. Historical
+analysis lineage is preserved. Original fixtures and frozen historical workbooks
+remain unchanged.
+
+The [synthetic benchmark](../reports/benchmarks/v0.6-synthetic-360-months.json)
+used three samples per case over 360 months, with parity PASS. Median full/cached
+wall times were 12.085/11.273 seconds for unchanged inputs and 10.455/8.217 seconds
+for one changed assumption. These include clone, calculation, workbook, commit and
+validation, ran alongside tests, and are observations rather than a production
+speed guarantee. No measured AI usage or cost saving is asserted.
+
+Open acceptance evidence remains: private repository verification; GitHub runner R2
+configuration, credentials and actual connectivity; a private synthetic financial
+request; sourced real imports and legacy-workbook reconciliation; version-matched
+methodology approval; manual production demonstrations; and explicit Monday macro
+and special-monitor timings/methodologies. Remaining numerical sectors are OMC,
+refining, IPP, holding companies, auto, cement, textile, chemical, pharma, consumer,
+insurance and shipping. Policies and schedules remain disabled.

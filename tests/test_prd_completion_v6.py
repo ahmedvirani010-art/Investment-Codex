@@ -421,3 +421,71 @@ def test_pinned_artifact_rehydrates_without_reaccepting_financial_data(storage_r
     assert storage.committed(root,pipeline.STATE)==before
     path.unlink();s3.data['approved/rehydrate.json']=b'tampered'
     with pytest.raises(ValueError,match='SHA-256'): artifact(root,'rehydrate.source',digest(data))
+
+
+def test_catalyst_bucket_boundaries_keep_market_cutoff(repo,full):
+    from datetime import timedelta
+    cutoff=date.fromisoformat(full['market_cutoff'])
+    first=full['integration']['catalysts'][0]
+    full['integration']['catalysts']=[]
+    expected={-1:'OUTSIDE_90_DAYS_OR_PAST',0:'30_DAY',30:'30_DAY',31:'90_DAY',90:'90_DAY',91:'OUTSIDE_90_DAYS_OR_PAST'}
+    for offset in expected:
+        record=deepcopy(first);record.update(record_id='boundary.'+str(offset),window_start=str(cutoff+timedelta(days=offset)),window_end=str(cutoff+timedelta(days=offset+5)))
+        full['integration']['catalysts'].append(record)
+    full['integration']['candidates']=[]
+    full['integration']['proposals']=[]
+    state=publish(repo,full)
+    assert {r['days_to_start']:r['window_bucket'] for r in state['integration']['catalysts']}==expected
+    assert state['summary']['market_cutoff']==str(cutoff)
+
+
+def test_expired_historical_entitlement_late_partial_and_excess_receipts(full):
+    b=Bundle.model_validate(full);state=calculate(b);d=b.research.dividends[0]
+    first=dividend_result(d,b,state,{},lambda _:True)
+    expired=d.model_copy(update={'valid_until':date(2026,10,8)})
+    out=dividend_result(expired,b,state,{},lambda _:False,{'dividends':[first]})
+    assert out['status']=='RECEIVED' and out['entitlement_basis']==first['entitlement_basis']
+    tx=next(t for t in state['transactions'] if t['transaction_id'] in d.receipt_transaction_ids)
+    late=expired.model_copy(update={'payment_date':date(2026,10,8)})
+    tx.update(amount='100',taxes='20',fees='3')
+    out=dividend_result(late,b,state,{},lambda _:False,{'dividends':[first]})
+    assert out['status']=='PARTIALLY_RECEIVED' and out['overdue'] and Decimal(out['net_pending'])==120
+    for amount,tax in [('300','60'),('100','19')]:
+        tx.update(amount=amount,taxes=tax)
+        out=dividend_result(late,b,state,{},lambda _:False,{'dividends':[first]})
+        assert out['status']=='RECEIPT_EXCEPTION' and out['net_pending'] is None
+    assert state['summary']['cash']=='15220.00'
+
+
+@pytest.mark.parametrize('operation',['run','simulate','accept-and-run','import','decision','validate','storage.pull','storage.push','storage.status'])
+def test_each_request_operation_publishes_to_temporary_git_remote(storage_ready,tmp_path,monkeypatch,operation):
+    repo,s3=storage_ready;state=read_json(repo,pipeline.STATE)
+    policy={'enabled':True,'repository':'synthetic/workspace','authorized_by':'test owner','auto_push':True,'max_work_units':2000,'max_seconds':300,'max_request_bytes':5242880}
+    (repo/'config/workspace-requests.json').write_bytes(dumps(policy))
+    git(repo,'add','--','config/workspace-requests.json');git(repo,'-c','user.name=Test','-c','user.email=test@localhost','commit','-qm','synthetic private policy')
+    kw={'workflows':['valuation']}
+    if operation in {'accept-and-run','import'}: kw['package']={'sources':[]}
+    if operation=='decision':
+        p=state['integration']['input']['proposals'][0]
+        source=deepcopy(json.loads(pipeline.current_input(repo))['sources'][-1]);source['source_id']='synthetic.remote-decision'
+        kw['package']={'sources':[source],'decisions':[{'record_id':'remote.defer','ticker':p['ticker'],'effective_date':'2026-10-09','valid_until':'2026-10-12','source_ids':[source['source_id']],
+          'proposal_id':p['record_id'],'decision':'DEFER','decided_by':'Synthetic owner','decided_at':'2026-10-09T00:00:00+05:00',
+          'reason':'Synthetic remote routing verification','reviewed_basis_hash':basis(state,p['ticker'])}]}
+    if operation=='storage.pull':
+        s3.data['approved/remote.json']=b'{}'
+        kw['storage']={'request_id':'workspace.1','operation':'pull','objects':[{'key':'approved/remote.json','sha256':digest(b'{}')}]}
+    if operation=='storage.push': kw['storage']={'request_id':'workspace.1','operation':'push','run_id':state['published_run_id'],'paths':['workbooks/Investment_Workspace.xlsx']}
+    if operation=='storage.status':
+        s3.data['approved/status.json']=b'{}'
+        transfer_execute(repo,StorageRequest(request_id='status.seed',operation='pull',objects=[PullObject(key='approved/status.json',sha256=digest(b'{}'))]),s3=s3)
+        kw['transfer_receipt_id']='status.seed'
+    request(repo,operation,**kw)
+    remote=tmp_path/'remote.git';git(repo,'init','--bare','-q',str(remote));git(repo,'remote','add','origin',str(remote));git(repo,'push','-q','origin','HEAD')
+    monkeypatch.setenv('GITHUB_ACTIONS','true');monkeypatch.setenv('GITHUB_REPOSITORY','synthetic/workspace');monkeypatch.setenv('WORKSPACE_PRIVATE_REPOSITORY','true')
+    result=pending(repo,push=True,s3=s3)
+    assert result['publication']['status']=='PUSHED'
+    receipt=read_json(repo,'reports/requests/workspace.1.json')
+    assert receipt['status']=='COMPLETE',receipt['errors']
+    assert head(repo)==git(remote,'rev-parse','HEAD').stdout.decode().strip()
+    assert json.loads(git(remote,'show','HEAD:reports/requests/workspace.1.json').stdout)['request_hash']==receipt['request_hash']
+    assert pipeline.validate(repo)['integrity']=='PASS'

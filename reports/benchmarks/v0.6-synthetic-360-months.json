@@ -1,0 +1,195 @@
+{
+  "ai_cost": null,
+  "code_hash": "e20ec9959110ba49e55530ee024c4be05dfc5b7089c2f1ec3a4002796aacd6b4",
+  "dataset": "SYNTHETIC_ONLY",
+  "dependencies": {
+    "openpyxl": "3.1.5",
+    "pydantic": "2.13.4"
+  },
+  "input_hash": "e83cf504b38a8c3d52d6198058144f158ab162392a6e33295df54391349e69ed",
+  "measurements": [
+    {
+      "cache_hits": 20,
+      "calculation_units": 20,
+      "case": "unchanged",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.018169,
+        "portfolio": 0.002075,
+        "valuation": 0.009139,
+        "wealth": 0.162487
+      },
+      "sample": 1,
+      "seconds": 12.085204176000843
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 0,
+      "case": "unchanged",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.009194,
+        "portfolio": 0.001493,
+        "valuation": 0.009406,
+        "wealth": 0.092823
+      },
+      "sample": 1,
+      "seconds": 11.272958076000577
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 0,
+      "case": "unchanged",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.005855,
+        "portfolio": 0.001206,
+        "valuation": 0.006895,
+        "wealth": 0.053299
+      },
+      "sample": 2,
+      "seconds": 10.927833361998637
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 20,
+      "case": "unchanged",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.011049,
+        "portfolio": 0.00159,
+        "valuation": 0.009276,
+        "wealth": 0.114068
+      },
+      "sample": 2,
+      "seconds": 12.216165347999777
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 20,
+      "case": "unchanged",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.006003,
+        "portfolio": 0.001072,
+        "valuation": 0.005842,
+        "wealth": 0.085597
+      },
+      "sample": 3,
+      "seconds": 11.27058407200093
+    },
+    {
+      "cache_hits": 20,
+      "calculation_units": 0,
+      "case": "unchanged",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.012516,
+        "portfolio": 0.003378,
+        "valuation": 0.010388,
+        "wealth": 0.099045
+      },
+      "sample": 3,
+      "seconds": 12.71011684000041
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 20,
+      "case": "one_assumption_changed",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.006047,
+        "portfolio": 0.001247,
+        "valuation": 0.010566,
+        "wealth": 0.079184
+      },
+      "sample": 1,
+      "seconds": 11.248024590999194
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 1,
+      "case": "one_assumption_changed",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.009258,
+        "portfolio": 0.001905,
+        "valuation": 0.010845,
+        "wealth": 0.179179
+      },
+      "sample": 1,
+      "seconds": 8.216752304999318
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 1,
+      "case": "one_assumption_changed",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.005189,
+        "portfolio": 0.000916,
+        "valuation": 0.005757,
+        "wealth": 0.060692
+      },
+      "sample": 2,
+      "seconds": 8.013909428998886
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 20,
+      "case": "one_assumption_changed",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.011035,
+        "portfolio": 0.001639,
+        "valuation": 0.009187,
+        "wealth": 0.141584
+      },
+      "sample": 2,
+      "seconds": 8.210358055999677
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 20,
+      "case": "one_assumption_changed",
+      "mode": "full",
+      "phase_seconds": {
+        "integration": 0.006026,
+        "portfolio": 0.000956,
+        "valuation": 0.00662,
+        "wealth": 0.145602
+      },
+      "sample": 3,
+      "seconds": 10.455468963000385
+    },
+    {
+      "cache_hits": 19,
+      "calculation_units": 1,
+      "case": "one_assumption_changed",
+      "mode": "cached",
+      "phase_seconds": {
+        "integration": 0.00524,
+        "portfolio": 0.001273,
+        "valuation": 0.005126,
+        "wealth": 0.097121
+      },
+      "sample": 3,
+      "seconds": 15.792093620999367
+    }
+  ],
+  "months": 360,
+  "one_assumption_changed": {
+    "cached_median_seconds": 8.216752304999318,
+    "full_median_seconds": 10.455468963000385,
+    "full_over_cached_ratio": 1.272457605499312
+  },
+  "parity": "PASS",
+  "python_version": "3.12.14",
+  "samples": 3,
+  "timing_scope": "sandbox clone, calculation, workbook, local commit and parity validation",
+  "unchanged": {
+    "cached_median_seconds": 11.272958076000577,
+    "full_median_seconds": 12.085204176000843,
+    "full_over_cached_ratio": 1.07205261427606
+  }
+}
