@@ -1,0 +1,83 @@
+{
+  "accepted_inputs_changed": false,
+  "as_of": "2026-10-09",
+  "authorized_by": "Synthetic CI verification",
+  "base_commit": "4f8bad9ca80b8c4193d398ad15474a10ff3ca124",
+  "base_run_id": "20261031T090009615428Z-0c7ddfaf",
+  "canonical_unchanged": true,
+  "deferred_work": [],
+  "errors": [],
+  "expected_run_resolution": "DYNAMIC_SYNTHETIC_SEED_ONLY",
+  "fixture_sha256": "88f46f79d617920492b808b368cf9bf01ab3c398cc6c227e9852bbf9d2cb9831",
+  "instruction": "Verify immutable fixed-fixture GitHub request routing only",
+  "missing_inputs": [
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_hash": "e20ec9959110ba49e55530ee024c4be05dfc5b7089c2f1ec3a4002796aacd6b4",
+      "code_version": "0.6.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "field": "migration",
+      "input_hash": "592307b35c452d32d56e3458d31a4d0c085743baed565f2093588a640e5da899",
+      "market_cutoff_metadata": "2026-10-09",
+      "next_action": "Inspect and map the real PSX_Mean_Reversion_DataStore.xlsx before claiming parity",
+      "owner": "validation",
+      "reason": "LEGACY_DATASTORE_NOT_MIGRATED",
+      "record_id": "data_gaps.0",
+      "run_id": "20261031T090010368969Z-e73f5b6a",
+      "schema_version": "1.0",
+      "source_ids": [
+        "input.592307b35c452d32d56e3458d31a4d0c085743baed565f2093588a640e5da899"
+      ],
+      "ticker": null,
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    },
+    {
+      "assumption_ids": [
+        "policy.2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b"
+      ],
+      "code_hash": "e20ec9959110ba49e55530ee024c4be05dfc5b7089c2f1ec3a4002796aacd6b4",
+      "code_version": "0.6.0",
+      "confidence": "SYNTHETIC",
+      "effective_date": "2026-10-09",
+      "field": "timing",
+      "input_hash": "592307b35c452d32d56e3458d31a4d0c085743baed565f2093588a640e5da899",
+      "market_cutoff_metadata": "2026-10-09",
+      "next_action": "Supply documented calibration before claiming integrated completion",
+      "owner": "validation",
+      "reason": "UNVALIDATED_MEAN_REVERSION_METHODOLOGY",
+      "record_id": "data_gaps.1",
+      "run_id": "20261031T090010368969Z-e73f5b6a",
+      "schema_version": "1.0",
+      "source_ids": [
+        "input.592307b35c452d32d56e3458d31a4d0c085743baed565f2093588a640e5da899"
+      ],
+      "ticker": null,
+      "units": "PKR / shares / fraction as named",
+      "upstream_run_ids": [],
+      "validation_status": "VALIDATED"
+    }
+  ],
+  "modules": {
+    "cross-asset": "COMPLETE",
+    "retirement": "COMPLETE",
+    "valuation": "COMPLETE"
+  },
+  "operation": "simulate",
+  "origin_request": "requests/smoke/verify-v06.json",
+  "outputs": {
+    "snapshot": "reports/smoke/verify-v06/snapshot.json",
+    "workbook": "reports/smoke/verify-v06/Investment_Workspace.xlsx"
+  },
+  "publication_commit": "e464f557892f3c786b5faa81d7220de83e0150d3",
+  "request_hash": "b3e8cade070cb558236b11225b55306e271f2e02e72bc95d2b2f6536f7435d78",
+  "request_id": "verify-v06",
+  "result_run_id": "20261031T090010368969Z-e73f5b6a",
+  "source_code_hash": "e20ec9959110ba49e55530ee024c4be05dfc5b7089c2f1ec3a4002796aacd6b4",
+  "status": "COMPLETE",
+  "synthetic_only": true
+}
