@@ -1,0 +1,36 @@
+{
+  "analysis_run_id": "20261026T152031546516Z-5f77f1ad",
+  "attempted_at": "2026-10-26T15:21:59.548338+00:00",
+  "base_commit": "94386b8f9080143bf9194c1f3c312b860ad537f0",
+  "code_hash": "3bd0707b8337b0cde6739740adb57936d2e2b38e6516087241a7e435214ee059",
+  "code_version": "0.2.0",
+  "dependencies": {
+    "openpyxl": "3.1.5",
+    "pydantic": "2.13.4"
+  },
+  "dependency_lock_hash": "0e6b2c31679b9d5726dc8c9d108aa78f5cb4dfb2aeff1120c139cbedb532aed5",
+  "error": null,
+  "input_hash": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+  "market_cutoff": "2026-10-09",
+  "offline": true,
+  "output_hashes": {
+    "data/canonical/portfolio.json": "847dcd964b147bd1145466fc987397b775446883300f357c6cfc85d078fb4ea1",
+    "data/evidence/sources.json": "1f138272490e52b40952f5e0a82b046f4bc5b6f5dcfd920526f6eac250fe4539",
+    "reports/latest/summary.json": "ca9ccdaf2841e7e762393b6caee9337ed93ace19f886d866f649467d5f105502",
+    "runs/20261026T152159474843Z-b2428599/changes.json": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570",
+    "runs/20261026T152159474843Z-b2428599/coverage.json": "394051476589c8d001a28b272f0cc417e48057e6f672b4e1b6163693cbd55464",
+    "runs/20261026T152159474843Z-b2428599/input.json": "f7e46148c5af19d0e06edcfffe6b661e851d33406278545dc24ef9487cf65892",
+    "runs/20261026T152159474843Z-b2428599/snapshot.json": "847dcd964b147bd1145466fc987397b775446883300f357c6cfc85d078fb4ea1",
+    "runs/20261026T152159474843Z-b2428599/usage.json": "5e46193c6c9263d495b7f3e9dd51e15815749c5905f2feec60e7e6e96c8bacc6",
+    "runs/20261026T152159474843Z-b2428599/validation.json": "b210011e30fb0aff1c6b325d75f40d915060d996d3c766b6f8c429e97f5f19cc",
+    "workbooks/Investment_Workspace.xlsx": "fa9760a959fb36f407a8cf8d4074757cfeef38528fea3fb06ee9e000e7a4fdcc"
+  },
+  "policy_hash": "2df429d66e495fb1169bd0ae55c856a17ff340d040bfaf4c4b632837f763676b",
+  "publication_status": "LOCAL_ONLY",
+  "python_version": "3.12.14",
+  "run_id": "20261026T152159474843Z-b2428599",
+  "schema_version": "1.0",
+  "scope": "Phase 1 portfolio; valuation blocked",
+  "status": "NO_MATERIAL_CHANGE",
+  "workflow": "export-excel"
+}
