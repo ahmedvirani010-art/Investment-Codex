@@ -1,0 +1,74 @@
+{
+  "phase": 6,
+  "status": "BLOCKED_EXTERNAL_PREREQUISITES",
+  "assessment_date": "2026-10-31",
+  "published_release": "e88446f6e4bb4b873cff7ffb1839f5a12d2f910a",
+  "repository": {
+    "name": "ahmedvirani010-art/Investment-Codex",
+    "private": false,
+    "default_branch": "work",
+    "verification": "GitHub repository API"
+  },
+  "storage": {
+    "bucket": "investmentcodex",
+    "plugin_authenticated": true,
+    "text_roundtrip_sha256": "PASS",
+    "managed_public_access_enabled": true,
+    "public_access_user_choice": "LEAVE_ENABLED",
+    "binary_workbook_roundtrip": "NOT_VERIFIED",
+    "source_objects": 0,
+    "approved_objects": 1,
+    "approved_objects_scope": "Synthetic connectivity probe only"
+  },
+  "local_preflight": {
+    "assessment_date": "2026-10-31",
+    "local_revision": "727f39c13363c24dab1f46d1bbf30a75cd1fdc17",
+    "run_status": "PARTIAL",
+    "error": null,
+    "dataset": {
+      "dataset_id": "legacy.demo",
+      "mode": "DEMO"
+    },
+    "evaluation_as_of": "2026-10-31",
+    "market_cutoff": "2026-10-09",
+    "data_gap_reasons": [
+      "STALE_HOLDINGS",
+      "STALE_PRICE",
+      "UNCONFIGURED_RISK_LIMITS"
+    ],
+    "canonical_unchanged": true,
+    "boto3_available_locally": false,
+    "local_runner_settings_present": {
+      "R2_ENDPOINT_URL": false,
+      "R2_BUCKET": false,
+      "R2_ACCESS_KEY_ID": true,
+      "R2_SECRET_ACCESS_KEY": true
+    },
+    "github_actions_secrets_configuration": "NOT_INSPECTABLE_WITH_CONNECTED_GITHUB_TOOLS"
+  },
+  "phase5_ci": {
+    "run_id": 41212499565,
+    "passed": 392,
+    "conclusion": "success"
+  },
+  "open_requirements": [
+    "Verified private repository for guarded production requests",
+    "Approved real sources and original PRD documents",
+    "Actual legacy workbook and explicit mapping/parity review",
+    "Version-matched real methodology approval",
+    "Automated runner R2 credentials/connectivity or separately implemented plugin transport",
+    "Binary workbook end-to-end verification",
+    "Manual real-data production demonstrations",
+    "Confirmed Monday macro and special-monitor schedules/methodologies"
+  ],
+  "policies": {
+    "production": false,
+    "storage": false,
+    "workspace-requests": false,
+    "wealth-requests": false,
+    "schedules": false
+  },
+  "github_actions_credentials": "UNKNOWN: connector cannot inspect/configure secrets",
+  "financial_imports_performed": false,
+  "activation_performed": false
+}

@@ -1,0 +1,718 @@
+{
+  "Source": {
+    "required": [
+      "source_id",
+      "title",
+      "publisher",
+      "effective_date",
+      "locator",
+      "evidence_label"
+    ],
+    "optional": [
+      "url",
+      "published_at",
+      "accessed_at",
+      "document_sha256",
+      "coverage_through",
+      "owner"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 18
+  },
+  "Snapshot": {
+    "required": [
+      "timestamp",
+      "source_id",
+      "cash",
+      "positions"
+    ],
+    "optional": [],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 59
+  },
+  "Transaction": {
+    "required": [
+      "transaction_id",
+      "timestamp",
+      "settlement_date",
+      "kind",
+      "source_id"
+    ],
+    "optional": [
+      "ticker",
+      "quantity",
+      "price",
+      "amount",
+      "fees",
+      "taxes",
+      "ratio"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 74
+  },
+  "Price": {
+    "required": [
+      "ticker",
+      "session_date",
+      "close",
+      "source_id"
+    ],
+    "optional": [
+      "adjustment_basis"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 116
+  },
+  "Earnings": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "period_start",
+      "period_end",
+      "period_label",
+      "basis",
+      "reported_pat",
+      "weighted_average_shares",
+      "reported_eps",
+      "share_basis_date",
+      "quality_rationale"
+    ],
+    "optional": [
+      "supersedes",
+      "adjustments",
+      "quality"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 269
+  },
+  "ValuationModel": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "earnings_id",
+      "method",
+      "model_version",
+      "origin",
+      "methodology_rationale",
+      "forward_period",
+      "forward_basis",
+      "accounting_basis",
+      "share_basis_date",
+      "horizon_years",
+      "sovereign_benchmark",
+      "benchmark_date",
+      "equity_risk_premium",
+      "discount_rate_rationale",
+      "margin_of_safety",
+      "scenarios"
+    ],
+    "optional": [
+      "supersedes",
+      "certification",
+      "approval",
+      "legacy_column_map",
+      "historical_outputs",
+      "reproduction_tolerance",
+      "timing_gate",
+      "risk_gate",
+      "event_checked_through",
+      "covered_event_ids",
+      "dividend_tax_rate",
+      "capital_gains_tax_rate",
+      "entry_cost_rate",
+      "exit_cost_rate",
+      "liabilities_per_share"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 333
+  },
+  "Scenario": {
+    "required": [
+      "scenario_id",
+      "name",
+      "forward_eps",
+      "sustainable_dps",
+      "exit_price",
+      "horizon_dividends",
+      "exit_basis",
+      "dividends_rationale",
+      "discount_rate",
+      "terminal_growth",
+      "drivers"
+    ],
+    "optional": [
+      "book_value_per_share",
+      "sustainable_roe",
+      "fcfe",
+      "shares",
+      "terminal_value",
+      "payout_crosscheck",
+      "crosscheck_tolerance",
+      "contract_years",
+      "components",
+      "parent_net_debt",
+      "parent_liabilities",
+      "minority_interests",
+      "normalized_operating_eps",
+      "earnings_multiple",
+      "surplus_cash_per_share",
+      "cash_income_excluded",
+      "profile",
+      "sector_forecasts",
+      "operating_forecasts"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 293
+  },
+  "Dividend": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "announcement_date",
+      "dps"
+    ],
+    "optional": [
+      "supersedes",
+      "dividend_type",
+      "ex_date",
+      "record_date",
+      "book_closure_start",
+      "book_closure_end",
+      "payment_date",
+      "dates_verified",
+      "settlement_rule",
+      "tax_rate",
+      "receipt_transaction_ids",
+      "revision_kind"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 378
+  },
+  "FinancialFact": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "period_start",
+      "period_end",
+      "accounting_basis",
+      "line_item",
+      "amount",
+      "units",
+      "locator"
+    ],
+    "optional": [
+      "supersedes",
+      "quantity_unit"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 697
+  },
+  "ScenarioProfile": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "name",
+      "profile_version",
+      "financial_basis",
+      "period",
+      "horizon_years",
+      "assumptions"
+    ],
+    "optional": [
+      "supersedes"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 949
+  },
+  "ScenarioLink": {
+    "required": [
+      "profile_id",
+      "financial_basis",
+      "period",
+      "horizon_years"
+    ],
+    "optional": [
+      "mapping_rationale",
+      "source_ids",
+      "overrides",
+      "bindings",
+      "binding_units"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 964
+  },
+  "BankForecast": {
+    "required": [
+      "period",
+      "accounting_basis",
+      "source_ids",
+      "fact_ids",
+      "fact_bindings",
+      "shares",
+      "tax_charge",
+      "engine",
+      "earning_assets",
+      "funding",
+      "fees",
+      "treasury_income",
+      "operating_costs",
+      "credit_charge",
+      "opening_equity",
+      "oci",
+      "capital_movements",
+      "opening_eligible_capital",
+      "eligible_oci",
+      "risk_weighted_assets",
+      "minimum_capital_ratio",
+      "distributable_reserves",
+      "cash_available",
+      "proposed_dividends"
+    ],
+    "optional": [
+      "methodology_version"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 992
+  },
+  "EPForecast": {
+    "required": [
+      "period",
+      "accounting_basis",
+      "source_ids",
+      "fact_ids",
+      "fact_bindings",
+      "shares",
+      "tax_charge",
+      "engine",
+      "commodities",
+      "royalties",
+      "fixed_operating_costs",
+      "depletion",
+      "net_interest",
+      "other_income",
+      "opening_receivables",
+      "collections",
+      "other_working_capital_increase",
+      "other_wc_excludes_receivables",
+      "capex",
+      "net_borrowing",
+      "cash_income_included"
+    ],
+    "optional": [
+      "methodology_version"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 1026
+  },
+  "IndustrialForecast": {
+    "required": [
+      "period",
+      "accounting_basis",
+      "source_ids",
+      "fact_ids",
+      "fact_bindings",
+      "shares",
+      "tax_charge",
+      "engine",
+      "products",
+      "fixed_operating_costs",
+      "depreciation",
+      "net_interest",
+      "other_income",
+      "receivables_increase",
+      "inventory_increase",
+      "payables_increase",
+      "capex",
+      "net_borrowing",
+      "midcycle_rationale",
+      "cash_income_included"
+    ],
+    "optional": [
+      "methodology_version"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 1051
+  },
+  "TimingPolicy": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "benchmark",
+      "relative_lookback",
+      "momentum_lag",
+      "short_window",
+      "long_window",
+      "slope_sessions",
+      "flat_slope",
+      "liquidity_window",
+      "min_average_traded_value",
+      "min_rank_universe",
+      "max_extension",
+      "breakout_window",
+      "reversion_window",
+      "oversold_z",
+      "overbought_z",
+      "calibration_rationale"
+    ],
+    "optional": [
+      "supersedes",
+      "calibration_status",
+      "backtest_start",
+      "backtest_cost_rate"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 513
+  },
+  "MarketHistory": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "action_coverage_through",
+      "bars"
+    ],
+    "optional": [
+      "supersedes",
+      "role",
+      "price_basis",
+      "actions"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 471
+  },
+  "RiskLimits": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "max_position_weight",
+      "max_sector_weight",
+      "max_factor_weight",
+      "minimum_cash_weight",
+      "per_trade_risk_budget",
+      "max_daily_participation",
+      "correlation_lookback",
+      "min_correlation_observations"
+    ],
+    "optional": [
+      "supersedes",
+      "user_confirmed"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 578
+  },
+  "WatchCandidate": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "author",
+      "thesis",
+      "invalidation",
+      "portfolio_fit",
+      "desired_entry",
+      "stop_price",
+      "approach_fraction",
+      "next_review"
+    ],
+    "optional": [
+      "supersedes",
+      "requested_stage",
+      "catalyst_ids",
+      "requested_target_weight"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 620
+  },
+  "ICProposal": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "action",
+      "reason",
+      "confidence",
+      "invalidation",
+      "opportunity_cost"
+    ],
+    "optional": [
+      "supersedes",
+      "candidate_id"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 640
+  },
+  "ICDecision": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "proposal_id",
+      "decision",
+      "decided_by",
+      "decided_at",
+      "reason",
+      "reviewed_basis_hash"
+    ],
+    "optional": [
+      "supersedes",
+      "approved_quantity",
+      "transaction_ids"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 1070
+  },
+  "WealthAsset": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "economic_id",
+      "kind",
+      "available_from"
+    ],
+    "optional": [
+      "supersedes",
+      "balance",
+      "currency",
+      "portfolio_link",
+      "fx_to_pkr",
+      "fx_date",
+      "fx_source_id"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 789
+  },
+  "WealthFlow": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "kind",
+      "amount",
+      "price_basis",
+      "frequency",
+      "starts",
+      "ends"
+    ],
+    "optional": [
+      "supersedes",
+      "asset_key",
+      "amount_basis",
+      "economic_claim_id"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 813
+  },
+  "WealthScenario": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "name",
+      "annual_inflation",
+      "returns"
+    ],
+    "optional": [
+      "supersedes",
+      "profile"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 843
+  },
+  "RetirementPlan": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "start_date",
+      "retirement_date",
+      "months",
+      "monthly_spending_real",
+      "withdrawal_order"
+    ],
+    "optional": [
+      "supersedes"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 856
+  },
+  "CrossAssetHistory": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "asset_key",
+      "currency",
+      "return_basis",
+      "quotes"
+    ],
+    "optional": [
+      "supersedes",
+      "fx_source_id"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 880
+  },
+  "WorkbookMigration": {
+    "required": [
+      "record_id",
+      "ticker",
+      "effective_date",
+      "valid_until",
+      "source_ids",
+      "kind",
+      "workbook_sha256",
+      "mappings",
+      "approved_by",
+      "reason",
+      "store_permitted"
+    ],
+    "optional": [
+      "supersedes",
+      "methodology_reviewed",
+      "ignored_sheets",
+      "absolute_tolerance",
+      "relative_tolerance"
+    ],
+    "file": "src/investment_workspace/schemas.py",
+    "line": 766
+  },
+  "WorkspaceRequest": {
+    "required": [
+      "request_id",
+      "operation",
+      "dataset_id",
+      "expected_run_id",
+      "as_of",
+      "authorized_by",
+      "instruction"
+    ],
+    "optional": [
+      "schema_version",
+      "workflows",
+      "package",
+      "package_artifact",
+      "storage",
+      "transfer_receipt_id",
+      "archive_paths"
+    ],
+    "file": "src/investment_workspace/workspace_requests.py",
+    "line": 51
+  },
+  "WorkspacePackage": {
+    "required": [],
+    "optional": [
+      "portfolio",
+      "sources",
+      "market_cutoff",
+      "research",
+      "integration",
+      "wealth",
+      "financials",
+      "scenario_profiles",
+      "decisions",
+      "originals"
+    ],
+    "file": "src/investment_workspace/workspace_requests.py",
+    "line": 38
+  },
+  "StorageRequest": {
+    "required": [
+      "request_id",
+      "operation"
+    ],
+    "optional": [
+      "objects",
+      "run_id",
+      "paths"
+    ],
+    "file": "src/investment_workspace/object_storage.py",
+    "line": 22
+  },
+  "EvidencePackage": {
+    "required": [],
+    "optional": [
+      "schema_version",
+      "bundle",
+      "sources",
+      "market_cutoff",
+      "research",
+      "integration",
+      "wealth",
+      "financials",
+      "scenario_profiles",
+      "decisions",
+      "files"
+    ],
+    "file": "src/investment_workspace/intake.py",
+    "line": 19
+  },
+  "WealthRequest": {
+    "required": [
+      "request_id",
+      "operation",
+      "dataset_id",
+      "expected_run_id",
+      "as_of",
+      "instruction",
+      "authorized_by"
+    ],
+    "optional": [
+      "schema_version",
+      "modules",
+      "package"
+    ],
+    "file": "src/investment_workspace/wealth_requests.py",
+    "line": 27
+  },
+  "WealthPacket": {
+    "required": [
+      "wealth"
+    ],
+    "optional": [
+      "sources",
+      "market_cutoff"
+    ],
+    "file": "src/investment_workspace/wealth_requests.py",
+    "line": 21
+  }
+}

@@ -265,3 +265,10 @@ uv run --locked investment-workspace storage pull --file inputs/private/pull.jso
 Production, unified requests and R2 processing ship disabled. Real sources, explicit
 methodology approval, private repository access and live transfer verification remain
 required before operation. There is no trade execution or automatic live acquisition.
+
+## ChatGPT prompt catalogue
+
+See the [34-prompt catalogue](docs/prompts/README.md) for required inputs,
+execution routes and Excel/JSON/Markdown outputs, with a downloadable PDF guide.
+[Project custom instructions](docs/investment-project-instructions.txt) describe
+the research process, controlled R2 transfers and PDF presentation requirement.

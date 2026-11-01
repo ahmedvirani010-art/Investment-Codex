@@ -1,0 +1,13 @@
+{
+  "schema_version": "1.0",
+  "request_id": "example-screen-001",
+  "operation": "run",
+  "dataset_id": "REPLACE_DATASET_ID",
+  "expected_run_id": "REPLACE_PUBLISHED_RUN_ID",
+  "as_of": "2026-11-01",
+  "authorized_by": "REPLACE_REQUESTING_USER",
+  "instruction": "Run the accepted valuation screen and report missing inputs",
+  "workflows": [
+    "valuation"
+  ]
+}
